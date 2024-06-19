@@ -5,3 +5,7 @@ test vtoroj
 
 
 zagruzka s oleg
+
+
+
+proverka pravil iz oleg
