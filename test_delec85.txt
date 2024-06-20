@@ -2,10 +2,6 @@ pervij test
 proba pera
 test vtoroj
 
+proverka iz delec85
 
-
-zagruzka s oleg
-
-
-
-proverka pravil iz oleg
+proverka iz delec85 nomer 2
