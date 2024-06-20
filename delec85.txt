@@ -3,3 +3,6 @@ privet
 proverka s pravilami
 
 otpravka iz delec85
+
+
+proverka iz oleg
