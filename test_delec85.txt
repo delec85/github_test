@@ -4,4 +4,12 @@ test vtoroj
 
 proverka iz delec85
 
+
+zagruzka s oleg
+
+
+
+proverka pravil iz oleg
+
+proverka iz oleg nomer 3
 proverka iz delec85 nomer 2
