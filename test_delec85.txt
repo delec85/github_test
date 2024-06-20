@@ -9,3 +9,5 @@ zagruzka s oleg
 
 
 proverka pravil iz oleg
+
+proverka iz oleg nomer 3
