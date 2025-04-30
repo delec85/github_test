@@ -1,67 +1,36 @@
-// client/public/boots_img
- //* all bots img
+//!COMPONENTS
 
- // client/public/prof_img/avatar.webp
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/components/HeaderButton.tsx
 
+import { useNavigate } from "react-router-dom";
 
+const HeaderButton = () => {
+  const navigate = useNavigate();
 
+  return (
+    <div className="fixed top-4 left-6 z-50">
+      <button
+        onClick={() => navigate("/")}
+        className="text-transparent bg-clip-text 
+             bg-gradient-to-r from-purple-400 via-indigo-300 to-cyan-300
+             text-xl sm:text-xl md:text-2xl lg:text-3xl font-bold 
+             bg-transparent 
+             transition-transform duration-300 ease-in-out 
+             hover:scale-110"
+             style={{ 
+              textShadow:`
+                2px 2px 10px rgba(255, 255, 255, 0.3),
+                0px 0px 25px rgba(209, 255, 249, 0.6)
+                `,
+            }}
+      >
+        NEON PONG
+      </button>
+    </div>
+  );
+};
 
- // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/styles/cursor.css
-
-
- .neon-cursor {
-	position: fixed;
-	width: 20px;
-	height: 20px;
-	background: radial-gradient(
-	  circle,
-	  rgba(255, 153, 255, 1) 20%,
-	  rgba(102, 255, 255, 0.3) 80%
-	);
-	border-radius: 50%;
-	pointer-events: none;
-	z-index: 9999;
-	transform: translate(-50%, -50%);
-	box-shadow: 
-	  0 0 15px rgba(255, 153, 255, 1),
-	  0 0 30px rgba(102, 255, 255, 0.7),
-	  0 0 50px rgba(255, 255, 204, 0.5);
-	transition: transform 0.2s ease;
-  }
-  
-  /* Шлейф */
-  .cursor-trail {
-	position: fixed;
-	width: 20px;
-	height: 20px;
-	background: radial-gradient(
-	  circle,
-	  rgba(255, 153, 255, 0.8) 20%,
-	  rgba(102, 255, 255, 0.2) 70%,
-	  transparent 80%
-	);
-	border-radius: 50%;
-	pointer-events: none;
-	z-index: 9998;
-	transform: translate(-50%, -50%); /* Центрируем шлейф */
-	animation: fade-out 1s ease-out forwards;
-	box-shadow: 
-	  0 0 10px rgba(255, 153, 255, 0.8),
-	  0 0 20px rgba(102, 255, 255, 0.5);
-  }
-  
-  /* Анимация для исчезновения шлейфа */
-  @keyframes fade-out {
-	0% {
-	  opacity: 0.8;
-	  transform: translate(-50%, -50%) scale(1); /* Учитываем центрирование */
-	}
-	100% {
-	  opacity: 0;
-	  transform: translate(-50%, -50%) scale(0.3); /* Учитываем центрирование */
-	}
-  }
-
+export default HeaderButton;
 
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/components/NeonCursor.tsx
@@ -122,6 +91,493 @@ const NeonCursor: React.FC = () => {
 };
 
 export default NeonCursor;
+
+
+
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/components/LogIn_SignIn.tsx
+
+import React from 'react';
+
+const AuthButtons = ({ openModal }: { openModal: (mode: "login" | "signup") => void }) => {
+  return (
+    <div className="fixed top-4 right-8 z-50 flex gap-4">
+      <button
+        onClick={()=> openModal("login")}
+        className="px-2 py-1 rounded-lg font-bold bg-transparent outline-3 outline-offset-2 outline-double 
+            border border-blue-300  text-white transition-all duration-300 ease-in-out hover:scale-110
+            text-xs sm:text-xs md:text-sm lg:text-sm xl:text-sm"
+		style={{ 
+			textShadow:`
+			  0 0 4px rgba(102, 0, 255, 0.9),
+			  0 0 8px rgba(102, 0, 255, 0.7),
+			  0 0 16px rgba(102, 0, 255, 0.5),
+			  0 0 32px rgba(102, 0, 255, 0.3)
+			  `,
+		  }}
+	    >
+        LOG IN
+      </button>
+      <button
+        onClick={()=> openModal("signup")}
+        className="px-2 py-1 rounded-lg font-bold bg-transparent outline-3 outline-offset-2 outline-double
+             border border-blue-300  text-white transition-all duration-300 ease-in-out hover:scale-110
+             text-xs sm:text-xs md:text-sm lg:text-sm xl:text-sm"
+		style={{ 
+			textShadow:`
+			  0 0 4px rgba(102, 0, 255, 0.9),
+			  0 0 8px rgba(102, 0, 255, 0.7),
+			  0 0 16px rgba(102, 0, 255, 0.5),
+			  0 0 32px rgba(102, 0, 255, 0.3)
+			  `,
+		  }}
+	    >
+        SIGN UP
+      </button>
+    </div>
+  );
+};
+
+
+export default AuthButtons;
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/components/Layout.tsx
+
+import React, { useState } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
+import AuthPage from '../pages/AuthPage/AuthPage';
+
+const Layout: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'login' | 'signup'>('login');
+  const location = useLocation();
+
+  const openModal = (mode: 'login' | 'signup' = 'login') => {
+    setModalMode(mode);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  // Не показываем модальное окно, если текущий маршрут /login или /signup
+  const isAuthRoute = location.pathname === '/login' || location.pathname === '/signup';
+
+  return (
+    <div>
+      <Outlet context={{ openModal }} />
+      {isModalOpen && !isAuthRoute && <AuthPage mode={modalMode} onClose={closeModal} />}
+    </div>
+  );
+};
+
+export default Layout;
+
+
+//! ROUTER
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/router/AppRouter.tsx
+
+import MainPage from '../pages/MainPage/MainPage';
+import Profile from '../pages/Profile/Profile';
+import AuthPage from '../pages/AuthPage/AuthPage';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import Layout from '../components/Layout';
+
+const AppRouter = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<MainPage />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/login" element={<AuthPage mode="login" onClose={() => {}} />} />
+          <Route path="/signup" element={<AuthPage mode="signup" onClose={() => {}} />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+export default AppRouter;
+
+// AUTHPAGE
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pages/AuthPage/AuthPage.css
+
+.form_wrap {
+  width: 400px;
+  margin: 2rem auto;
+}
+
+.form1 {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form_group {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.error_message {
+  /* color: rgb(255, 0, 0); */
+  font-size: 20px;
+  margin-top: 10px;
+}
+
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pages/AuthPage/AuthPage.tsx
+
+import React, { useState } from "react";
+//import { useNavigate } from "react-router-dom";
+import SignInForm from "./LogInForm";
+import SignUpForm from "./SignUpForm";
+
+const AuthPage = ({ onClose, mode }: { onClose: () => void; mode: "login" | "signup" }) => {
+  const [isLogin, setIsLogin] = useState(mode === "login");
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+      <div className="bg-white bg-opacity-30 rounded-lg shadow-xl p-6 max-w-md w-full relative">
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 text-blue-100 hover:text-red-500 text-lg font-bold"
+        >
+          ✕
+        </button>
+        {isLogin ? (
+          <SignInForm onSuccess={onClose} />
+        ) : (
+          <SignUpForm onSuccess={onClose} />
+        )}
+        <div className="text-center mt-4">
+          <button
+            onClick={() => setIsLogin(!isLogin)}
+            className="text-indigo-200 hover:underline"
+          >
+            {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AuthPage;
+
+
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pages/AuthPage/LogInForm.tsx
+
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+
+const SignInForm = ({ onSuccess }: { onSuccess: () => void }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [err, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      localStorage.setItem("token", data.accessToken); // Store JWT token
+      console.log("Logged in with JWT:", data.accessToken);
+      toast.success("Successfully logged in!");
+      onSuccess(); // Close modal or redirect
+      navigate("/profile");
+    } catch (error: any) {
+      setError(error.message || "Login failed");
+    }
+  };
+
+  return (
+    <div className="p-6 max-w-md mx-auto">
+      <h2 className="text-2xl tracking-wide font-bold mb-5 text-center">Login</h2>
+      <form onSubmit={handleLogin} className="space-y-4">
+        {err && <p className="text-red-500">{err}</p>}
+        <div className="space-y-2">
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full px-4 py-2 bg-black text-white bg-opacity-30 border rounded-lg focus:outline-none 
+                    focus:ring-2 focus:ring-indigo-800"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full px-4 py-2 bg-black text-white bg-opacity-30 border rounded-lg focus:outline-none 
+                    focus:ring-2 focus:ring-indigo-800"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <div className="flex justify-center">
+          <button
+            type="submit"
+            className="w-1/2 bg-indigo-950 hover:bg-rose-950 text-white font-medium py-2 px-4 rounded-lg transition duration-300"
+          >
+            Login
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default SignInForm;
+
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pages/AuthPage/SignUpForm.tsx
+
+
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+interface SignUpFormProps {
+  onSuccess?: () => void;  // Made optional if not always provided
+  closeModal?: () => void;  // Add closeModal prop
+}
+
+const SignUpForm = ({ onSuccess, closeModal }: SignUpFormProps) => {
+  const [name, setName] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [err, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("http://localhost:3000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, nickname, email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      localStorage.setItem("token", data.accessToken);
+      console.log("Signed up with JWT:", data.accessToken);
+
+      // Call both success handlers if they exist
+      onSuccess?.();
+      closeModal?.();
+
+      navigate("/profile");
+    } catch (error: any) {
+      setError(error.message || "Signup failed");
+    }
+  };
+
+  return (
+    <div className="p-6 max-w-md mx-auto">
+      <h2 className="text-2xl tracking-wide font-bold mb-5 text-center">Registration</h2>
+      <form onSubmit={handleSignUp} className="space-y-4">
+        {err && <p className="text-red-500 text-center">{err}</p>}
+        <div className="space-y-2">
+          <input
+            type="text"
+            placeholder="Name"
+            className="w-full bg-black text-white bg-opacity-30 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-800"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Nickname"
+            className="w-full px-4 py-2 bg-black text-white bg-opacity-30 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-800"
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full px-4 py-2 bg-black text-white bg-opacity-30 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-800"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full px-4 py-2 bg-black text-white bg-opacity-30 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-800"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <div className="flex justify-center">
+          <button
+            type="submit"
+            className="w-1/2 bg-indigo-950 hover:bg-rose-950 text-white font-medium py-2 px-4 rounded-lg transition duration-300"
+          >
+            Sign Up
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default SignUpForm;
+
+
+
+
+//! MAINPAGE
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pages/MainPage/MainPage.tsx
+
+import React from 'react';
+import myImage from '../../assets/mainPageImages/Main_Image.png';
+import { useOutletContext } from "react-router-dom";
+
+const MainPage = () => {
+  const { openModal } = useOutletContext<{ openModal: (mode?: 'login' | 'signup') => void }>();
+  
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="container mx-auto flex flex-col items-center justify-center relative">
+        <div className="relative w-full pt-10">
+          <img 
+            src={myImage} 
+            alt="Main Visual" 
+            className="w-full h-auto rounded-xl shadow-neon transition-shadow duration-300 ease-in-out"
+          />
+          <div className="absolute top-20 left-1/2 transform -translate-x-1/2">
+            <button 
+              className="rounded-lg outline-3 outline-offset-2 outline-double border-4 border-blue-300 
+                        px-8 sm:px-10 md:px-14 py-4 sm:py-3 md:py-5
+                        font-bold text-transparent text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl
+                        bg-clip-text bg-gradient-to-r from-indigo-300 via-blue-300 to-sky-500
+                        hover:from-red-50 hover:via-indigo-200 hover:to-purple-100
+                        animate-pulse hover:animate-none
+                        transition-all duration-300 ease-in-out hover:scale-110 w-full sm:w-auto text-center"
+              style={{ 
+                textShadow: '2px 2px 10px rgba(209, 255, 249, 0.6)', 
+                boxShadow: '0 0 15px 6px rgba(117, 184, 255, 0.5)'
+              }}
+              onClick={() => openModal('login')} // Открываем логин по умолчанию
+            >
+              START GAME
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MainPage;
+
+
+
+
+
+
+//! CLIENT
+
+
+
+
+// client/public/boots_img
+ //* all bots img
+
+ // client/public/prof_img/avatar1.webp
+
+
+ // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/styles/cursor.css
+
+ .neon-cursor {
+	position: fixed;
+	width: 20px;
+	height: 20px;
+	background: radial-gradient(
+	  circle,
+	  rgba(255, 153, 255, 1) 20%,
+	  rgba(102, 255, 255, 0.3) 80%
+	);
+	border-radius: 50%;
+	pointer-events: none;
+	z-index: 9999;
+	transform: translate(-50%, -50%);
+	box-shadow: 
+	  0 0 15px rgba(255, 153, 255, 1),
+	  0 0 30px rgba(102, 255, 255, 0.7),
+	  0 0 50px rgba(255, 255, 204, 0.5);
+	transition: transform 0.2s ease;
+  }
+  
+  /* Шлейф */
+  .cursor-trail {
+	position: fixed;
+	width: 20px;
+	height: 20px;
+	background: radial-gradient(
+	  circle,
+	  rgba(255, 153, 255, 0.8) 20%,
+	  rgba(102, 255, 255, 0.2) 70%,
+	  transparent 80%
+	);
+	border-radius: 50%;
+	pointer-events: none;
+	z-index: 9998;
+	transform: translate(-50%, -50%); /* Центрируем шлейф */
+	animation: fade-out 1s ease-out forwards;
+	box-shadow: 
+	  0 0 10px rgba(255, 153, 255, 0.8),
+	  0 0 20px rgba(102, 255, 255, 0.5);
+  }
+  
+  /* Анимация для исчезновения шлейфа */
+  @keyframes fade-out {
+	0% {
+	  opacity: 0.8;
+	  transform: translate(-50%, -50%) scale(1); /* Учитываем центрирование */
+	}
+	100% {
+	  opacity: 0;
+	  transform: translate(-50%, -50%) scale(0.3); /* Учитываем центрирование */
+	}
+  }
 
 
 
@@ -194,6 +650,8 @@ export default NeonCursor;
 
 
 //  /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/types/UserInfo.ts
+
+
 export type MatchResult = {
 	date: string;
 	weekday: string;
@@ -201,11 +659,11 @@ export type MatchResult = {
   };
   
   export type UserInfo = {
+	id: string;
 	username: string;
 	avatar: string;
 	email: string;
-	firstName: string;
-	lastName: string;
+	name: string;
 	password: string;
 	wins: number;
 	losses: number;
@@ -248,10 +706,10 @@ export type MatchResult = {
 	};
   };
 
-
   
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/types/fakeNames.ts
+
 
 import { UserInfo } from "./UserInfo";
 import { toast } from "react-hot-toast";
@@ -261,8 +719,7 @@ export const defaultFriends: UserInfo[] = [
     username: "Zoe",
     avatar: "/boots_img/ghost.png",
     email: "zoe@example.com",
-    firstName: "Zoe",
-    lastName: "Fast",
+    name: "Zoe",
     password: "secret",
     online: true,
     wins: 11,
@@ -278,8 +735,7 @@ export const defaultFriends: UserInfo[] = [
     username: "Mika",
     avatar: "/boots_img/ninja.png",
     email: "mika@example.com",
-    firstName: "Mika",
-    lastName: "Stealth",
+    name: "Mika",
     password: "secret",
     online: false,
     wins: 5,
@@ -295,8 +751,7 @@ export const defaultFriends: UserInfo[] = [
     username: "Alex",
     avatar: "/boots_img/chef.png",
     email: "alex@example.com",
-    firstName: "Alex",
-    lastName: "Cook",
+    name: "Alex",
     password: "secret",
     online: true,
     wins: 9,
@@ -312,8 +767,7 @@ export const defaultFriends: UserInfo[] = [
     username: "Tina",
     avatar: "/boots_img/mermaid.png",
     email: "tina@example.com",
-    firstName: "Tina",
-    lastName: "Wave",
+    name: "Tina",
     password: "secret",
     online: false,
     wins: 3,
@@ -410,21 +864,21 @@ export const defaultPlayers: UserInfo[] = defaultFriends.map((player) => ({
 
 
 import React, { useEffect, useState } from 'react';
+import { UserInfo } from './types/UserInfo';
 
 interface AvatarProps {
-  src: string;
-  username: string;
+  user: Pick<UserInfo, "avatar" | "username">;
   className?: string;
 }
 
-const Avatar: React.FC<AvatarProps> = ({ src, username, className }) => {
-  const [imgSrc, setImgSrc] = useState(src);
+const Avatar: React.FC<AvatarProps> = ({ user, className }) => {
+  const [imgSrc, setImgSrc] = useState(user.avatar);
   const [isImageLoaded, setIsImageLoaded] = useState(true);
 
   useEffect(() => {
-    setImgSrc(src);
+    setImgSrc(user.avatar);
     setIsImageLoaded(true);
-  }, [src]);
+  }, [user.avatar]);
 
   return (
     <div className="flex flex-col items-center">
@@ -446,12 +900,12 @@ const Avatar: React.FC<AvatarProps> = ({ src, username, className }) => {
         {isImageLoaded ? (
           <img
             src={imgSrc}
-            alt={username}
+            alt={user.username}
             className="w-full h-full object-cover"
             onError={() => setIsImageLoaded(false)}
           />
         ) : (
-          <span className="text-sm font-semibold px-2">{username}</span>
+          <span className="text-sm font-semibold px-2">{user.username}</span>
         )}
       </div>
     </div>
@@ -576,7 +1030,6 @@ import React, { useState } from "react";
 import { UserInfo } from "./types/UserInfo";
 import PlayerCard from "./PlayerCard";
 import { CardWrapper } from "./types/ui";
-import { toast } from 'react-hot-toast';
 
 interface Props {
   friends: UserInfo[];
@@ -590,17 +1043,19 @@ const EnhancedFriendsList: React.FC<Props> = ({ friends }) => {
   };
 
   return (
-    <div className="
-      flex 
-      flex-col 
-      gap-2 
-      overflow-y-auto 
-      max-h-[500px] 
-      pr-1 
-      scrollbar-thin 
-      scrollbar-thumb-white/60 
-      scrollbar-track-transparent
-    ">
+    <div
+      className="
+        flex
+        flex-col
+        gap-2
+        overflow-y-auto
+        max-h-[500px]
+        pr-1
+        scrollbar-thin
+        scrollbar-thumb-white/60
+        scrollbar-track-transparent
+      "
+    >
       {friends.map((friend, index) => {
         const isExpanded = expandedIndex === index;
 
@@ -608,28 +1063,21 @@ const EnhancedFriendsList: React.FC<Props> = ({ friends }) => {
           <CardWrapper key={index} onClick={() => toggleExpand(index)}>
             <div className="flex justify-between items-center">
               <div className="font-bold text-base">{friend.username}</div>
-              <div className={`text-sm ${friend.online ? "text-green-400" : "text-gray-400"}`}>
+              <div
+                className={`text-sm ${friend.online ? "text-green-400" : "text-gray-400"}`}
+              >
                 {friend.online ? "Online" : "Offline"}
               </div>
             </div>
-
-            {/* Expanded content */}
-            <div className={`
-              transition-all 
-              duration-300 
-              overflow-hidden 
-              ${isExpanded ? "max-h-[600px] mt-3" : "max-h-0"}
-            `}>
-              <PlayerCard
-                name={friend.username}
-                online={friend.online}
-                wins={friend.wins}
-                losses={friend.losses}
-                avatar={friend.avatar}
-                history={friend.history}
-                onRemove={() => toast(`${friend.username} removed from friends 👋`)}
-                onChallenge={() => toast.success(`Challenge sent to ${friend.username}`)}
-              />
+            <div
+              className={`
+                transition-all
+                duration-300
+                overflow-hidden
+                ${isExpanded ? "max-h-[600px] mt-3" : "max-h-0"}
+              `}
+            >
+              <PlayerCard user={friend} />
             </div>
           </CardWrapper>
         );
@@ -645,7 +1093,6 @@ export default EnhancedFriendsList;
 
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameModelSelector.tsx
-
 
 import React from "react";
 
@@ -671,7 +1118,7 @@ const GameModeSelector: React.FC = () => {
         flex
         flex-col
         items-center
-        gap-4
+        gap-9
       "
     >
       {modes.map((mode, index) => (
@@ -718,61 +1165,62 @@ export default GameModeSelector;
 
 
 
+
+
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/PlayArena.tsx
 
 
+
 import React from 'react';
+import { UserInfo } from './types/UserInfo';
 
 interface ArenaProps {
-  username: string;
+  user: Pick<UserInfo, "username" | "avatar">;
   opponentImage?: string | null;
-  playerImage?: string | null;
   opponentName?: string;
 }
 
 const Arena: React.FC<ArenaProps> = ({
-  username,
+  user,
   opponentImage,
-  playerImage,
-  opponentName
+  opponentName,
 }) => {
   return (
     <div className="
-				flex
-				flex-col
-				items-center
-				justify-center
-				gap-4
-				mt-8
-				px-4
-				sm:flex-row
-				sm:gap-10
-				sm:mt-10">
-					
+      flex
+      flex-col
+      items-center
+      justify-center
+      gap-4
+      mt-8
+      px-4
+      sm:flex-row
+      sm:gap-10
+      sm:mt-10">
       {/* Player 1 */}
       <div className="
-				h-32
-				w-32
-				sm:w-36
-				sm:h-36
-				md:w-40
-				md:h-40
-				lg:w-44
-				lg:h-44
-				xl:w-48
-				xl:h-48
-				rounded-full
-				bg-gray-700
-				bg-opacity-60
-				shadow-inner
-				overflow-hidden
-				flex
-				items-center
+        h-32
+        w-32
+        sm:w-36
+        sm:h-36
+        md:w-40
+        md:h-40
+        lg:w-44
+        lg:h-44
+        xl:w-48
+        xl:h-48
+        rounded-full
+        bg-gray-700
+        bg-opacity-60
+        shadow-inner
+        overflow-hidden
+        flex
+        items-center
         drop-shadow-[0_0_8px_white]
-				justify-center">
-        {playerImage ? (
+        justify-center">
+        {user.avatar ? (
           <img
-            src={playerImage}
+            src={user.avatar}
             alt="Player 1"
             className="
               w-full
@@ -780,12 +1228,9 @@ const Arena: React.FC<ArenaProps> = ({
               object-cover
               rounded-full"/>
         ) : (
-          <div className="flex 
-		  				flex-col 
-						items-center 
-						text-xs">
+          <div className="flex flex-col items-center text-xs">
             <span className="font-semibold">Player 1</span>
-            <span className="text-gray-300 mt-1">{username}</span>
+            <span className="text-gray-300 mt-1">{user.username}</span>
           </div>
         )}
       </div>
@@ -795,26 +1240,26 @@ const Arena: React.FC<ArenaProps> = ({
 
       {/* Player 2 */}
       <div className="
-				w-32
-				h-32
-				sm:w-36
-				sm:h-36
-				md:w-40
-				md:h-40
-				lg:w-44
-				lg:h-44
-				xl:w-48
-				xl:h-48
-				rounded-full
-				bg-gray-700
-				bg-opacity-60
-				shadow-inner
-				overflow-hidden
-				flex
-				items-center
-				justify-center
+        w-32
+        h-32
+        sm:w-36
+        sm:h-36
+        md:w-40
+        md:h-40
+        lg:w-44
+        lg:h-44
+        xl:w-48
+        xl:h-48
+        rounded-full
+        bg-gray-700
+        bg-opacity-60
+        shadow-inner
+        overflow-hidden
+        flex
+        items-center
+        justify-center
         drop-shadow-[0_0_8px_white]
-				relative">
+        relative">
         {opponentImage ? (
           <>
             <img
@@ -838,10 +1283,7 @@ const Arena: React.FC<ArenaProps> = ({
             )}
           </>
         ) : (
-          <div className="flex
-		  				flex-col 
-						items-center 
-						text-xs">
+          <div className="flex flex-col items-center text-xs">
             <span className="font-semibold">Player 2</span>
             <span className="text-gray-300 mt-1">Waiting...</span>
           </div>
@@ -858,107 +1300,97 @@ export default Arena;
 
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/PlayerCard.tsx
+
+
 import React from "react";
 import UserHeader from "./UserHeader";
-import { MatchResult, calculateUserStats } from "./types/UserInfo";
+import { UserInfo } from "./types/UserInfo";
 
 interface Props {
-  name: string;
-  online: boolean;
-  wins: number;
-  losses: number;
-  onRemove?: () => void;
-  onChallenge?: () => void;
-  avatar?: string;
-  history?: MatchResult[];
+  user: UserInfo;
 }
 
-const PlayerCard: React.FC<Props> = ({
-  name,
-  online,
-  wins,
-  losses,
-  onRemove,
-  onChallenge,
-  avatar = "/boots_img/robot.png",
-  history = [],
-}) => {
-  const { winRate, latestDate, winsToday, lossesToday } = calculateUserStats(
-    wins,
-    losses,
-    history
-  );
-
+const PlayerCard: React.FC<Props> = ({ user }) => {
   return (
     <div
       className="
-      bg-gray-900
-      rounded-xl
-      p-4
-      shadow-md
-      space-y-4
-      w-full
-      flex
-      flex-col
-      items-center
-    "
+        bg-gray-900
+        rounded-xl
+        p-4
+        shadow-md
+        space-y-4
+        w-full
+        flex
+        flex-col
+        items-center
+      "
     >
-      <UserHeader username={name} avatar={avatar} wins={wins} losses={winRate} />
-      {latestDate && (
-        <p className="text-sm 
-					text-purple-300 
-					text-center 
-					font-semibold">
-          {name} on {latestDate}: {winsToday} wins, {lossesToday} losses
-        </p>
-      )}
-      <div className="flex gap-3 
-	  				justify-center 
-	  				flex-wrap pt-2">
-        {onRemove && (
+      <UserHeader
+        user={{
+          username: user.username,
+          avatar: user.avatar,
+          wins: user.wins,
+          losses: user.losses,
+          history: user.history,
+        }}
+      />
+      <div
+        className="
+          flex
+          gap-3
+          justify-center
+          flex-wrap
+          pt-2
+        "
+      >
+        {user.onRemove && (
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onRemove();
+              user.onRemove!();
             }}
-            className="px-4 
-					py-2 
-					rounded-md 
-					text-sm 
-					font-semibold 
-					text-red-400 
-					border-2 
-					border-red-500 
-					hover:bg-red-600 
-					hover:text-white 
-					transition 
-					duration-300 
-					shadow-[0_0_12px_#ff4d4d] 
-					hover:shadow-[0_0_18px_#ff4d4d]"
+            className="
+              px-4
+              py-2
+              rounded-md
+              text-sm
+              font-semibold
+              text-red-400
+              border-2
+              border-red-500
+              hover:bg-red-600
+              hover:text-white
+              transition
+              duration-300
+              shadow-[0_0_12px_#ff4d4d]
+              hover:shadow-[0_0_18px_#ff4d4d]
+            "
           >
             Remove
           </button>
         )}
-        {onChallenge && (
+        {user.onChallenge && (
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onChallenge();
+              user.onChallenge!();
             }}
-            className="px-4 
-					py-2 
-					rounded-md 
-					text-sm 
-					font-semibold 
-					text-cyan-300 
-					border-2 
-					border-cyan-400 
-					hover:bg-cyan-500 
-					hover:text-black 
-					transition 
-					duration-300 
-					shadow-[0_0_12px_#00ffff] 
-					hover:shadow-[0_0_18px_#00ffff]"
+            className="
+              px-4
+              py-2
+              rounded-md
+              text-sm
+              font-semibold
+              text-cyan-300
+              border-2
+              border-cyan-400
+              hover:bg-cyan-500
+              hover:text-black
+              transition
+              duration-300
+              shadow-[0_0_12px_#00ffff]
+              hover:shadow-[0_0_18px_#00ffff]
+            "
           >
             Challenge
           </button>
@@ -974,20 +1406,16 @@ export default PlayerCard;
 
 
 
-
-
-
-
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/PlayersList.tsx
+
 
 import React, { useState } from "react";
 import PlayerCard from "./PlayerCard";
 import { CardWrapper } from "./types/ui";
-import { toast } from 'react-hot-toast';
-import { UserInfo } from "./types/UserInfo"; // Импортируем UserInfo
+import { UserInfo } from "./types/UserInfo";
 
 type Props = {
-  players: UserInfo[]; // Заменяем EnhancedFriend на UserInfo
+  players: UserInfo[];
 };
 
 const PlayersList: React.FC<Props> = ({ players }) => {
@@ -998,17 +1426,19 @@ const PlayersList: React.FC<Props> = ({ players }) => {
   };
 
   return (
-    <div className="
-      flex 
-      flex-col 
-      gap-2 
-      overflow-y-auto 
-      max-h-[500px] 
-      pr-1 
-      scrollbar-thin 
-      scrollbar-thumb-white/60 
-      scrollbar-track-transparent
-    ">
+    <div
+      className="
+        flex
+        flex-col
+        gap-2
+        overflow-y-auto
+        max-h-[500px]
+        pr-1
+        scrollbar-thin
+        scrollbar-thumb-white/60
+        scrollbar-track-transparent
+      "
+    >
       {players.map((player, index) => {
         const isExpanded = expandedIndex === index;
 
@@ -1016,26 +1446,21 @@ const PlayersList: React.FC<Props> = ({ players }) => {
           <CardWrapper key={index} onClick={() => toggleExpand(index)}>
             <div className="flex justify-between items-center">
               <div className="font-bold text-base">{player.username}</div>
-              <div className={`text-sm ${player.online ? "text-green-400" : "text-gray-400"}`}>
+              <div
+                className={`text-sm ${player.online ? "text-green-400" : "text-gray-400"}`}
+              >
                 {player.online ? "Online" : "Offline"}
               </div>
             </div>
-
-            <div className={`
-              transition-all 
-              duration-300 
-              overflow-hidden 
-              ${isExpanded ? "max-h-[600px] mt-3" : "max-h-0"}
-            `}>
-              <PlayerCard
-                name={player.username}
-                online={player.online}
-                wins={player.wins}
-                losses={player.losses}
-                avatar={player.avatar}
-                history={player.history}
-                onChallenge={() => toast.success(`Challenged ${player.username}`)}
-              />
+            <div
+              className={`
+                transition-all
+                duration-300
+                overflow-hidden
+                ${isExpanded ? "max-h-[600px] mt-3" : "max-h-0"}
+              `}
+            >
+              <PlayerCard user={player} />
             </div>
           </CardWrapper>
         );
@@ -1047,59 +1472,6 @@ const PlayersList: React.FC<Props> = ({ players }) => {
 export default PlayersList;
 
 
-
-
-
-// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/WinsLossChart.tsx
-
-import React from 'react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-  CartesianGrid,
-} from 'recharts';
-import { MatchResult } from './types/UserInfo';
-import MatchHistory from './MatchHistory';
-
-interface WinLossChartProps {
-  history?: MatchResult[];
-}
-
-const getLast7Dates = () => {
-  const result: { date: string; weekday: string }[] = [];
-  const options: Intl.DateTimeFormatOptions = { weekday: 'short' };
-
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split('T')[0];
-    const weekday = d.toLocaleDateString('en-US', options);
-    result.push({ date: dateStr, weekday });
-  }
-
-  return result;
-};
-
-const transformHistoryToChartData = (history: MatchResult[] = []) => {
-  const last7Days = getLast7Dates();
-
-  return last7Days.map(({ date, weekday }) => {
-    const dayMatches = history.filter((match) => match.date === date);
-    const wins = dayMatches.filter((m) => m.result === 'win').length;
-    const losses = dayMatches.filter((m) => m.result === 'loss').length;
-
-    return {
-      day: weekday,
-      wins,
-      losses,
-    };
-  });
-};
 
 const WinLossChart: React.FC<WinLossChartProps> = ({ history = [] }) => {
   const data = transformHistoryToChartData(history);
@@ -1156,6 +1528,7 @@ export default WinLossChart;
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/Profile.tsx
 
+
 import React, { useState, useEffect } from "react";
 import PlayersList from "./PlayersList";
 import BotCard from "./BotCard";
@@ -1163,82 +1536,14 @@ import { bots } from "./types/botsData";
 import PlayArena from "./PlayArena";
 import ProfileActions from "./ProfileActions";
 import EnhancedFriendsList from "./EnhancedFriendsList";
-import WinLossChart from "./WinsLossChart";
 import ProfileModal from "./ProfileModal";
 import { PrimaryButton } from "./types/ui";
-import GameModeSelector from "./GameModelSelector";
+import GameModeSelector from "./GameModeSelector";
 import UserHeader from "./UserHeader";
 import { UserInfo, MatchResult } from "./types/UserInfo";
 import { toast } from "react-hot-toast";
-import { defaultFriends, defaultPlayers } from "./types/fakeNames";
-
-// Попытка импорта axios с проверкой
-let axios: any;
-try {
-  axios = require("axios");
-} catch (error) {
-  console.warn("axios не установлен, используется локальный вариант загрузки данных");
-  axios = null;
-}
-
-// Захардкоженные данные для локального варианта (только для user)
-const defaultUser: UserInfo = {
-  username: "Legend",
-  avatar: "/prof_img/avatar.webp",
-  email: "legend@example.com",
-  firstName: "Legi",
-  lastName: "Gnoman",
-  password: "default",
-  wins: 30,
-  losses: 0,
-  online: true,
-  history: [
-    { date: "2025-04-21", weekday: "Mon", result: "win" },
-    { date: "2025-04-22", weekday: "Tue", result: "loss" },
-    { date: "2025-04-23", weekday: "Wed", result: "win" },
-    { date: "2025-04-23", weekday: "Wed", result: "win" },
-    { date: "2025-04-23", weekday: "Wed", result: "loss" },
-    { date: "2025-04-24", weekday: "Thu", result: "win" },
-  ],
-};
-
-// Функции для взаимодействия с сервером (если axios доступен)
-const fetchUserFromServer = async (): Promise<UserInfo> => {
-  if (!axios) throw new Error("axios не доступен");
-  const response = await axios.get("/api/user");
-  return response.data;
-};
-
-const saveUserToServer = async (user: UserInfo): Promise<void> => {
-  if (!axios) throw new Error("axios не доступен");
-  await axios.post("/api/user", user);
-};
-
-const fetchFriendsFromServer = async (): Promise<UserInfo[]> => {
-  if (!axios) throw new Error("axios не доступен");
-  const response = await axios.get("/api/friends");
-  return response.data.map((friend: UserInfo) => ({
-    ...friend,
-    onRemove: () => toast(`${friend.username} removed from friends 👋`),
-    onChallenge: () => toast.success(`Challenge sent to ${friend.username}`),
-  }));
-};
-
-const fetchPlayersFromServer = async (): Promise<UserInfo[]> => {
-  if (!axios) throw new Error("axios не доступен");
-  const response = await axios.get("/api/players");
-  return response.data.map((player: UserInfo) => ({
-    ...player,
-    onChallenge: () => toast.success(`Challenged ${player.username}`),
-  }));
-};
-
-// Локальная загрузка данных
-const loadLocalData = () => ({
-  user: defaultUser,
-  friends: defaultFriends,
-  players: defaultPlayers,
-});
+import { Buffer } from 'buffer';
+import { useNavigate } from 'react-router-dom';
 
 const Profile: React.FC = () => {
   const [selectedBot, setSelectedBot] = useState<(typeof bots)[0] | null>(null);
@@ -1248,111 +1553,206 @@ const Profile: React.FC = () => {
   const [friends, setFriends] = useState<UserInfo[]>([]);
   const [players, setPlayers] = useState<UserInfo[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  // Загрузка данных
+  const decodeToken = (token: string) => {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      const decoded = JSON.parse(jsonPayload);
+      console.log("Decoded token:", decoded);
+      return decoded;
+    } catch (e) {
+      console.error("Failed to decode token:", e);
+      return null; // Возвращаем null вместо ошибки
+    }
+  };
+
+  const fetchDataFromServer = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found in localStorage");
+      throw new Error("No token found, please log in.");
+    }
+
+    console.log("Fetching data with token:", token);
+    const response = await fetch("http://localhost:3000/users", {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`Server responded with status ${response.status}: ${response.statusText}`);
+      throw new Error(`Failed to fetch users: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("Server response:", data);
+
+    if (!data.users || !Array.isArray(data.users)) {
+      console.error("Invalid server response: 'users' field is missing or not an array");
+      throw new Error("Invalid server response");
+    }
+
+    // Поскольку id в токене отсутствует, будем считать последнего зарегистрированного пользователя текущим
+    const currentUser = data.users[data.users.length - 1]; // Временное решение: берём последнего пользователя
+    if (!currentUser) {
+      console.error("No users found in response:", data.users);
+      throw new Error("Current user not found");
+    }
+
+    const userData: UserInfo = {
+      id: currentUser.id || 'unknown',
+      username: currentUser.nickname || currentUser.name || "Unknown",
+      avatar: currentUser.image ? `data:image/jpeg;base64,${Buffer.from(currentUser.image).toString('base64')}` : "/prof_img/avatar1.png",
+      email: currentUser.email || "",
+      name: currentUser.name || "",
+      password: "",
+      wins: 0,
+      losses: 0,
+      online: !!currentUser.online,
+      history: [],
+    };
+
+    // Оставляем friends и players пустыми
+    const friendsData: UserInfo[] = [];
+    const playersData: UserInfo[] = [];
+
+    return { userData, friendsData, playersData };
+  };
+
+  const saveUserData = async (updatedUser: UserInfo) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found in localStorage");
+        throw new Error("No token found, please log in.");
+      }
+
+      await fetch("http://localhost:3000/updateProfile", {
+        method: "PATCH",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: updatedUser.id,
+          name: updatedUser.name,
+          nickname: updatedUser.username,
+          password: updatedUser.password || undefined,
+        }),
+      });
+
+      if (updatedUser.avatar && updatedUser.avatar.startsWith("data:image")) {
+        const base64Data = updatedUser.avatar.split(',')[1];
+        const blob = await (await fetch(`data:image/jpeg;base64,${base64Data}`)).blob();
+        const formData = new FormData();
+        formData.append("id", updatedUser.id);
+        formData.append("file", blob, "avatar.jpg");
+
+        await fetch("http://localhost:3000/uploadPicture", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+          body: formData,
+        });
+      }
+
+      setUser(updatedUser);
+      toast.success('Profile updated successfully!');
+    } catch (err) {
+      console.error("Error saving data:", err);
+      setError("Couldn’t save the data. Please try again.");
+      toast.error("Couldn’t save the data. Please try again.");
+    }
+  };
+
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        if (axios) {
-          const userData = await fetchUserFromServer();
-          setUser(userData);
-
-          const friendsData = await fetchFriendsFromServer();
-          setFriends(friendsData);
-
-          const playersData = await fetchPlayersFromServer();
-          setPlayers(playersData);
-        } else {
-          const localData = loadLocalData();
-          setUser(localData.user);
-          setFriends(localData.friends);
-          setPlayers(localData.players);
+        const { userData, friendsData, playersData } = await fetchDataFromServer();
+        setUser(userData);
+        setFriends(friendsData);
+        setPlayers(playersData);
+      } catch (err: any) {
+        console.error("Detailed error:", err.message, err.stack);
+        setError(`Couldn’t load data from the server: ${err.message}`);
+        toast.error(`Couldn’t load data: ${err.message}`);
+        if (err.message.includes("No token found") || err.message.includes("Current user not found")) {
+          localStorage.removeItem("token");
+          navigate("/signup");
         }
-      } catch (err) {
-        console.error("Ошибка загрузки данных:", err);
-        const localData = loadLocalData();
-        setUser(localData.user);
-        setFriends(localData.friends);
-        setPlayers(localData.players);
-        setError("Не удалось загрузить данные с сервера. Используются локальные данные.");
       } finally {
         setIsLoading(false);
       }
     };
 
     loadData();
-  }, []);
+  }, [navigate]);
 
-  // Сохранение данных
-  const saveUserData = async (updatedUser: UserInfo) => {
-    try {
-      if (axios) {
-        await saveUserToServer(updatedUser);
-      } else {
-        console.warn("axios не доступен, данные сохранены локально");
-      }
-      setUser(updatedUser);
-    } catch (err) {
-      console.error("Ошибка сохранения данных:", err);
-      setError("Не удалось сохранить данные. Пожалуйста, попробуйте снова.");
-    }
-  };
-
-  // Обработчик сохранения из ProfileModal
   const handleSaveProfile = async (data: {
     avatar: string;
     username: string;
-    email: string;
     password: string;
   }) => {
     if (!user) return;
 
-    const updatedUser = {
+    const updatedUser: UserInfo = {
       ...user,
       avatar: data.avatar,
       username: data.username,
-      email: data.email,
       password: data.password || user.password,
     };
     await saveUserData(updatedUser);
     setIsModalOpen(false);
   };
 
-  // Обработчик завершения игры
   const handleGameEnd = async (result: "win" | "loss") => {
     if (!user) return;
 
     const today = new Date().toISOString().split("T")[0];
     const weekday = new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(new Date());
 
-    const updatedUser = {
+    const updatedUser: UserInfo = {
       ...user,
       history: [...user.history, { date: today, weekday, result }],
       wins: result === "win" ? user.wins + 1 : user.wins,
       losses: result === "loss" ? user.losses + 1 : user.losses,
     };
 
-    await saveUserData(updatedUser);
+    setUser(updatedUser);
   };
 
-  // Обработчик нажатия на кнопку "PLAY"
   const handlePlayClick = () => {
+    if (!user) {
+      toast.error("User data not loaded!");
+      return;
+    }
+
     if (!selectedBot) {
-      toast.error("Пожалуйста, выберите бота для игры!");
+      toast.error("Please select a bot to play with first!");
       return;
     }
 
     const result = Math.random() > 0.5 ? "win" : "loss";
     handleGameEnd(result);
-    toast.success(`Игра завершена! Вы ${result === "win" ? "победили" : "проиграли"} против ${selectedBot.name}!`);
+    toast.success(`Game over! You ${result === "win" ? "won" : "lost"} against ${selectedBot.name}!`);
   };
 
-  // Обработка состояний загрузки и ошибок
   if (isLoading) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center text-white">
-        Загрузка...
+        Loading data, please wait...
       </div>
     );
   }
@@ -1368,327 +1768,95 @@ const Profile: React.FC = () => {
   if (!user) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center text-white">
-        Данные пользователя не найдены.
+        Couldn’t find user data.
       </div>
     );
   }
 
   return (
     <>
-      <div
-        className="
-          min-h-screen
-          w-full
-          text-white
-          flex
-          flex-col
-          overflow-y-auto
-          justify-between
-        "
-      >
-        <div
-          className="
-            flex
-            justify-between
-            items-center
-            px-6
-            py-4
-          "
-        >
+      <div className="min-h-screen w-full text-white flex flex-col overflow-y-auto justify-between">
+        <div className="flex justify-between items-center px-6 py-4">
           <div
-            className="
-              text-transparent
-              bg-clip-text
-              bg-gradient-to-r
-              from-red-400
-              via-indigo-300
-              to-green-300
-              text-2xl
-              sm:text-3xl
-              font-bold
-              transition-transform
-              duration-300
-              ease-in-out
-              hover:scale-110
-            "
-            style={{
-              textShadow: `0 0 20px rgba(255, 255, 255, 0.3), 0 0 32px rgba(255, 0, 255, 0.3)`,
-            }}
+            className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-indigo-300 to-green-300 text-2xl sm:text-3xl font-bold transition-transform duration-300 ease-in-out hover:scale-110"
+            style={{ textShadow: `0 0 20px rgba(255, 255, 255, 0.3), 0 0 32px rgba(255, 0, 255, 0.3)` }}
           >
             NEON PONG
           </div>
           <ProfileActions
-            username={user.username}
-            online={user.online}
+            user={{ username: user.username, online: user.online, email: user.email }}
             onProfileClick={() => setIsModalOpen(true)}
           />
         </div>
 
-        <div
-          className="
-            hidden
-            xl:grid
-            xl:grid-cols-6
-            gap-4
-            px-4
-            flex-grow
-          "
-        >
-          <div
-            className="
-              pt-4
-              flex
-              flex-col
-              items-start
-              col-span-1
-              max-w-[220px]
-            "
-          >
-            <h2
-              className="
-                text-lg
-                font-semibold
-                mb-2
-                text-left
-                drop-shadow-[0_0_8px_red]
-              "
-            >
-              Friends
-            </h2>
+        <div className="hidden xl:grid xl:grid-cols-6 gap-4 px-4 flex-grow">
+          <div className="pt-4 flex flex-col items-start col-span-1 max-w-[220px]">
+            <h2 className="text-lg font-semibold mb-2 text-left drop-shadow-[0_0_8px_red]">Friends</h2>
             <EnhancedFriendsList friends={friends} />
           </div>
-
-          <div
-            className="
-              pt-6
-              col-span-1
-              ml-12
-            "
-          >
-            <WinLossChart history={user.history} />
+          <div className="pt-6 col-span-1 mx-auto">
+            <div className="w-full max-w-[750px] bg-gray-800 bg-opacity-40 rounded-lg p-1 shadow-lg ml-14 mt-32">
+              <video src="/videos/fight_gif.mp4" autoPlay loop muted playsInline className="w-full h-auto rounded-lg" />
+            </div>
           </div>
-
-          <div
-            className="
-              pt-8
-              flex
-              flex-col
-              items-center
-              justify-start
-              gap-6
-              col-span-2
-            "
-          >
+          <div className="pt-8 flex flex-col items-center justify-start gap-6 col-span-2">
             <UserHeader
-              username={user.username}
-              avatar={user.avatar}
-              wins={user.wins}
-              losses={user.losses}
-              history={user.history}
+              user={{ username: user.username, avatar: user.avatar, wins: user.wins, losses: user.losses, history: user.history }}
             />
             <PrimaryButton onClick={handlePlayClick}>PLAY</PrimaryButton>
             <PlayArena
-              username={user.username}
-              opponentImage={selectedBot?.image ?? null}
-              opponentName={selectedBot?.name}
-              playerImage={user.avatar}
+              user={{ username: user.username, avatar: user.avatar }}
+              opponentImage={selectedBot ? selectedBot.image : null}
+              opponentName={selectedBot ? selectedBot.name : undefined}
             />
           </div>
-
-          <div
-            className="
-              pt-8
-              flex
-              justify-center
-              col-span-1
-            "
-          >
-            <div
-              className="
-                flex
-                flex-col
-                items-center
-                justify-start
-                pt-5
-                px-2
-                xl:px-5
-                w-full
-                max-w-[320px]
-                xl:max-w-full
-              "
-            >
+          <div className="pt-8 flex justify-center col-span-1">
+            <div className="flex flex-col items-center justify-start pt-5 px-2 xl:px-5 w-full max-w-[320px] xl:max-w-full">
               <GameModeSelector />
             </div>
           </div>
-
-          <div
-            className="
-              pt-4
-              flex
-              flex-col
-              items-end
-              col-span-1
-              max-w-[220px]
-              ml-auto
-            "
-          >
-            <h2
-              className="
-                text-lg
-                font-semibold
-                mb-2
-                text-right
-                drop-shadow-[0_0_8px_red]
-              "
-            >
-              Players
-            </h2>
+          <div className="pt-4 flex flex-col items-end col-span-1 max-w-[220px] ml-auto">
+            <h2 className="text-lg font-semibold mb-2 text-right drop-shadow-[0_0_8px_red]">Players</h2>
             <PlayersList players={players} />
           </div>
         </div>
 
-        <div
-          className="
-            flex
-            xl:hidden
-            flex-col
-            items-center
-            px-4
-            gap-4
-          "
-        >
-          <div
-            className="
-              w-full
-              max-w-md
-            "
-          >
-            <WinLossChart history={user.history} />
-          </div>
-
+        <div className="flex xl:hidden flex-col items-center px-4 gap-4">
           <UserHeader
-            username={user.username}
-            avatar={user.avatar}
-            wins={user.wins}
-            losses={user.losses}
-            history={user.history}
+            user={{ username: user.username, avatar: user.avatar, wins: user.wins, losses: user.losses, history: user.history }}
           />
           <PrimaryButton onClick={handlePlayClick}>PLAY</PrimaryButton>
           <PlayArena
-            username={user.username}
-            opponentImage={selectedBot?.image ?? null}
-            opponentName={selectedBot?.name}
-            playerImage={user.avatar}
+            user={{ username: user.username, avatar: user.avatar }}
+            opponentImage={selectedBot ? selectedBot.image : null}
+            opponentName={selectedBot ? selectedBot.name : undefined}
           />
-
-          <div
-            className="
-              w-full
-              max-w-xs
-              mt-4
-            "
-          >
+          <div className="w-full max-w-xs mt-4">
             <GameModeSelector />
           </div>
-
-          <div
-            className="
-              w-full
-              flex
-              flex-col
-              sm:flex-row
-              sm:justify-between
-              gap-4
-            "
-          >
-            <div
-              className="
-                w-full
-                sm:w-1/2
-                min-w-0
-              "
-            >
-              <h2
-                className="
-                  text-lg
-                  font-semibold
-                  mb-2
-                  text-left
-                  drop-shadow-[0_0_8px_red]
-                "
-              >
-                Friends
-              </h2>
+          <div className="w-full flex flex-col sm:flex-row sm:justify-between gap-4">
+            <div className="w-full sm:w-1/2 min-w-0">
+              <h2 className="text-lg font-semibold mb-2 text-left drop-shadow-[0_0_8px_red]">Friends</h2>
               <EnhancedFriendsList friends={friends} />
             </div>
-            <div
-              className="
-                w-full
-                sm:w-1/2
-                min-w-0
-                flex
-                flex-col
-                items-end
-              "
-            >
-              <h2
-                className="
-                  text-lg
-                  font-semibold
-                  mb-2
-                  text-right
-                  drop-shadow-[0_0_8px_red]
-                "
-              >
-                Players
-              </h2>
+            <div className="w-full sm:w-1/2 min-w-0 flex flex-col items-end">
+              <h2 className="text-lg font-semibold mb-2 text-right drop-shadow-[0_0_8px_red]">Players</h2>
               <PlayersList players={players} />
+            </div>
+          </div>
+          <div className="w-full mt-8">
+            <div className="w-full max-w-[600px] bg-gray-800 bg-opacity-50 rounded-2xl p-4 shadow-lg mx-auto">
+              <video src="/videos/fight_gif.mp4" autoPlay loop muted playsInline className="w-full h-auto rounded-lg" />
             </div>
           </div>
         </div>
 
-        <div
-          className="
-            bg-gray-900
-            bg-opacity-70
-            w-full
-            flex
-            flex-col
-            text-center
-            pt-2
-            px-4
-            pb-5
-            mt-4
-          "
-        >
-          <p
-            className="
-              text-lg
-              text-purple-400
-              font-extrabold
-              uppercase
-              tracking-wide
-              drop-shadow-[0_0_8px_white]
-            "
-          >
+        <div className="bg-gray-900 bg-opacity-70 w-full flex flex-col text-center pt-2 px-4 pb-5 mt-4">
+          <p className="text-lg text-purple-400 font-extrabold uppercase tracking-wide drop-shadow-[0_0_8px_white]">
             Fighters — choose your rival!
           </p>
-
           <div className="pt-2">
-            <div
-              className="
-                grid
-                grid-cols-1
-                sm:grid-cols-2
-                md:grid-cols-3
-                lg:grid-cols-4
-                xl:grid-cols-5
-                gap-3
-                w-full
-                px-2
-                sm:px-4
-              "
-            >
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 w-full px-2 sm:px-4">
               {bots.map((bot, idx) => (
                 <BotCard
                   key={idx}
@@ -1705,13 +1873,7 @@ const Profile: React.FC = () => {
       {isModalOpen && (
         <ProfileModal
           onClose={() => setIsModalOpen(false)}
-          userData={{
-            avatar: user.avatar,
-            username: user.username,
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-          }}
+          userData={{ avatar: user.avatar, username: user.username, name: user.name }}
           onSave={handleSaveProfile}
         />
       )}
@@ -1723,99 +1885,78 @@ export default Profile;
 
 
 
-// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/ProfileActions.tsx
 
-import React from 'react';
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/ProfileActions.tsx
+import React from "react";
+import { UserInfo } from "./types/UserInfo";
+import { toast } from "react-hot-toast";
 
 interface ProfileActionsProps {
-	username: string;
-	online: boolean;
-	onProfileClick: () => void;
-  }
-  
+  user: Pick<UserInfo, "username" | "online" | "email">;
+  onProfileClick: () => void;
+}
 
-const ProfileActions: React.FC<ProfileActionsProps> = ({ username, online, onProfileClick }) => {
-	const handleLogout = () => alert('Logging out...');
+const ProfileActions: React.FC<ProfileActionsProps> = ({ user, onProfileClick }) => {
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: user.email }),
+      });
+      if (!response.ok) throw new Error("Failed to logout");
+      toast.success("Logged out successfully!");
+      // Можно добавить редирект на страницу логина, если есть
+    } catch (err) {
+      console.error("Logout error:", err);
+      toast.error("Failed to logout. Please try again.");
+    }
+  };
 
-	return (
-		<div className="flex
-                    items-center
-                    gap-4">
-			<span className={`text-sm
-                  font-bold
-                  ${online ? 'text-green-400' : 'text-gray-400'}`}>
-				{username}
-			</span>
-				
-			{/* PROFILE */}
-			<button
-				onClick={onProfileClick}
-				className="px-4
-							py-2
-							rounded-2xl 
-							text-base 
-							font-bold 
-							bg-transparent 
-							outline-3 
-							outline-offset-2 
-							outline-double 
-							border
-							border-emerald-200
-							text-white 
-							transition-all 
-							duration-300 
-							ease-in-out 
-							hover:scale-110"
-				style={{ 
-					textShadow:`
-					0 0 4px rgba(102, 0, 255, 0.9),
-					0 0 8px rgba(102, 0, 255, 0.7),
-					0 0 16px rgba(102, 0, 255, 0.5),
-					0 0 32px rgba(102, 0, 255, 0.3)
-					`,
-				}}
-			
-			>
-				Profile
-			</button>
-			
-			{/* LogOut */}
-			<button
-				onClick={handleLogout}
-				className="px-4
-							py-2
-							rounded-2xl 
-							text-base 
-							font-bold 
-							bg-transparent 
-							outline-3 
-							outline-offset-2 
-							outline-double 
-							border
-							border-emerald-200
-							text-white 
-							transition-all 
-							duration-300 
-							ease-in-out 
-							hover:scale-110"
-				style={{ 
-					textShadow:`
-					0 0 4px rgba(102, 0, 255, 0.9),
-					0 0 8px rgba(102, 0, 255, 0.7),
-					0 0 16px rgba(102, 0, 255, 0.5),
-					0 0 32px rgba(102, 0, 255, 0.3)
-					`,
-				}}
-			
-			>
-				LogOut
-			</button>
-		</div>
-	);
+  return (
+    <div className="flex items-center gap-4">
+      <span className={`text-sm font-bold ${user.online ? "text-green-400" : "text-gray-400"}`}>
+        {user.username}
+      </span>
+      {/* PROFILE */}
+      <button
+        onClick={onProfileClick}
+        className="px-4 py-2 rounded-2xl text-base font-bold bg-transparent outline-3 outline-offset-2 outline-double border border-emerald-200 text-white transition-all duration-300 ease-in-out hover:scale-110"
+        style={{
+          textShadow: `
+            0 0 4px rgba(102, 0, 255, 0.9),
+            0 0 8px rgba(102, 0, 255, 0.7),
+            0 0 16px rgba(102, 0, 255, 0.5),
+            0 0 32px rgba(102, 0, 255, 0.3)
+          `,
+        }}
+      >
+        Profile
+      </button>
+      {/* LogOut */}
+      <button
+        onClick={handleLogout}
+        className="px-4 py-2 rounded-2xl text-base font-bold bg-transparent outline-3 outline-offset-2 outline-double border border-emerald-200 text-white transition-all duration-300 ease-in-out hover:scale-110"
+        style={{
+          textShadow: `
+            0 0 4px rgba(102, 0, 255, 0.9),
+            0 0 8px rgba(102, 0, 255, 0.7),
+            0 0 16px rgba(102, 0, 255, 0.5),
+            0 0 32px rgba(102, 0, 255, 0.3)
+          `,
+        }}
+      >
+        LogOut
+      </button>
+    </div>
+  );
 };
 
 export default ProfileActions;
-
 
 
 
@@ -1829,10 +1970,9 @@ interface ProfileModalProps {
   onSave: (data: {
     avatar: string;
     username: string;
-    email: string;
     password: string;
   }) => void;
-  userData: Pick<UserInfo, "avatar" | "username" | "email" | "firstName" | "lastName">;
+  userData: Pick<UserInfo, "avatar" | "username" | "name">;
 }
 
 const ProfileModal: React.FC<ProfileModalProps> = ({
@@ -1842,7 +1982,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 }) => {
   const [avatar, setAvatar] = useState(userData.avatar);
   const [username, setUsername] = useState(userData.username);
-  const [email, setEmail] = useState(userData.email);
   const [password, setPassword] = useState("");
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1907,15 +2046,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
           className="w-full p-2 rounded bg-gray-800 border border-gray-600"
         />
 
-        {/* Email */}
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 rounded bg-gray-800 border border-gray-600"
-        />
-
         {/* Password */}
         <input
           type="password"
@@ -1927,8 +2057,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 
         {/* Static fields */}
         <div className="text-sm text-gray-400 space-y-1">
-          <p>First Name: {userData.firstName}</p>
-          <p>Last Name: {userData.lastName}</p>
+            <p>Name: {userData.name}</p>
         </div>
 
         {/* Buttons */}
@@ -1944,7 +2073,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
               onSave({
                 avatar,
                 username,
-                email,
                 password,
               })
             }
@@ -1965,98 +2093,62 @@ export default ProfileModal;
 
 
 
+
+
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/UserHeader.tsx
 
 
 import React from "react";
 import Avatar from "./Avatar";
-import { MatchResult, calculateUserStats } from "./types/UserInfo";
+import { UserInfo, calculateUserStats } from "./types/UserInfo";
 
 interface UserHeaderProps {
-	username: string;
-	avatar: string;
-	wins: number;
-	losses: number | string;
-	history?: MatchResult[];
-	className?: string;
+  user: Pick<UserInfo, "username" | "avatar" | "wins" | "losses" | "history">;
 }
 
-const UserHeader: React.FC<UserHeaderProps> = ({
-	username,
-	avatar,
-	wins,
-	losses,
-	history = [],
-	className,
-}) => {
-	const { winRate, latestDate, winsToday, lossesToday } = calculateUserStats(
-		wins,
-		losses,
-		history
-	);
+const UserHeader: React.FC<UserHeaderProps> = ({ user }) => {
+  const { winRate, latestDate, winsToday, lossesToday } = calculateUserStats(
+    user.wins,
+    user.losses,
+    user.history
+  );
 
-	return (
-		<div
-			className={`
-      flex
-      flex-col
-      items-center
-      text-center
-      gap-3
-      ${className ?? ""}
-    `}
-		>
-			<Avatar
-				src={avatar}
-				username={username}
-				className="
-          w-32
-          h-32
-          sm:w-40
-          sm:h-40
-          md:w-44
-          md:h-44
-          xl:w-48
-          xl:h-48
-        "
-			/>
-			<h1
-				className="
-        text-xl
-        sm:text-2xl
-        font-bold
+  return (
+    <div
+      className="
+        flex
+        flex-col
+        items-center
+        gap-4
+        w-full
+        max-w-md
+        mx-auto
+        text-center
       "
-			>
-				{username}
-			</h1>
-			<p
-				className="
-        text-gray-300
-        text-sm
-        sm:text-base
-      "
-			>
-				Wins: {wins} |{" "}
-				{typeof losses === "number" ? `Winrate: ${winRate}%` : `Losses: ${losses}`}
-			</p>
-			{latestDate && (
-				<p
-					className="
-          text-sm
-          text-purple-300
-        "
-				>
-					Last Game: {latestDate} — Wins: {winsToday}, Losses: {lossesToday}
-				</p>
-			)}
-		</div>
-	);
+    >
+      <Avatar user={user} className="w-24 h-24 sm:w-32 sm:h-32" />
+      <h2 className="text-xl sm:text-2xl font-bold">{user.username}</h2>
+      <div className="text-sm sm:text-base space-y-1">
+        <p>
+          Wins: <span className="text-green-400">{user.wins}</span> | Losses:{" "}
+          <span className="text-red-400">{user.losses}</span>
+        </p>
+        <p>
+          Win Rate: <span className="text-cyan-400">{winRate}%</span>
+        </p>
+        {latestDate && (
+          <p>
+            Last Game: {latestDate} — Wins:{" "}
+            <span className="text-green-400">{winsToday}</span>, Losses:{" "}
+            <span className="text-red-400">{lossesToday}</span>
+          </p>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default UserHeader;
-
-
-  
   
   
   
@@ -2066,24 +2158,22 @@ export default UserHeader;
 
   import AppRouter from './router/AppRouter'
   import './index.css';
-  import Profile from './pages/Profile/Profile';
   import { Toaster } from 'react-hot-toast';
   import NeonCursor from './components/NeonCursor';
+  //import Profile from './pages/Profile/Profile';
   
   function App() {
-  
-	return (
-	  <>
-		{/* <AppRouter/> */}
-		<NeonCursor />
-		<Profile />
-		<Toaster position="top-right" reverseOrder={false} />
-	  </>
-	  
-	)
+    return (
+      <>
+        <AppRouter/>
+        <NeonCursor />
+        {/* <Profile /> */}
+        <Toaster position="top-right" reverseOrder={false} />
+      </>
+    );
   }
   
-  export default App
+  export default App;
   
 
 
@@ -2141,3 +2231,622 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   </React.StrictMode>
 );
 
+
+
+
+
+
+//! SERVER
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/server/controllers/auth.js
+
+// import HttpError from "../http-error.js";
+import db from "../database/database.js"; // Using better-sqlite3
+
+export async function signup(req, reply) {
+  console.log("We are in SIGNUP middleware");
+
+  const { name, nickname, email, password } = req.body;
+
+  // Validate request body
+  if (!name || !password || !email || !nickname) {
+    return reply.code(400).send({ message: "No pass or name or email" });
+  }
+
+  try {
+    const hasUser = db
+      .prepare("SELECT * FROM users WHERE email = ? OR nickname = ?")
+      .get(email, nickname);
+    console.log("Has user", hasUser);
+    if (!hasUser) {
+      const users = db.prepare(
+        "INSERT INTO users (name, nickname, email, password) VALUES (?, ?, ?, ?)"
+      );
+      const result = users.run(name, nickname, email, password);
+      const token  =  req.jwt.sign ({
+        id: users.id
+      })
+
+      console.log("TOKEN_ID", token);
+
+      console.log("22222 =>", result.lastInsertRowid);
+
+      const online = db
+        .prepare("UPDATE users SET online = ? WHERE id = ?")
+        .run(1, result.lastInsertRowid);
+
+      // JUST CHECKING ONLINE
+      const updated = db
+        .prepare("SELECT id, online FROM users WHERE id = ?")
+        .get(result.lastInsertRowid);
+
+      console.log("ONLINE? =>", updated);
+
+      return reply.code(201).send({ message: "USER created", users, accessToken: token });// TOKEN DELETE LATER!!!!!!!!!!!!
+    } else {
+      console.log("User already exist");
+      return reply.code(400).send({ message: "User already exist" });
+    }
+  } catch (err) {
+    console.error("Database error:", err.message);
+    return reply.code(500).send({ message: "Something went wrong" });
+  }
+}
+
+export async function login(req, reply) {
+  const { email, password } = req.body;
+
+  if (!password || !email) {
+    return reply.code(400).send({ message: "No pass or email" });
+  }
+
+  try {
+    const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+    console.log("Query result:", user); // Log the result
+
+    if (user) {
+      console.log("Email", user.email);
+      console.log("Pass", user.password);
+      // reply.code(200).send({ message: "There is such a user", user });
+      const kuku = db
+        .prepare("SELECT * FROM users WHERE email = ? AND password = ?")
+        .get(email, password);
+
+        // const token = jwt.sign(
+        //   { userId: user.id },
+        //   { expiresIn: "2h" }
+        // );
+      // console.log("kuku", kuku);
+
+      const token  =  req.jwt.sign ({
+        id: user.id
+      })
+      if (kuku) {
+        console.log("WE are logged in");
+        const userOnline = db
+          .prepare("SELECT * FROM users WHERE id = ?")
+          .get(user.id);
+
+        console.log("ID=>", user.id);
+        // Put Online
+        const online = db
+          .prepare("UPDATE users SET online = '1' WHERE id = ?")
+          .run(user.id);
+
+        console.log("ONLINE =>", online.changes);
+
+        return reply.code(200).send({ message: "We are logged in", accessToken: token });// TOKEN DELETE LATER
+      } else {
+        console.log("Wrong pass ");
+        return reply.code(401).send({ message: "Wrong pass" });
+      }
+    } else {
+      return reply.code(400).send({ message: "No such user?" });
+    }
+  } catch (err) {
+    console.error("Database error:", err.message);
+    return reply.code(500).send({ message: "Something went wrong" });
+  }
+}
+
+export async function logout(req, reply) {
+  const { email } = req.body;
+  try {
+    const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+
+    console.log("ID=>",user.id)
+
+    // console.log(logout);
+    const offline = db.prepare("UPDATE users SET online = ? WHERE email = ?").run(0, email)
+    console.log("Offline =>",offline)
+    return reply.code(200).send({ message: "We are logout", user });
+  } catch (err) {
+    console.error("Database error:", err.message);
+    return reply.code(500).send({ message: "Something went wrong" });
+  }
+}
+
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/server/controllers/friends.js
+
+import db from "../database/database.js";
+
+export async function friendsSearch(req, reply) {
+  console.log("WE ARE IN FRIENDS");
+
+  const { nickname } = req.body;
+  
+  if(!nickname)
+        return reply.code(400).send({message: "PLease fill in frien nickname"})
+
+  try
+  {
+    const hasUser = db.prepare("SELECT * FROM users WHERE nickname = ? ").get(nickname);
+    console.log("THERE is such nickname",hasUser);
+    if(!hasUser)
+    {
+        return reply.code(400).send({ message: "Not such user" });
+    }
+    if(hasUser)
+    {
+        console.log("KUKU, lets add display user");
+        return reply.code(200).send({ message: "we have this user", hasUser });
+    }
+
+  }catch (err) {
+    console.error("Database error:", err.message);
+    return reply.code(500).send({ message: "Something went wrong" });
+  }
+}     
+
+export async function friendsAdd(req, reply) {
+    console.log("WE ARE IN ADDING FRIENDS");
+  
+    const {id, nickname } = req.body;
+    
+    if(!nickname || !id)
+          return reply.code(400).send({message: "PLease fill in friend nickname"})
+  
+    try
+    {
+      const hasUser = db.prepare("SELECT * FROM users WHERE nickname = ? ").get(nickname);
+      console.log("THERE is such nickname",hasUser);
+      if(!hasUser)
+      {
+          return reply.code(400).send({ message: "Not such user" });
+      }
+      if(hasUser)
+      {
+          console.log("KUKU, lets add display user");
+          return reply.code(200).send({ message: "we have this user", hasUser });
+      }
+  
+    }catch (err) {
+      console.error("Database error:", err.message);
+      return reply.code(500).send({ message: "Something went wrong" });
+    }
+  }
+  
+
+
+  // /home/ogoman/HIVE/Projects/ft_transcendence/server/controllers/profile.js
+
+
+  import db from "../database/database.js";
+
+  export async function updateProfile(req, reply) {
+    console.log("WE in Update Profile MW");
+    const { name, nickname, id, password } = req.body;
+  
+    if (!name && !nickname && !password) {
+      return reply.code(400).send({ message: "Notning to change" });
+    }
+    // console.log("name", name);
+    console.log("idddd", id);
+    try {
+      console.log("id", id);
+      const user = db.prepare("SELECT * FROM users WHERE id = ?").get(id); ///Here we need id not id!!!!!!
+      console.log("user ok => ", user.id);
+      if (!user) {
+        return reply.code(400).send({ message: "Notning to change" });
+      }
+      if (user) {
+        if (name) {
+          const updateName = db
+            .prepare("UPDATE users SET name = ? WHERE id = ?")
+            .run(name, user.id);
+          console.log("NAME UPDATED =>", updateName);
+          // return reply.code(200).send({message: "Name updated"})
+        }
+        if (password) {
+          const updatePassword = db
+            .prepare("UPDATE users SET password = ? WHERE id = ?")
+            .run(password, id);
+          console.log("password UPDATED =>", updatePassword);
+          // return reply.code(200).send({message: "password updated"})
+        }
+        if (nickname) {
+          console.log("we are in nick change");
+          const nickExist = db
+            .prepare("SELECT * FROM users WHERE nickname = ?")
+            .get(nickname);
+          console.log("NickExist =>", nickExist);
+          if (nickExist) {
+            return reply.code(400).send({ message: "Nick already exists" });
+          } else {
+            const updateNickname = db
+              .prepare("UPDATE users SET nickname = ? WHERE id = ?")
+              .run(nickname, id);
+            console.log("nickname UPDATED =>", updateNickname);
+            // return reply.code(200).send({message: "Nick updated"})
+          }
+        }
+        return reply.code(200).send({ message: "updated" });
+      }
+    } catch (err) {
+      console.error("Database error:", err.message);
+      return reply.code(500).send({ message: "Something went wrong" });
+    }
+  }
+  
+  
+  
+  
+  
+  
+  export async function uploadPicture(pic,reply) {
+    console.log("Kuku from upload pictures");
+  
+    const allowedTypes = ["image/jpeg", "image/png"];
+  
+    // const { image, email } = req.body;
+  
+    if (!pic) {
+      return reply.code(400).send({ message: "no image to upload" });
+    }
+  
+    if (!allowedTypes.includes(pic.mimetype)) {
+      return reply.code(400).send({ message: "invalidddd" });
+    }
+    
+    // const email = pic.fields?.email;
+    // if (!email) {
+    //   return reply.code(400).send({ message: "no email provided" });
+    // }
+    const id = pic.fields?.id.value;
+    try {
+      console.log("eeeeeeeeeeeeeee");
+      console.log("id=>", id)
+      const user = db.prepare("SELECT * FROM users WHERE id = ?").get(id); 
+      console.log("user ok => ", user.id);
+  
+      const buffer = await pic.toBuffer();
+  
+      db.prepare("UPDATE users SET image = ? WHERE id = ?").run(buffer, user.id);
+      return reply.code(200).send({ message: "Image uploaded" });
+    } catch (err) {
+      console.error("Database error:", err.message);
+      return reply.code(500).send({ message: "Something went wrong" });
+    }
+  }
+
+  
+
+
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/server/database/database.js
+
+import Database from "better-sqlite3";
+
+const db = new Database("./database/users.db");
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nickname TEXT NOT NULL,
+    email TEXT NOT NULL,
+    name TEXT NOT NULL,
+    password TEXT NOT NULL,
+    online BOOL, 
+    image BLOB
+  );
+`);
+
+console.log("Database initialized and users table is ready.");
+
+export default db;
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/server/database/users.db
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/server/routes/AuthRoutes.js
+
+import { signup, login, logout } from "../controllers/auth.js";
+import db from "../database/database.js";
+import { SignUpSchema, LoginSchema} from "../schema/user.schema.js";
+
+async function authRoutes(fastify) {
+  fastify.post("/login", async (req, reply) =>
+  {
+    const validated = LoginSchema.safeParse(req.body);
+    if(!validated.success)
+    {
+      return reply.code(400).send({
+        message: "Validation error",
+        errors: validated.error.errors,
+      });
+    }
+    return login ({...req, body:validated.data}, reply);
+  });
+
+  fastify.post("/signup", async (req, reply) => {
+    const validated = SignUpSchema.safeParse(req.body);
+
+    if (!validated.success) {
+      return reply.code(400).send({
+        message: "Validation error",
+        errors: validated.error.errors,
+      });
+    }
+    return signup({...req, body:validated.data}, reply);
+  });
+
+  fastify.post("/logout", logout);
+
+  ///for debug???? or delete later
+  fastify.get("/users", async (req, reply) => {
+    try {
+      const rows = db.prepare("SELECT * FROM users").all();
+
+      // console.log("!!!!", rows);
+      return reply.code(200).send({ users: rows });
+    } catch (err) {
+      console.error("Error fetching users:", err.message);
+      return reply.code(500).send({ message: "Failed to fetch users" });
+    }
+  });
+}
+
+export default authRoutes;
+
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/server/routes/FriendsRoutes.js
+
+
+
+import {FriendsAddSchema, FriendsSchema} from "../schema/friends.schema.js"
+import { friendsSearch } from "../controllers/friends.js";
+async function friendsRoutes(fastify) {
+
+    fastify.post ("/friends", async (req, reply) =>
+    {
+        const validated = FriendsSchema.safeParse(req.body);
+            if(!validated.success)
+            {
+              return reply.code(400).send({
+                message: "Validation error",
+                errors: validated.error.errors,
+              });
+            }
+            return friendsSearch ({...req, body:validated.data}, reply);
+    })
+    
+    fastify.post ("/add_friends", async (req, reply) =>
+        {
+            const validated = FriendsAddSchema.safeParse(req.body);
+                if(!validated.success)
+                {
+                  return reply.code(400).send({
+                    message: "Validation error",
+                    errors: validated.error.errors,
+                  });
+                }
+                return friendsAdd ({...req, body:validated.data}, reply);
+        })
+}
+
+export default friendsRoutes;
+
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/server/routes/ProfileRoutes.js
+
+import { ProfileSchema } from "../schema/profile.schema.js";
+import fastifyMultipart from "@fastify/multipart";
+import { updateProfile, uploadPicture } from "../controllers/profile.js";
+
+async function profileRoutes(fastify) {
+  fastify.register(fastifyMultipart);
+
+  fastify.patch("/updateProfile", async (req, reply) => {
+    const validated = ProfileSchema.safeParse(req.body);
+    if (!validated.success) {
+      return reply.code(400).send({
+        message: "Validation error",
+        errors: validated.error.errors,
+      });
+    }
+    return updateProfile({ ...req, body: validated.data }, reply);
+  });
+  fastify.post("/uploadPicture", async (req, reply) => {
+    const pic = await req.file();
+    // const email = pic.fields?.email.value;
+    // console.log("email:", email);
+
+    if (!pic) {
+      return reply.code(400).send({ message: "No picture uploaded" });
+    }
+
+    // if (!email) {
+    //   return reply.code(400).send({ message: "No email provided" });
+    // }
+
+    return uploadPicture(pic, reply);
+  });
+}
+
+export default profileRoutes;
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/server/schema/friends.schema.js
+
+import { z } from "zod"; /// validation
+
+export const FriendsSchema = z.object({
+  nickname: z.string().max(20)
+});
+
+export const FriendsAddSchema = z.object({
+  id: z.string().max(),
+  nickname: z.string().max(20)
+});
+
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/server/schema/profile.schema.js
+
+import { z } from "zod"
+
+export const ProfileSchema = z.object
+(
+    {
+        name: z.string().max(20),
+        nickname: z.string().max(20),
+        password: z.string().min(4).max(40),
+        id: z.string(),
+        // image: z.string(),
+    }
+)
+
+
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/server/schema/user.schema.js
+
+import { z } from "zod"; /// validation
+
+export const SignUpSchema = z.object({
+  name: z.string().max(20),
+  nickname: z.string().max(20),
+  email: z.string().max(40).email(),
+  password: z.string().min(4).max(40),
+});
+
+export const LoginSchema = z.object({
+    email: z.string().max(40).email(),
+    password: z.string().min(4).max(40),
+  });
+  
+
+  
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/server/.env
+
+PORT=3000
+JWT_SECRET_KEY=kuku
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/server/http-error.js
+
+class HttpError extends Error {
+    constructor(message, errorCode) {
+      super(message); /// add message property, super mena comes from parent
+      this.code = errorCode; // add code property
+    }
+  }
+  
+  export default HttpError; 
+  
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/server/package.json
+
+{
+  "name": "server",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/cors": "^11.0.1",
+    "@fastify/jwt": "^9.1.0",
+    "@fastify/view": "^11.0.0",
+    "better-sqlite3": "^11.9.1",
+    "dotenv": "^16.5.0",
+    "ejs": "^3.1.10",
+    "fastify": "^5.2.2",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.24.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/server/server.js
+
+import Fastify from "fastify";
+import authRoutes from "./routes/AuthRoutes.js";
+import cors from '@fastify/cors';
+import dotenv from 'dotenv';
+import jwt from '@fastify/jwt';
+
+dotenv.config();
+
+const fastify = Fastify({
+  logger: true,
+});
+
+// JWT
+fastify.register(jwt, { secret: 'kuku' });
+
+fastify.addHook('preHandler', (req, res, next) => {
+  req.jwt = fastify.jwt;
+  next();
+});
+
+// CORS
+await fastify.register(cors, {
+  origin: 'http://localhost:5173',
+  credentials: true,
+});
+
+// Routes
+fastify.register(authRoutes);
+
+// Server start
+const start = async () => {
+  try {
+    await fastify.listen({ port: process.env.PORT || 3000 });
+  } catch (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
+};
+
+start();
