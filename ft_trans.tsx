@@ -373,7 +373,7 @@ interface SignUpFormProps {
 
 const SignUpForm = ({ onSuccess, closeModal }: SignUpFormProps) => {
   const [name, setName] = useState("");
-  const [nickname, setNickname] = useState("");
+  const [username, setusername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setError] = useState("");
@@ -387,7 +387,7 @@ const SignUpForm = ({ onSuccess, closeModal }: SignUpFormProps) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, nickname, email, password }),
+        body: JSON.stringify({ name, username, email, password }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
@@ -421,10 +421,10 @@ const SignUpForm = ({ onSuccess, closeModal }: SignUpFormProps) => {
           />
           <input
             type="text"
-            placeholder="Nickname"
+            placeholder="username"
             className="w-full px-4 py-2 bg-black text-white bg-opacity-30 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-800"
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
+            value={username}
+            onChange={(e) => setusername(e.target.value)}
             required
           />
           <input
@@ -582,6 +582,171 @@ export default MainPage;
 
 
 
+  // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/hooks/useProfile.ts
+
+
+  import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+  import { useNavigate } from "react-router-dom";
+  import { toast } from "react-hot-toast";
+  import { UserInfo, MatchResult } from "../types/UserInfo";
+  import { fetchUserData, updateUserProfile, getAuthHeaders, saveGameResult } from "../types/api";
+  import { bots } from "../types/botsData";
+  
+  export const useProfile = () => {
+	  const [selectedBot, setSelectedBot] = useState<(typeof bots)[0] | null>(null);
+	  const [isModalOpen, setIsModalOpen] = useState(false);
+	  const [isLoading, setIsLoading] = useState(true);
+	  const [user, setUser] = useState<UserInfo | null>(null);
+	  const [friends, setFriends] = useState<UserInfo[]>([]);
+	  const [players, setPlayers] = useState<UserInfo[]>([]);
+	  const navigate = useNavigate();
+	  const isFetchingRef = useRef(false);
+  
+	  const authHeaders = useMemo(() => getAuthHeaders(), []);
+  
+	  const loadData = useCallback(async () => {
+		  if (isFetchingRef.current) {
+			  return;
+		  }
+		  isFetchingRef.current = true;
+  
+		  const token = localStorage.getItem("token");
+		  if (!token) {
+			  setIsLoading(false);
+			  toast.error("No token found. Please log in.");
+			  navigate("/login");
+			  isFetchingRef.current = false;
+			  return;
+		  }
+  
+		  setIsLoading(true);
+		  try {
+			  const userData = await fetchUserData(authHeaders);
+			  setUser(userData);
+			  setFriends([]); // Заглушка для друзей
+		  } catch (err: any) {
+			  toast.error("Failed to load user data. Please log in again.");
+			  localStorage.removeItem("token");
+			  navigate("/login");
+		  } finally {
+			  setIsLoading(false);
+			  isFetchingRef.current = false;
+		  }
+	  }, [navigate, authHeaders]);
+  
+	  const saveUserData = useCallback(
+		  async (updatedUser: UserInfo) => {
+			  const profileUpdates: Partial<UserInfo> = {};
+			  if (updatedUser.name !== user?.name)
+				  profileUpdates.name = updatedUser.name;
+			  if (updatedUser.username !== user?.username)
+				  profileUpdates.username = updatedUser.username;
+			  if (updatedUser.password !== user?.password)
+				  profileUpdates.password = updatedUser.password;
+  
+			  await updateUserProfile(
+				  profileUpdates,
+				  updatedUser.avatar !== user?.avatar ? updatedUser.avatar : undefined,
+				  authHeaders
+			  );
+			  const updatedUserData = await fetchUserData(authHeaders);
+			  setUser(updatedUserData);
+			  toast.success("Profile updated successfully!");
+		  },
+		  [user, authHeaders]
+	  );
+  
+	  const handleSaveProfile = useCallback(
+		  async (data: Partial<UserInfo>) => {
+			  if (!user) return;
+			  const updatedUser: UserInfo = {
+				  ...user,
+				  ...data,
+				  password: data.password || user.password,
+			  };
+			  await saveUserData(updatedUser);
+			  setIsModalOpen(false);
+		  },
+		  [user, saveUserData]
+	  );
+  
+	  const handleGameEnd = useCallback(
+		  async (result: "win" | "loss", opponent: string) => {
+			  if (!user) return;
+  
+			  const today = new Date().toISOString().split("T")[0];
+			  const weekday = new Intl.DateTimeFormat("en-US", {
+				  weekday: "short",
+			  }).format(new Date());
+  
+			  const matchResult: MatchResult = { date: today, weekday, result };
+  
+			  try {
+				  // Отправляем результат игры на сервер
+				  await saveGameResult(matchResult, authHeaders);
+				  
+				  // Запрашиваем обновлённые данные пользователя с сервера
+				  const updatedUserData = await fetchUserData(authHeaders);
+				  setUser(updatedUserData);
+				  
+				  toast.success(`Game over! You ${result} against ${opponent}!`);
+			  } catch (err: any) {
+				  toast.error("Failed to save game result. Please try again.");
+			  }
+		  },
+		  [user, authHeaders]
+	  );
+  
+	  const handlePlay = useCallback(() => {
+  
+		  // Выбираем случайного бота, если не выбран
+		  const opponent = selectedBot || bots[Math.floor(Math.random() * bots.length)];
+		  const result = Math.random() > 0.5 ? "win" : "loss";
+  
+		  // Вызываем handleGameEnd с результатом и именем соперника
+		  handleGameEnd(result, opponent.name);
+  
+		  // Если бот был выбран случайно, сбрасываем выбор
+		  if (!selectedBot) {
+			  setSelectedBot(null);
+		  }
+	  }, [user, selectedBot, handleGameEnd, navigate]);
+  
+	  useEffect(() => {
+		  let isMounted = true;
+  
+		  const fetchData = async () => {
+			  if (isMounted) {
+				  await loadData();
+			  }
+		  };
+  
+		  fetchData();
+  
+		  return () => {
+			  isMounted = false;
+		  };
+	  }, [loadData]);
+  
+	  return {
+		  user,
+		  friends,
+		  players,
+		  selectedBot,
+		  isModalOpen,
+		  isLoading,
+		  setSelectedBot,
+		  setIsModalOpen,
+		  setFriends,
+		  setPlayers,
+		  handleSaveProfile,
+		  handlePlay,
+	  };
+  };
+
+
+	  
+
  // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/types/botsData.ts
  //! TYPES
  export const bots = [
@@ -646,6 +811,95 @@ export default MainPage;
 	  weaknesses: 'Gags at smell of basil',
 	},
   ];
+
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/types/api.ts
+
+import axios, { AxiosInstance, AxiosError } from "axios";
+import { toast } from "react-hot-toast";
+import { UserInfo, MatchResult } from "./UserInfo";
+
+const BASE_URL = "http://localhost:3000";
+
+const api: AxiosInstance = axios.create({
+    baseURL: BASE_URL,
+    headers: {
+        "Content-Type": "application/json",
+    },
+});
+
+api.interceptors.response.use(
+    (response) => response,
+    (error: AxiosError) => {
+        if (error.response?.status === 401) {
+            toast.error("Session expired. Please log in again.");
+            localStorage.removeItem("token");
+            window.location.href = "/login"; // Изменил на /login вместо /signup
+        }
+        return Promise.reject(error);
+    }
+);
+
+export const getAuthHeaders = (): { Authorization: string } | {} => {
+    const token = localStorage.getItem("token");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+export const fetchUserData = async (headers: { Authorization: string } | {} = getAuthHeaders()): Promise<UserInfo> => {
+    const response = await api.get("/users/me", { headers });
+    const currentUser = response.data.user;
+
+    return {
+        id: currentUser.id || "unknown",
+        username: currentUser.username || currentUser.name || "Unknown",
+        avatar: currentUser.image ? `data:image/jpeg;base64,${currentUser.image}` : "/prof_img/avatar1.png",
+        email: currentUser.email || "",
+        name: currentUser.name || "",
+        password: currentUser.password || "",
+        wins: currentUser.wins || 0, // Теперь берём с сервера
+        losses: currentUser.losses || 0, // Теперь берём с сервера
+        online: !!currentUser.online,
+        history: currentUser.history || [], // Теперь берём с сервера
+    };
+};
+
+export const updateUserProfile = async (
+    profileUpdates: Partial<UserInfo>,
+    avatar?: string,
+    headers: { Authorization: string } | {} = getAuthHeaders()
+): Promise<void> => {
+    const updates: Partial<UserInfo> = {};
+    if (profileUpdates.name) updates.name = profileUpdates.name;
+    if (profileUpdates.username) updates.username = profileUpdates.username;
+    if (profileUpdates.password) updates.password = profileUpdates.password;
+
+    if (Object.keys(updates).length > 0) {
+        await api.patch("/updateProfile", updates, { headers });
+    }
+
+    if (avatar && avatar.startsWith("data:image")) {
+        const base64Data = avatar.split(",")[1];
+        const blob = await (await fetch(`data:image/jpeg;base64,${base64Data}`)).blob();
+        const formData = new FormData();
+        formData.append("file", blob, "avatar.jpg");
+
+        await api.post("/uploadPicture", formData, {
+            headers: {
+                ...headers,
+                "Content-Type": "multipart/form-data",
+            },
+        });
+    }
+};
+
+export const saveGameResult = async (
+    matchResult: MatchResult,
+    headers: { Authorization: string } | {} = getAuthHeaders()
+): Promise<void> => {
+    await api.post("/game/result", matchResult, { headers });
+
+
 
 
 
@@ -860,8 +1114,466 @@ export const defaultPlayers: UserInfo[] = defaultFriends.map((player) => ({
   
   
 //! PROFILE
-// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/Avatar.tsx
 
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/BotSelector.tsx
+
+import React from "react";
+import BotCard from "./BotCard";
+import { bots } from "./types/botsData";
+
+interface BotSelectorProps {
+  selectedBot: (typeof bots)[0] | null;
+  setSelectedBot: (bot: (typeof bots)[0]) => void;
+}
+
+const BotSelector: React.FC<BotSelectorProps> = ({ selectedBot, setSelectedBot }) => {
+  return (
+    <div className="bg-gray-900 bg-opacity-70 w-full flex flex-col text-center pt-2 px-4 pb-5 mt-4">
+      <p className="text-lg text-purple-400 font-extrabold uppercase tracking-wide drop-shadow-[0_0_8px_white]">
+        Fighters — Choose Your Opponent!
+      </p>
+      <div className="pt-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 w-full px-2 sm:px-4">
+          {bots.map((bot, idx) => (
+            <BotCard
+              key={idx}
+              {...bot}
+              onSelect={() => setSelectedBot(bot)}
+              selected={selectedBot?.image === bot.image}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BotSelector;
+
+
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/DesktopLayout.tsx
+
+import React from "react";
+import EnhancedFriendsList from "./EnhancedFriendsList";
+import PlayersList from "./PlayersList";
+import UserHeader from "./UserHeader";
+import PlayArena from "./PlayArena";
+import GameModeSelector from "./GameModeSelector";
+import { PrimaryButton } from "./types/ui";
+import { UserInfo } from "./types/UserInfo";
+import { bots } from "./types/botsData";
+
+interface DesktopLayoutProps {
+  user: UserInfo;
+  friends: UserInfo[];
+  players: UserInfo[];
+  selectedBot: (typeof bots)[0] | null;
+  handlePlay: () => void;
+}
+
+const DesktopLayout: React.FC<DesktopLayoutProps> = ({
+  user,
+  friends,
+  players,
+  selectedBot,
+  handlePlay,
+}) => {
+  return (
+    <div
+      className={`
+        hidden
+        xl:grid
+        xl:grid-cols-6
+        gap-4
+        px-4
+        flex-grow
+      `}
+      /* Main container: Creates a responsive grid layout visible only on extra-large screens */
+    >
+      <div
+        className={`
+          pt-4
+          flex
+          flex-col
+          items-start
+          col-span-1
+          max-w-[220px]
+        `}
+        /* Friends section: Aligns the friends list vertically on the left side with constrained width */
+      >
+        <h2
+          className={`
+            text-lg
+            font-semibold
+            mb-2
+            text-left
+            drop-shadow-[0_0_8px_red]
+          `}
+          /* Friends title: Styles the heading for the friends list with a red glow */
+        >
+          Friends
+        </h2>
+        <EnhancedFriendsList friends={friends} />
+      </div>
+
+      <div
+        className={`
+          pt-6
+          col-span-1
+          mx-auto
+        `}
+        /* Video section: Centers the video container with top padding */
+      >
+        <div
+          className={`
+            w-full
+            max-w-[750px]
+            bg-gray-800
+            bg-opacity-40
+            rounded-lg
+            p-1
+            shadow-lg
+            ml-14
+            mt-32
+          `}
+          /* Video wrapper: Styles the video container with a semi-transparent background and shadow */
+        >
+          <video
+            src="/videos/fight_gif.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className={`
+              w-full
+              h-auto
+              rounded-lg
+            `}
+            /* Video: Ensures the video fills the container with rounded corners */
+          />
+        </div>
+      </div>
+
+      <div
+        className={`
+          pt-8
+          flex
+          flex-col
+          items-center
+          justify-start
+          gap-6
+          col-span-2
+        `}
+        /* Central section: Centers user info, play button, and arena with vertical spacing */
+      >
+        <UserHeader
+          user={{
+            username: user.username,
+            avatar: user.avatar,
+            wins: user.wins,
+            losses: user.losses,
+            history: user.history,
+          }}
+        />
+        <PrimaryButton onClick={handlePlay}>PLAY</PrimaryButton>
+        <PlayArena
+          user={{ username: user.username, avatar: user.avatar }}
+          opponentImage={selectedBot ? selectedBot.image : null}
+          opponentName={selectedBot ? selectedBot.name : undefined}
+        />
+      </div>
+
+      <div
+        className={`
+          pt-8
+          flex
+          justify-center
+          col-span-1
+        `}
+        /* Game mode section: Centers the game mode selector */
+      >
+        <div
+          className={`
+            flex
+            flex-col
+            items-center
+            justify-start
+            pt-5
+            px-2
+            xl:px-5
+            w-full
+            max-w-[320px]
+            xl:max-w-full
+          `}
+          /* Game mode wrapper: Styles the container for the game mode selector with responsive padding */
+        >
+          <GameModeSelector />
+        </div>
+      </div>
+
+      <div
+        className={`
+          pt-4
+          flex
+          flex-col
+          items-end
+          col-span-1
+          max-w-[220px]
+          ml-auto
+        `}
+        /* Players section: Aligns the players list vertically on the right side with constrained width */
+      >
+        <h2
+          className={`
+            text-lg
+            font-semibold
+            mb-2
+            text-right
+            drop-shadow-[0_0_8px_red]
+          `}
+          /* Players title: Styles the heading for the players list with a red glow */
+        >
+          Players
+        </h2>
+        <PlayersList players={players} />
+      </div>
+    </div>
+  );
+};
+
+export default DesktopLayout;
+
+
+
+
+
+///Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/Header.tsx
+
+import React from "react";
+import ProfileActions from "./ProfileActions";
+import { UserInfo } from "./types/UserInfo";
+
+interface HeaderProps {
+	user: Pick<UserInfo, "username" | "online" | "email">;
+	onProfileClick: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ user, onProfileClick }) => {
+	return (
+		<div
+			className={`
+        flex
+        justify-between
+        items-center
+        px-6
+        py-4
+      `}
+		/* Main container: Aligns the title and profile actions horizontally with padding */
+		>
+			<div
+				className={`
+          text-transparent
+          bg-clip-text
+          bg-gradient-to-r
+          from-red-400
+          via-indigo-300
+          to-green-300
+          text-2xl
+          sm:text-3xl
+          font-bold
+          transition-transform
+          duration-300
+          ease-in-out
+          hover:scale-110
+        `}
+				style={{
+					textShadow:
+						"0 0 20px rgba(255, 255, 255, 0.3), 0 0 32px rgba(255, 0, 255, 0.3)",
+				}}
+			/* Title: Styles the "NEON PONG" logo with a gradient, hover effect, and custom shadow */
+			>
+				NEON PONG
+			</div>
+			<ProfileActions user={user} onProfileClick={onProfileClick} />
+		</div>
+	);
+};
+
+export default Header;
+
+
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/MobileLayout.tsx
+
+import React from "react";
+import EnhancedFriendsList from "./EnhancedFriendsList";
+import PlayersList from "./PlayersList";
+import UserHeader from "./UserHeader";
+import PlayArena from "./PlayArena";
+import GameModeSelector from "./GameModeSelector";
+import { PrimaryButton } from "./types/ui";
+import { UserInfo } from "./types/UserInfo";
+import { bots } from "./types/botsData";
+
+interface MobileLayoutProps {
+  user: UserInfo;
+  friends: UserInfo[];
+  players: UserInfo[];
+  selectedBot: (typeof bots)[0] | null;
+  handlePlay: () => void;
+}
+
+const MobileLayout: React.FC<MobileLayoutProps> = ({
+  user,
+  friends,
+  players,
+  selectedBot,
+  handlePlay,
+}) => {
+  return (
+    <div
+      className={`
+        flex
+        xl:hidden
+        flex-col
+        items-center
+        px-4
+        gap-4
+      `}
+      /* Main container: Creates a centered, vertical layout for mobile screens, hidden on xl screens */
+    >
+      <UserHeader
+        user={{
+          username: user.username,
+          avatar: user.avatar,
+          wins: user.wins,
+          losses: user.losses,
+          history: user.history,
+        }}
+      />
+      <PrimaryButton onClick={handlePlay}>PLAY</PrimaryButton>
+      <PlayArena
+        user={{ username: user.username, avatar: user.avatar }}
+        opponentImage={selectedBot ? selectedBot.image : null}
+        opponentName={selectedBot ? selectedBot.name : undefined}
+      />
+      <div
+        className={`
+          w-full
+          max-w-xs
+          mt-4
+        `}
+        /* Game mode section: Constrains the width of the game mode selector with top margin */
+      >
+        <GameModeSelector />
+      </div>
+      <div
+        className={`
+          w-full
+          flex
+          flex-col
+          sm:flex-row
+          sm:justify-between
+          gap-4
+        `}
+        /* Friends and players container: Arranges friends and players lists vertically on mobile, horizontally on sm screens */
+      >
+        <div
+          className={`
+            w-full
+            sm:w-1/2
+            min-w-0
+          `}
+          /* Friends section: Styles the friends list container, taking half width on sm screens */
+        >
+          <h2
+            className={`
+              text-lg
+              font-semibold
+              mb-2
+              text-left
+              drop-shadow-[0_0_8px_red]
+            `}
+            /* Friends title: Styles the heading for the friends list with a red glow */
+          >
+            Friends
+          </h2>
+          <EnhancedFriendsList friends={friends} />
+        </div>
+        <div
+          className={`
+            w-full
+            sm:w-1/2
+            min-w-0
+            flex
+            flex-col
+            items-end
+          `}
+          /* Players section: Styles the players list container, aligned right, taking half width on sm screens */
+        >
+          <h2
+            className={`
+              text-lg
+              font-semibold
+              mb-2
+              text-right
+              drop-shadow-[0_0_8px_red]
+            `}
+            /* Players title: Styles the heading for the players list with a red glow */
+          >
+            Players
+          </h2>
+          <PlayersList players={players} />
+        </div>
+      </div>
+      <div
+        className={`
+          w-full
+          mt-8
+        `}
+        /* Video section: Centers the video container with top margin */
+      >
+        <div
+          className={`
+            w-full
+            max-w-[600px]
+            bg-gray-800
+            bg-opacity-50
+            rounded-2xl
+            p-4
+            shadow-lg
+            mx-auto
+          `}
+          /* Video wrapper: Styles the video container with a semi-transparent background and shadow */
+        >
+          <video
+            src="/videos/fight_gif.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className={`
+              w-full
+              h-auto
+              rounded-lg
+            `}
+            /* Video: Ensures the video fills the container with rounded corners */
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MobileLayout;
+
+
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/Avatar.tsx
 
 import React, { useEffect, useState } from 'react';
 import { UserInfo } from './types/UserInfo';
@@ -1527,227 +2239,27 @@ export default WinLossChart;
 
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/Profile.tsx
-
-
-import React, { useState, useEffect } from "react";
-import PlayersList from "./PlayersList";
-import BotCard from "./BotCard";
-import { bots } from "./types/botsData";
-import PlayArena from "./PlayArena";
-import ProfileActions from "./ProfileActions";
-import EnhancedFriendsList from "./EnhancedFriendsList";
+import React from "react";
 import ProfileModal from "./ProfileModal";
-import { PrimaryButton } from "./types/ui";
-import GameModeSelector from "./GameModeSelector";
-import UserHeader from "./UserHeader";
-import { UserInfo, MatchResult } from "./types/UserInfo";
-import { toast } from "react-hot-toast";
-import { Buffer } from 'buffer';
-import { useNavigate } from 'react-router-dom';
+import Header from "./Header";
+import DesktopLayout from "./DesktopLayout";
+import MobileLayout from "./MobileLayout";
+import BotSelector from "./BotSelector";
+import { useProfile } from "./hooks/useProfile";
 
 const Profile: React.FC = () => {
-  const [selectedBot, setSelectedBot] = useState<(typeof bots)[0] | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<UserInfo | null>(null);
-  const [friends, setFriends] = useState<UserInfo[]>([]);
-  const [players, setPlayers] = useState<UserInfo[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
-
-  const decodeToken = (token: string) => {
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-      const decoded = JSON.parse(jsonPayload);
-      console.log("Decoded token:", decoded);
-      return decoded;
-    } catch (e) {
-      console.error("Failed to decode token:", e);
-      return null; // Возвращаем null вместо ошибки
-    }
-  };
-
-  const fetchDataFromServer = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No token found in localStorage");
-      throw new Error("No token found, please log in.");
-    }
-
-    console.log("Fetching data with token:", token);
-    const response = await fetch("http://localhost:3000/users", {
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      console.error(`Server responded with status ${response.status}: ${response.statusText}`);
-      throw new Error(`Failed to fetch users: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    console.log("Server response:", data);
-
-    if (!data.users || !Array.isArray(data.users)) {
-      console.error("Invalid server response: 'users' field is missing or not an array");
-      throw new Error("Invalid server response");
-    }
-
-    // Поскольку id в токене отсутствует, будем считать последнего зарегистрированного пользователя текущим
-    const currentUser = data.users[data.users.length - 1]; // Временное решение: берём последнего пользователя
-    if (!currentUser) {
-      console.error("No users found in response:", data.users);
-      throw new Error("Current user not found");
-    }
-
-    const userData: UserInfo = {
-      id: currentUser.id || 'unknown',
-      username: currentUser.nickname || currentUser.name || "Unknown",
-      avatar: currentUser.image ? `data:image/jpeg;base64,${Buffer.from(currentUser.image).toString('base64')}` : "/prof_img/avatar1.png",
-      email: currentUser.email || "",
-      name: currentUser.name || "",
-      password: "",
-      wins: 0,
-      losses: 0,
-      online: !!currentUser.online,
-      history: [],
-    };
-
-    // Оставляем friends и players пустыми
-    const friendsData: UserInfo[] = [];
-    const playersData: UserInfo[] = [];
-
-    return { userData, friendsData, playersData };
-  };
-
-  const saveUserData = async (updatedUser: UserInfo) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.error("No token found in localStorage");
-        throw new Error("No token found, please log in.");
-      }
-
-      await fetch("http://localhost:3000/updateProfile", {
-        method: "PATCH",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: updatedUser.id,
-          name: updatedUser.name,
-          nickname: updatedUser.username,
-          password: updatedUser.password || undefined,
-        }),
-      });
-
-      if (updatedUser.avatar && updatedUser.avatar.startsWith("data:image")) {
-        const base64Data = updatedUser.avatar.split(',')[1];
-        const blob = await (await fetch(`data:image/jpeg;base64,${base64Data}`)).blob();
-        const formData = new FormData();
-        formData.append("id", updatedUser.id);
-        formData.append("file", blob, "avatar.jpg");
-
-        await fetch("http://localhost:3000/uploadPicture", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-          },
-          body: formData,
-        });
-      }
-
-      setUser(updatedUser);
-      toast.success('Profile updated successfully!');
-    } catch (err) {
-      console.error("Error saving data:", err);
-      setError("Couldn’t save the data. Please try again.");
-      toast.error("Couldn’t save the data. Please try again.");
-    }
-  };
-
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      try {
-        const { userData, friendsData, playersData } = await fetchDataFromServer();
-        setUser(userData);
-        setFriends(friendsData);
-        setPlayers(playersData);
-      } catch (err: any) {
-        console.error("Detailed error:", err.message, err.stack);
-        setError(`Couldn’t load data from the server: ${err.message}`);
-        toast.error(`Couldn’t load data: ${err.message}`);
-        if (err.message.includes("No token found") || err.message.includes("Current user not found")) {
-          localStorage.removeItem("token");
-          navigate("/signup");
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-  }, [navigate]);
-
-  const handleSaveProfile = async (data: {
-    avatar: string;
-    username: string;
-    password: string;
-  }) => {
-    if (!user) return;
-
-    const updatedUser: UserInfo = {
-      ...user,
-      avatar: data.avatar,
-      username: data.username,
-      password: data.password || user.password,
-    };
-    await saveUserData(updatedUser);
-    setIsModalOpen(false);
-  };
-
-  const handleGameEnd = async (result: "win" | "loss") => {
-    if (!user) return;
-
-    const today = new Date().toISOString().split("T")[0];
-    const weekday = new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(new Date());
-
-    const updatedUser: UserInfo = {
-      ...user,
-      history: [...user.history, { date: today, weekday, result }],
-      wins: result === "win" ? user.wins + 1 : user.wins,
-      losses: result === "loss" ? user.losses + 1 : user.losses,
-    };
-
-    setUser(updatedUser);
-  };
-
-  const handlePlayClick = () => {
-    if (!user) {
-      toast.error("User data not loaded!");
-      return;
-    }
-
-    if (!selectedBot) {
-      toast.error("Please select a bot to play with first!");
-      return;
-    }
-
-    const result = Math.random() > 0.5 ? "win" : "loss";
-    handleGameEnd(result);
-    toast.success(`Game over! You ${result === "win" ? "won" : "lost"} against ${selectedBot.name}!`);
-  };
+  const {
+    user,
+    friends,
+    players,
+    selectedBot,
+    isModalOpen,
+    isLoading,
+    setSelectedBot,
+    setIsModalOpen,
+    handleSaveProfile,
+    handlePlay,
+  } = useProfile();
 
   if (isLoading) {
     return (
@@ -1757,18 +2269,10 @@ const Profile: React.FC = () => {
     );
   }
 
-  if (error && !user) {
-    return (
-      <div className="min-h-screen w-full flex items-center justify-center text-white">
-        {error}
-      </div>
-    );
-  }
-
   if (!user) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center text-white">
-        Couldn’t find user data.
+        Failed to load user data.
       </div>
     );
   }
@@ -1776,104 +2280,42 @@ const Profile: React.FC = () => {
   return (
     <>
       <div className="min-h-screen w-full text-white flex flex-col overflow-y-auto justify-between">
-        <div className="flex justify-between items-center px-6 py-4">
-          <div
-            className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-indigo-300 to-green-300 text-2xl sm:text-3xl font-bold transition-transform duration-300 ease-in-out hover:scale-110"
-            style={{ textShadow: `0 0 20px rgba(255, 255, 255, 0.3), 0 0 32px rgba(255, 0, 255, 0.3)` }}
-          >
-            NEON PONG
-          </div>
-          <ProfileActions
-            user={{ username: user.username, online: user.online, email: user.email }}
-            onProfileClick={() => setIsModalOpen(true)}
-          />
-        </div>
-
-        <div className="hidden xl:grid xl:grid-cols-6 gap-4 px-4 flex-grow">
-          <div className="pt-4 flex flex-col items-start col-span-1 max-w-[220px]">
-            <h2 className="text-lg font-semibold mb-2 text-left drop-shadow-[0_0_8px_red]">Friends</h2>
-            <EnhancedFriendsList friends={friends} />
-          </div>
-          <div className="pt-6 col-span-1 mx-auto">
-            <div className="w-full max-w-[750px] bg-gray-800 bg-opacity-40 rounded-lg p-1 shadow-lg ml-14 mt-32">
-              <video src="/videos/fight_gif.mp4" autoPlay loop muted playsInline className="w-full h-auto rounded-lg" />
-            </div>
-          </div>
-          <div className="pt-8 flex flex-col items-center justify-start gap-6 col-span-2">
-            <UserHeader
-              user={{ username: user.username, avatar: user.avatar, wins: user.wins, losses: user.losses, history: user.history }}
-            />
-            <PrimaryButton onClick={handlePlayClick}>PLAY</PrimaryButton>
-            <PlayArena
-              user={{ username: user.username, avatar: user.avatar }}
-              opponentImage={selectedBot ? selectedBot.image : null}
-              opponentName={selectedBot ? selectedBot.name : undefined}
-            />
-          </div>
-          <div className="pt-8 flex justify-center col-span-1">
-            <div className="flex flex-col items-center justify-start pt-5 px-2 xl:px-5 w-full max-w-[320px] xl:max-w-full">
-              <GameModeSelector />
-            </div>
-          </div>
-          <div className="pt-4 flex flex-col items-end col-span-1 max-w-[220px] ml-auto">
-            <h2 className="text-lg font-semibold mb-2 text-right drop-shadow-[0_0_8px_red]">Players</h2>
-            <PlayersList players={players} />
-          </div>
-        </div>
-
-        <div className="flex xl:hidden flex-col items-center px-4 gap-4">
-          <UserHeader
-            user={{ username: user.username, avatar: user.avatar, wins: user.wins, losses: user.losses, history: user.history }}
-          />
-          <PrimaryButton onClick={handlePlayClick}>PLAY</PrimaryButton>
-          <PlayArena
-            user={{ username: user.username, avatar: user.avatar }}
-            opponentImage={selectedBot ? selectedBot.image : null}
-            opponentName={selectedBot ? selectedBot.name : undefined}
-          />
-          <div className="w-full max-w-xs mt-4">
-            <GameModeSelector />
-          </div>
-          <div className="w-full flex flex-col sm:flex-row sm:justify-between gap-4">
-            <div className="w-full sm:w-1/2 min-w-0">
-              <h2 className="text-lg font-semibold mb-2 text-left drop-shadow-[0_0_8px_red]">Friends</h2>
-              <EnhancedFriendsList friends={friends} />
-            </div>
-            <div className="w-full sm:w-1/2 min-w-0 flex flex-col items-end">
-              <h2 className="text-lg font-semibold mb-2 text-right drop-shadow-[0_0_8px_red]">Players</h2>
-              <PlayersList players={players} />
-            </div>
-          </div>
-          <div className="w-full mt-8">
-            <div className="w-full max-w-[600px] bg-gray-800 bg-opacity-50 rounded-2xl p-4 shadow-lg mx-auto">
-              <video src="/videos/fight_gif.mp4" autoPlay loop muted playsInline className="w-full h-auto rounded-lg" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gray-900 bg-opacity-70 w-full flex flex-col text-center pt-2 px-4 pb-5 mt-4">
-          <p className="text-lg text-purple-400 font-extrabold uppercase tracking-wide drop-shadow-[0_0_8px_white]">
-            Fighters — choose your rival!
-          </p>
-          <div className="pt-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 w-full px-2 sm:px-4">
-              {bots.map((bot, idx) => (
-                <BotCard
-                  key={idx}
-                  {...bot}
-                  onSelect={() => setSelectedBot(bot)}
-                  selected={selectedBot?.image === bot.image}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+        <Header
+          user={{
+            username: user.username,
+            online: user.online,
+            email: user.email,
+          }}
+          onProfileClick={() => setIsModalOpen(true)}
+        />
+        <DesktopLayout
+          user={user}
+          friends={friends}
+          players={players}
+          selectedBot={selectedBot}
+          handlePlay={handlePlay}
+        />
+        <MobileLayout
+          user={user}
+          friends={friends}
+          players={players}
+          selectedBot={selectedBot}
+          handlePlay={handlePlay}
+        />
+        <BotSelector
+          selectedBot={selectedBot}
+          setSelectedBot={setSelectedBot}
+        />
       </div>
 
       {isModalOpen && (
         <ProfileModal
           onClose={() => setIsModalOpen(false)}
-          userData={{ avatar: user.avatar, username: user.username, name: user.name }}
+          userData={{
+            avatar: user.avatar,
+            username: user.username,
+            name: user.name,
+          }}
           onSave={handleSaveProfile}
         />
       )}
@@ -1886,12 +2328,12 @@ export default Profile;
 
 
 
-
-
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/ProfileActions.tsx
 import React from "react";
 import { UserInfo } from "./types/UserInfo";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { getAuthHeaders } from "./types/api"; // Импорт функции
 
 interface ProfileActionsProps {
   user: Pick<UserInfo, "username" | "online" | "email">;
@@ -1899,18 +2341,22 @@ interface ProfileActionsProps {
 }
 
 const ProfileActions: React.FC<ProfileActionsProps> = ({ user, onProfileClick }) => {
+  const navigate = useNavigate();
+
   const handleLogout = async () => {
     try {
       const response = await fetch("http://localhost:3000/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...getAuthHeaders(), // Используем функцию без приведения типов
         },
         body: JSON.stringify({ email: user.email }),
       });
       if (!response.ok) throw new Error("Failed to logout");
       toast.success("Logged out successfully!");
-      // Можно добавить редирект на страницу логина, если есть
+      localStorage.removeItem("token"); // Очищаем токен
+      navigate("/login"); // Перенаправляем на страницу логина
     } catch (err) {
       console.error("Logout error:", err);
       toast.error("Failed to logout. Please try again.");
@@ -1922,7 +2368,6 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({ user, onProfileClick })
       <span className={`text-sm font-bold ${user.online ? "text-green-400" : "text-gray-400"}`}>
         {user.username}
       </span>
-      {/* PROFILE */}
       <button
         onClick={onProfileClick}
         className="px-4 py-2 rounded-2xl text-base font-bold bg-transparent outline-3 outline-offset-2 outline-double border border-emerald-200 text-white transition-all duration-300 ease-in-out hover:scale-110"
@@ -1937,7 +2382,6 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({ user, onProfileClick })
       >
         Profile
       </button>
-      {/* LogOut */}
       <button
         onClick={handleLogout}
         className="px-4 py-2 rounded-2xl text-base font-bold bg-transparent outline-3 outline-offset-2 outline-double border border-emerald-200 text-white transition-all duration-300 ease-in-out hover:scale-110"
@@ -1964,14 +2408,11 @@ export default ProfileActions;
 
 import React, { useState } from "react";
 import { UserInfo } from "./types/UserInfo";
+import { toast } from "react-hot-toast";
 
 interface ProfileModalProps {
   onClose: () => void;
-  onSave: (data: {
-    avatar: string;
-    username: string;
-    password: string;
-  }) => void;
+  onSave: (data: Partial<UserInfo>) => void;
   userData: Pick<UserInfo, "avatar" | "username" | "name">;
 }
 
@@ -1982,17 +2423,30 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 }) => {
   const [avatar, setAvatar] = useState(userData.avatar);
   const [username, setUsername] = useState(userData.username);
+  const [name] = useState(userData.name); // Read-only, не обновляется
   const [password, setPassword] = useState("");
+
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB max
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("File is too big! Max size: 10 MB.");
+      return;
+    }
 
     const reader = new FileReader();
     reader.onloadend = () => {
       setAvatar(reader.result as string);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleSave = () => {
+    console.log("Saving data:", { avatar, username, name, password }); // Отладка
+    onSave({ avatar, username, name, password });
   };
 
   return (
@@ -2022,7 +2476,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
       >
         <h2 className="text-2xl font-bold text-center">Edit Profile</h2>
 
-        {/* Avatar */}
         <div className="flex flex-col items-center gap-2">
           <img
             src={avatar}
@@ -2031,36 +2484,44 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
           />
           <input
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png"
             onChange={handleAvatarChange}
             className="text-sm text-gray-300"
           />
         </div>
 
-        {/* Username */}
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="w-full p-2 rounded bg-gray-800 border border-gray-600"
-        />
-
-        {/* Password */}
-        <input
-          type="password"
-          placeholder="New Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 rounded bg-gray-800 border border-gray-600"
-        />
-
-        {/* Static fields */}
-        <div className="text-sm text-gray-400 space-y-1">
-            <p>Name: {userData.name}</p>
+        <div className="flex flex-col gap-1">
+          <label className="text-sm text-gray-400">Name</label>
+          <input
+            type="text"
+            value={name}
+            readOnly
+            className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-gray-400 cursor-not-allowed"
+          />
         </div>
 
-        {/* Buttons */}
+        <div className="flex flex-col gap-1">
+          <label className="text-sm text-gray-400">Username</label>
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="w-full p-2 rounded bg-gray-800 border border-gray-600"
+          />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-sm text-gray-400">New Password</label>
+          <input
+            type="password"
+            placeholder="New Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-2 rounded bg-gray-800 border border-gray-600"
+          />
+        </div>
+
         <div className="flex justify-end gap-3 pt-4">
           <button
             onClick={onClose}
@@ -2069,13 +2530,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
             Cancel
           </button>
           <button
-            onClick={() =>
-              onSave({
-                avatar,
-                username,
-                password,
-              })
-            }
+            onClick={handleSave} // Используем отдельную функцию для отладки
             className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
           >
             Save
@@ -2087,7 +2542,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 };
 
 export default ProfileModal;
-
 
 
 
@@ -2241,31 +2695,31 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 // /home/ogoman/HIVE/Projects/ft_transcendence/server/controllers/auth.js
 
 // import HttpError from "../http-error.js";
-import db from "../database/database.js"; // Using better-sqlite3
+import db from "../database/database.js";
 
 export async function signup(req, reply) {
   console.log("We are in SIGNUP middleware");
 
-  const { name, nickname, email, password } = req.body;
+  const { name, username, email, password } = req.body;
 
   // Validate request body
-  if (!name || !password || !email || !nickname) {
+  if (!name || !password || !email || !username) {
     return reply.code(400).send({ message: "No pass or name or email" });
   }
 
   try {
     const hasUser = db
-      .prepare("SELECT * FROM users WHERE email = ? OR nickname = ?")
-      .get(email, nickname);
+      .prepare("SELECT * FROM users WHERE email = ? OR username = ?")
+      .get(email, username);
     console.log("Has user", hasUser);
     if (!hasUser) {
       const users = db.prepare(
-        "INSERT INTO users (name, nickname, email, password) VALUES (?, ?, ?, ?)"
+        "INSERT INTO users (name, username, email, password) VALUES (?, ?, ?, ?)"
       );
-      const result = users.run(name, nickname, email, password);
-      const token  =  req.jwt.sign ({
-        id: users.id
-      })
+      const result = users.run(name, username, email, password);
+
+      // result.lastInsertRowid  ID for new player
+      const token = req.jwt.sign({ id: result.lastInsertRowid });
 
       console.log("TOKEN_ID", token);
 
@@ -2282,7 +2736,7 @@ export async function signup(req, reply) {
 
       console.log("ONLINE? =>", updated);
 
-      return reply.code(201).send({ message: "USER created", users, accessToken: token });// TOKEN DELETE LATER!!!!!!!!!!!!
+      return reply.code(201).send({ message: "USER created", accessToken: token }); // TOKEN DELETE LATER!!!!!!!!!!!!
     } else {
       console.log("User already exist");
       return reply.code(400).send({ message: "User already exist" });
@@ -2302,25 +2756,25 @@ export async function login(req, reply) {
 
   try {
     const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
-    console.log("Query result:", user); // Log the result
+    console.log("Query result:", user);  // Log the result
 
     if (user) {
       console.log("Email", user.email);
       console.log("Pass", user.password);
-      // reply.code(200).send({ message: "There is such a user", user });
+	  // reply.code(200).send({ message: "There is such a user", user });
       const kuku = db
         .prepare("SELECT * FROM users WHERE email = ? AND password = ?")
         .get(email, password);
 
-        // const token = jwt.sign(
+		// const token = jwt.sign(
         //   { userId: user.id },
         //   { expiresIn: "2h" }
         // );
       // console.log("kuku", kuku);
 
-      const token  =  req.jwt.sign ({
-        id: user.id
-      })
+      const token = req.jwt.sign ({
+		id: user.id
+	  });
       if (kuku) {
         console.log("WE are logged in");
         const userOnline = db
@@ -2335,7 +2789,7 @@ export async function login(req, reply) {
 
         console.log("ONLINE =>", online.changes);
 
-        return reply.code(200).send({ message: "We are logged in", accessToken: token });// TOKEN DELETE LATER
+        return reply.code(200).send({ message: "We are logged in", accessToken: token }); // TOKEN DELETE LATER
       } else {
         console.log("Wrong pass ");
         return reply.code(401).send({ message: "Wrong pass" });
@@ -2354,11 +2808,10 @@ export async function logout(req, reply) {
   try {
     const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
 
-    console.log("ID=>",user.id)
+    console.log("ID=>", user.id);
 
-    // console.log(logout);
-    const offline = db.prepare("UPDATE users SET online = ? WHERE email = ?").run(0, email)
-    console.log("Offline =>",offline)
+    const offline = db.prepare("UPDATE users SET online = ? WHERE email = ?").run(0, email);
+    console.log("Offline =>", offline);
     return reply.code(200).send({ message: "We are logout", user });
   } catch (err) {
     console.error("Database error:", err.message);
@@ -2376,15 +2829,15 @@ import db from "../database/database.js";
 export async function friendsSearch(req, reply) {
   console.log("WE ARE IN FRIENDS");
 
-  const { nickname } = req.body;
+  const { username } = req.body;
   
-  if(!nickname)
-        return reply.code(400).send({message: "PLease fill in frien nickname"})
+  if(!username)
+        return reply.code(400).send({message: "PLease fill in frien username"})
 
   try
   {
-    const hasUser = db.prepare("SELECT * FROM users WHERE nickname = ? ").get(nickname);
-    console.log("THERE is such nickname",hasUser);
+    const hasUser = db.prepare("SELECT * FROM users WHERE username = ? ").get(username);
+    console.log("THERE is such username",hasUser);
     if(!hasUser)
     {
         return reply.code(400).send({ message: "Not such user" });
@@ -2404,15 +2857,15 @@ export async function friendsSearch(req, reply) {
 export async function friendsAdd(req, reply) {
     console.log("WE ARE IN ADDING FRIENDS");
   
-    const {id, nickname } = req.body;
+    const {id, username } = req.body;
     
-    if(!nickname || !id)
-          return reply.code(400).send({message: "PLease fill in friend nickname"})
+    if(!username || !id)
+          return reply.code(400).send({message: "PLease fill in friend username"})
   
     try
     {
-      const hasUser = db.prepare("SELECT * FROM users WHERE nickname = ? ").get(nickname);
-      console.log("THERE is such nickname",hasUser);
+      const hasUser = db.prepare("SELECT * FROM users WHERE username = ? ").get(username);
+      console.log("THERE is such username",hasUser);
       if(!hasUser)
       {
           return reply.code(400).send({ message: "Not such user" });
@@ -2436,102 +2889,124 @@ export async function friendsAdd(req, reply) {
 
   import db from "../database/database.js";
 
-  export async function updateProfile(req, reply) {
-    console.log("WE in Update Profile MW");
-    const { name, nickname, id, password } = req.body;
-  
-    if (!name && !nickname && !password) {
-      return reply.code(400).send({ message: "Notning to change" });
-    }
-    // console.log("name", name);
-    console.log("idddd", id);
-    try {
-      console.log("id", id);
-      const user = db.prepare("SELECT * FROM users WHERE id = ?").get(id); ///Here we need id not id!!!!!!
-      console.log("user ok => ", user.id);
-      if (!user) {
-        return reply.code(400).send({ message: "Notning to change" });
-      }
-      if (user) {
-        if (name) {
-          const updateName = db
-            .prepare("UPDATE users SET name = ? WHERE id = ?")
-            .run(name, user.id);
-          console.log("NAME UPDATED =>", updateName);
-          // return reply.code(200).send({message: "Name updated"})
-        }
-        if (password) {
-          const updatePassword = db
-            .prepare("UPDATE users SET password = ? WHERE id = ?")
-            .run(password, id);
-          console.log("password UPDATED =>", updatePassword);
-          // return reply.code(200).send({message: "password updated"})
-        }
-        if (nickname) {
-          console.log("we are in nick change");
-          const nickExist = db
-            .prepare("SELECT * FROM users WHERE nickname = ?")
-            .get(nickname);
-          console.log("NickExist =>", nickExist);
-          if (nickExist) {
-            return reply.code(400).send({ message: "Nick already exists" });
-          } else {
-            const updateNickname = db
-              .prepare("UPDATE users SET nickname = ? WHERE id = ?")
-              .run(nickname, id);
-            console.log("nickname UPDATED =>", updateNickname);
-            // return reply.code(200).send({message: "Nick updated"})
-          }
-        }
-        return reply.code(200).send({ message: "updated" });
-      }
-    } catch (err) {
-      console.error("Database error:", err.message);
-      return reply.code(500).send({ message: "Something went wrong" });
-    }
+// Helper function for searching user by ID
+const findUserById = (id) => {
+  try {
+    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(id);
+    return user;
+  } catch (err) {
+    console.error("Database error in findUserById:", err.message);
+    throw new Error(`Database error while finding user: ${err.message}`);
   }
-  
-  
-  
-  
-  
-  
-  export async function uploadPicture(pic,reply) {
-    console.log("Kuku from upload pictures");
-  
-    const allowedTypes = ["image/jpeg", "image/png"];
-  
-    // const { image, email } = req.body;
-  
-    if (!pic) {
-      return reply.code(400).send({ message: "no image to upload" });
-    }
-  
-    if (!allowedTypes.includes(pic.mimetype)) {
-      return reply.code(400).send({ message: "invalidddd" });
-    }
-    
-    // const email = pic.fields?.email;
-    // if (!email) {
-    //   return reply.code(400).send({ message: "no email provided" });
-    // }
-    const id = pic.fields?.id.value;
-    try {
-      console.log("eeeeeeeeeeeeeee");
-      console.log("id=>", id)
-      const user = db.prepare("SELECT * FROM users WHERE id = ?").get(id); 
-      console.log("user ok => ", user.id);
-  
-      const buffer = await pic.toBuffer();
-  
-      db.prepare("UPDATE users SET image = ? WHERE id = ?").run(buffer, user.id);
-      return reply.code(200).send({ message: "Image uploaded" });
-    } catch (err) {
-      console.error("Database error:", err.message);
-      return reply.code(500).send({ message: "Something went wrong" });
-    }
+};
+
+export async function updateProfile(req, reply) {
+  console.log("WE in Update Profile MW");
+  const { name, username, password } = req.body;
+
+  if (!name && !username && !password) {
+    return reply.code(400).send({ message: "Nothing to change" });
   }
 
+  const id = req.user.id; // ID from JWT-token
+
+  // console.log("name", name);
+  console.log("idddd", id);
+  try {
+    if (name) {
+      const updateName = db
+        .prepare("UPDATE users SET name = ? WHERE id = ?")
+        .run(name, id);
+      console.log("NAME UPDATED =>", updateName.changes);
+	  // return reply.code(200).send({message: "Name updated"})
+    }
+    if (password) {
+      const updatePassword = db
+        .prepare("UPDATE users SET password = ? WHERE id = ?")
+        .run(password, id);
+      console.log("password UPDATED =>", updatePassword.changes);
+	  // return reply.code(200).send({message: "password updated"})
+    }
+    if (username) {
+      console.log("we are in nick change");
+      const nickExist = db
+        .prepare("SELECT * FROM users WHERE username = ?")
+        .get(username);
+      console.log("NickExist =>", nickExist);
+      if (nickExist) {
+        return reply.code(400).send({ message: "Nick already exists" });
+      }
+      const updateusername = db
+        .prepare("UPDATE users SET username = ? WHERE id = ?")
+        .run(username, id);
+      console.log("username UPDATED =>", updateusername.changes);
+	  // return reply.code(200).send({message: "Nick updated"})
+    }
+    return reply.code(200).send({ message: "updated" });
+  } catch (err) {
+    console.error("Database error:", err.message);
+    return reply.code(500).send({ message: `Failed to update profile: ${err.message}` });
+  }
+}
+
+export async function uploadPicture(req, reply) {
+  console.log("Kuku from upload pictures");
+
+  const allowedTypes = ["image/jpeg", "image/png"];
+  const pic = req.file;
+
+  if (!pic) {
+    return reply.code(400).send({ message: "No image to upload" });
+  }
+
+  if (!allowedTypes.includes(pic.mimetype)) {
+    return reply.code(400).send({ message: "Invalid image format" });
+  }
+
+  // const email = pic.fields?.email;
+  // if (!email) {
+  //   return reply.code(400).send({ message: "no email provided" });
+  // }
+  const id = req.user.id; // ID from JWT-token
+  try {
+	console.log("eeeeeeeeeeeeeee");
+    console.log("id=>", id);
+    const buffer = await pic.toBuffer();
+    const result = db
+      .prepare("UPDATE users SET image = ? WHERE id = ?")
+      .run(buffer, id);
+    console.log("IMAGE UPDATED =>", result.changes);
+    return reply.code(200).send({ message: "Image uploaded successfully" });
+  } catch (err) {
+    console.error("Database error:", err.message);
+    return reply.code(500).send({ message: `Failed to upload image: ${err.message}` });
+  }
+}
+
+export async function getCurrentUser(req, reply) {
+  const userId = req.user.id;
+  console.log("Looking for user with id:", userId);
+
+  try {
+    const user = findUserById(userId);
+    if (!user) {
+      console.log("User not found for id:", userId);
+      return reply.code(404).send({ message: "User not found" });
+    }
+
+    // image to Base64
+    const userResponse = {
+      ...user,
+      image: user.image ? Buffer.from(user.image).toString("base64") : null,
+    };
+    
+    console.log("User found:", userResponse);
+    return reply.code(200).send({ user: userResponse });
+  } catch (err) {
+    console.error("Database error:", err.message);
+    return reply.code(500).send({ message: `Failed to fetch user: ${err.message}` });
+  }
+}
   
 
 
@@ -2547,7 +3022,7 @@ const db = new Database("./database/users.db");
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nickname TEXT NOT NULL,
+    username TEXT NOT NULL,
     email TEXT NOT NULL,
     name TEXT NOT NULL,
     password TEXT NOT NULL,
@@ -2619,6 +3094,7 @@ export default authRoutes;
 
 
 
+
 // /home/ogoman/HIVE/Projects/ft_transcendence/server/routes/FriendsRoutes.js
 
 
@@ -2663,10 +3139,29 @@ export default friendsRoutes;
 
 import { ProfileSchema } from "../schema/profile.schema.js";
 import fastifyMultipart from "@fastify/multipart";
-import { updateProfile, uploadPicture } from "../controllers/profile.js";
+import { updateProfile, uploadPicture, getCurrentUser } from "../controllers/profile.js";
+
+// Middleware for token verification using @fastify/jwt
+const authenticateToken = async (req, reply) => {
+  try {
+    const decoded = await req.jwt.verify(req.headers["authorization"]?.split(" ")[1]);
+    console.log("Decoded token:", decoded);
+    req.user = decoded;
+  } catch (err) {
+    console.error("Token verification error:", err);
+    return reply.code(403).send({ message: "Invalid token" });
+  }
+};
 
 async function profileRoutes(fastify) {
-  fastify.register(fastifyMultipart);
+  fastify.register(fastifyMultipart, {
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10 MB
+    },
+  });
+
+  // Apply middleware to all routes
+  fastify.addHook("preHandler", authenticateToken);
 
   fastify.patch("/updateProfile", async (req, reply) => {
     const validated = ProfileSchema.safeParse(req.body);
@@ -2678,20 +3173,25 @@ async function profileRoutes(fastify) {
     }
     return updateProfile({ ...req, body: validated.data }, reply);
   });
+
   fastify.post("/uploadPicture", async (req, reply) => {
     const pic = await req.file();
-    // const email = pic.fields?.email.value;
+	// const email = pic.fields?.email.value;
     // console.log("email:", email);
 
     if (!pic) {
       return reply.code(400).send({ message: "No picture uploaded" });
     }
 
-    // if (!email) {
+	// if (!email) {
     //   return reply.code(400).send({ message: "No email provided" });
     // }
+    
+    return uploadPicture({ ...req, file: pic }, reply);
+  });
 
-    return uploadPicture(pic, reply);
+  fastify.get("/users/me", async (req, reply) => {
+    return getCurrentUser(req, reply);
   });
 }
 
@@ -2704,12 +3204,12 @@ export default profileRoutes;
 import { z } from "zod"; /// validation
 
 export const FriendsSchema = z.object({
-  nickname: z.string().max(20)
+  username: z.string().max(20)
 });
 
 export const FriendsAddSchema = z.object({
   id: z.string().max(),
-  nickname: z.string().max(20)
+  username: z.string().max(20)
 });
 
 
@@ -2722,13 +3222,14 @@ import { z } from "zod"
 export const ProfileSchema = z.object
 (
     {
-        name: z.string().max(20),
-        nickname: z.string().max(20),
-        password: z.string().min(4).max(40),
-        id: z.string(),
+		name: z.string().max(20).optional(),
+		username: z.string().max(20).optional(),
+		password: z.string().min(4).max(40).optional(),
+        // id: z.string(),
         // image: z.string(),
     }
 )
+
 
 
 
@@ -2740,7 +3241,7 @@ import { z } from "zod"; /// validation
 
 export const SignUpSchema = z.object({
   name: z.string().max(20),
-  nickname: z.string().max(20),
+  username: z.string().max(20),
   email: z.string().max(40).email(),
   password: z.string().min(4).max(40),
 });
@@ -2812,6 +3313,8 @@ class HttpError extends Error {
 
 import Fastify from "fastify";
 import authRoutes from "./routes/AuthRoutes.js";
+import friendsRoutes from "./routes/FriendsRoutes.js";
+import profileRoutes from "./routes/ProfileRoutes.js";
 import cors from '@fastify/cors';
 import dotenv from 'dotenv';
 import jwt from '@fastify/jwt';
@@ -2834,10 +3337,14 @@ fastify.addHook('preHandler', (req, res, next) => {
 await fastify.register(cors, {
   origin: 'http://localhost:5173',
   credentials: true,
+  methods: ['GET', 'POST', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 });
 
 // Routes
 fastify.register(authRoutes);
+fastify.register(friendsRoutes);
+fastify.register(profileRoutes);
 
 // Server start
 const start = async () => {
@@ -2850,3 +3357,4 @@ const start = async () => {
 };
 
 start();
+
