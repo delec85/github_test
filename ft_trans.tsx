@@ -35,6 +35,7 @@ export default HeaderButton;
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/components/NeonCursor.tsx
 
+
 import React, { useEffect } from 'react';
 import '../styles/cursor.css';
 
@@ -143,6 +144,9 @@ const AuthButtons = ({ openModal }: { openModal: (mode: "login" | "signup") => v
 
 export default AuthButtons;
 
+
+
+
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/components/Layout.tsx
 
 import React, { useState } from 'react';
@@ -163,7 +167,6 @@ const Layout: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  // Не показываем модальное окно, если текущий маршрут /login или /signup
   const isAuthRoute = location.pathname === '/login' || location.pathname === '/signup';
 
   return (
@@ -175,6 +178,8 @@ const Layout: React.FC = () => {
 };
 
 export default Layout;
+
+
 
 
 //! ROUTER
@@ -205,6 +210,9 @@ const AppRouter = () => {
 };
 
 export default AppRouter;
+
+
+
 
 // AUTHPAGE
 
@@ -240,6 +248,7 @@ label {
 
 
 
+
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pages/AuthPage/AuthPage.tsx
 
 import React, { useState } from "react";
@@ -247,7 +256,13 @@ import React, { useState } from "react";
 import SignInForm from "./LogInForm";
 import SignUpForm from "./SignUpForm";
 
-const AuthPage = ({ onClose, mode }: { onClose: () => void; mode: "login" | "signup" }) => {
+const AuthPage = ({
+  onClose,
+  mode,
+}: {
+  onClose: () => void;
+  mode: "login" | "signup";
+}) => {
   const [isLogin, setIsLogin] = useState(mode === "login");
 
   return (
@@ -269,7 +284,9 @@ const AuthPage = ({ onClose, mode }: { onClose: () => void; mode: "login" | "sig
             onClick={() => setIsLogin(!isLogin)}
             className="text-indigo-200 hover:underline"
           >
-            {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login"}
+            {isLogin
+              ? "Don't have an account? Sign Up"
+              : "Already have an account? Login"}
           </button>
         </div>
       </div>
@@ -362,18 +379,17 @@ export default SignInForm;
 
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pages/AuthPage/SignUpForm.tsx
 
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface SignUpFormProps {
-  onSuccess?: () => void;  // Made optional if not always provided
-  closeModal?: () => void;  // Add closeModal prop
+  onSuccess?: () => void; // Made optional if not always provided
+  closeModal?: () => void; // Add closeModal prop
 }
 
 const SignUpForm = ({ onSuccess, closeModal }: SignUpFormProps) => {
   const [name, setName] = useState("");
-  const [username, setusername] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setError] = useState("");
@@ -407,7 +423,9 @@ const SignUpForm = ({ onSuccess, closeModal }: SignUpFormProps) => {
 
   return (
     <div className="p-6 max-w-md mx-auto">
-      <h2 className="text-2xl tracking-wide font-bold mb-5 text-center">Registration</h2>
+      <h2 className="text-2xl tracking-wide font-bold mb-5 text-center">
+        Registration
+      </h2>
       <form onSubmit={handleSignUp} className="space-y-4">
         {err && <p className="text-red-500 text-center">{err}</p>}
         <div className="space-y-2">
@@ -424,7 +442,7 @@ const SignUpForm = ({ onSuccess, closeModal }: SignUpFormProps) => {
             placeholder="username"
             className="w-full px-4 py-2 bg-black text-white bg-opacity-30 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-800"
             value={username}
-            onChange={(e) => setusername(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
           <input
@@ -466,7 +484,6 @@ export default SignUpForm;
 
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pages/MainPage/MainPage.tsx
 
-import React from 'react';
 import myImage from '../../assets/mainPageImages/Main_Image.png';
 import { useOutletContext } from "react-router-dom";
 
@@ -495,7 +512,7 @@ const MainPage = () => {
                 textShadow: '2px 2px 10px rgba(209, 255, 249, 0.6)', 
                 boxShadow: '0 0 15px 6px rgba(117, 184, 255, 0.5)'
               }}
-              onClick={() => openModal('login')} // Открываем логин по умолчанию
+              onClick={() => openModal('login')}
             >
               START GAME
             </button>
@@ -526,12 +543,13 @@ export default MainPage;
 
  // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/styles/cursor.css
 
+
  .neon-cursor {
 	position: fixed;
-	width: 20px;
-	height: 20px;
+	width: 25px;
+	height: 25px;
 	background: radial-gradient(
-	  circle,
+		circle,
 	  rgba(255, 153, 255, 1) 20%,
 	  rgba(102, 255, 255, 0.3) 80%
 	);
@@ -546,7 +564,7 @@ export default MainPage;
 	transition: transform 0.2s ease;
   }
   
-  /* Шлейф */
+
   .cursor-trail {
 	position: fixed;
 	width: 20px;
@@ -560,22 +578,22 @@ export default MainPage;
 	border-radius: 50%;
 	pointer-events: none;
 	z-index: 9998;
-	transform: translate(-50%, -50%); /* Центрируем шлейф */
+	transform: translate(-50%, -50%);
 	animation: fade-out 1s ease-out forwards;
 	box-shadow: 
 	  0 0 10px rgba(255, 153, 255, 0.8),
 	  0 0 20px rgba(102, 255, 255, 0.5);
   }
   
-  /* Анимация для исчезновения шлейфа */
+
   @keyframes fade-out {
 	0% {
 	  opacity: 0.8;
-	  transform: translate(-50%, -50%) scale(1); /* Учитываем центрирование */
+	  transform: translate(-50%, -50%) scale(1); 
 	}
 	100% {
 	  opacity: 0;
-	  transform: translate(-50%, -50%) scale(0.3); /* Учитываем центрирование */
+	  transform: translate(-50%, -50%) scale(0.3);
 	}
   }
 
@@ -586,163 +604,161 @@ export default MainPage;
 
 
   import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-  import { useNavigate } from "react-router-dom";
-  import { toast } from "react-hot-toast";
-  import { UserInfo, MatchResult } from "../types/UserInfo";
-  import { fetchUserData, updateUserProfile, getAuthHeaders, saveGameResult } from "../types/api";
-  import { bots } from "../types/botsData";
-  
-  export const useProfile = () => {
-	  const [selectedBot, setSelectedBot] = useState<(typeof bots)[0] | null>(null);
-	  const [isModalOpen, setIsModalOpen] = useState(false);
-	  const [isLoading, setIsLoading] = useState(true);
-	  const [user, setUser] = useState<UserInfo | null>(null);
-	  const [friends, setFriends] = useState<UserInfo[]>([]);
-	  const [players, setPlayers] = useState<UserInfo[]>([]);
-	  const navigate = useNavigate();
-	  const isFetchingRef = useRef(false);
-  
-	  const authHeaders = useMemo(() => getAuthHeaders(), []);
-  
-	  const loadData = useCallback(async () => {
-		  if (isFetchingRef.current) {
-			  return;
-		  }
-		  isFetchingRef.current = true;
-  
-		  const token = localStorage.getItem("token");
-		  if (!token) {
-			  setIsLoading(false);
-			  toast.error("No token found. Please log in.");
-			  navigate("/login");
-			  isFetchingRef.current = false;
-			  return;
-		  }
-  
-		  setIsLoading(true);
-		  try {
-			  const userData = await fetchUserData(authHeaders);
-			  setUser(userData);
-			  setFriends([]); // Заглушка для друзей
-		  } catch (err: any) {
-			  toast.error("Failed to load user data. Please log in again.");
-			  localStorage.removeItem("token");
-			  navigate("/login");
-		  } finally {
-			  setIsLoading(false);
-			  isFetchingRef.current = false;
-		  }
-	  }, [navigate, authHeaders]);
-  
-	  const saveUserData = useCallback(
-		  async (updatedUser: UserInfo) => {
-			  const profileUpdates: Partial<UserInfo> = {};
-			  if (updatedUser.name !== user?.name)
-				  profileUpdates.name = updatedUser.name;
-			  if (updatedUser.username !== user?.username)
-				  profileUpdates.username = updatedUser.username;
-			  if (updatedUser.password !== user?.password)
-				  profileUpdates.password = updatedUser.password;
-  
-			  await updateUserProfile(
-				  profileUpdates,
-				  updatedUser.avatar !== user?.avatar ? updatedUser.avatar : undefined,
-				  authHeaders
-			  );
-			  const updatedUserData = await fetchUserData(authHeaders);
-			  setUser(updatedUserData);
-			  toast.success("Profile updated successfully!");
-		  },
-		  [user, authHeaders]
-	  );
-  
-	  const handleSaveProfile = useCallback(
-		  async (data: Partial<UserInfo>) => {
-			  if (!user) return;
-			  const updatedUser: UserInfo = {
-				  ...user,
-				  ...data,
-				  password: data.password || user.password,
-			  };
-			  await saveUserData(updatedUser);
-			  setIsModalOpen(false);
-		  },
-		  [user, saveUserData]
-	  );
-  
-	  const handleGameEnd = useCallback(
-		  async (result: "win" | "loss", opponent: string) => {
-			  if (!user) return;
-  
-			  const today = new Date().toISOString().split("T")[0];
-			  const weekday = new Intl.DateTimeFormat("en-US", {
-				  weekday: "short",
-			  }).format(new Date());
-  
-			  const matchResult: MatchResult = { date: today, weekday, result };
-  
-			  try {
-				  // Отправляем результат игры на сервер
-				  await saveGameResult(matchResult, authHeaders);
-				  
-				  // Запрашиваем обновлённые данные пользователя с сервера
-				  const updatedUserData = await fetchUserData(authHeaders);
-				  setUser(updatedUserData);
-				  
-				  toast.success(`Game over! You ${result} against ${opponent}!`);
-			  } catch (err: any) {
-				  toast.error("Failed to save game result. Please try again.");
-			  }
-		  },
-		  [user, authHeaders]
-	  );
-  
-	  const handlePlay = useCallback(() => {
-  
-		  // Выбираем случайного бота, если не выбран
-		  const opponent = selectedBot || bots[Math.floor(Math.random() * bots.length)];
-		  const result = Math.random() > 0.5 ? "win" : "loss";
-  
-		  // Вызываем handleGameEnd с результатом и именем соперника
-		  handleGameEnd(result, opponent.name);
-  
-		  // Если бот был выбран случайно, сбрасываем выбор
-		  if (!selectedBot) {
-			  setSelectedBot(null);
-		  }
-	  }, [user, selectedBot, handleGameEnd, navigate]);
-  
-	  useEffect(() => {
-		  let isMounted = true;
-  
-		  const fetchData = async () => {
-			  if (isMounted) {
-				  await loadData();
-			  }
-		  };
-  
-		  fetchData();
-  
-		  return () => {
-			  isMounted = false;
-		  };
-	  }, [loadData]);
-  
-	  return {
-		  user,
-		  friends,
-		  players,
-		  selectedBot,
-		  isModalOpen,
-		  isLoading,
-		  setSelectedBot,
-		  setIsModalOpen,
-		  setFriends,
-		  setPlayers,
-		  handleSaveProfile,
-		  handlePlay,
-	  };
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { UserInfo, MatchResult } from "../types/UserInfo";
+import { fetchUserData, updateUserProfile, getAuthHeaders, saveGameResult } from "../types/api";
+import { bots } from "../types/botsData";
+
+export const useProfile = () => {
+  /* Initialize state and hooks: Set up user data, bot selection, modal state, and navigation */
+  const [selectedBot, setSelectedBot] = useState<(typeof bots)[0] | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<UserInfo | null>(null);
+  const [friends, setFriends] = useState<UserInfo[]>([]);
+  const [players, setPlayers] = useState<UserInfo[]>([]);
+  const navigate = useNavigate();
+  const isFetchingRef = useRef(false);
+
+  /* Cache authentication headers: Memoize headers for API requests to avoid recalculation */
+  const authHeaders = useMemo(() => getAuthHeaders(), []);
+
+  /* Load user data: Fetch user profile and handle authentication errors */
+  const loadData = useCallback(async () => {
+    if (isFetchingRef.current) {
+      return;
+    }
+    isFetchingRef.current = true;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setIsLoading(false);
+      toast.error("No token found. Please log in.");
+      navigate("/login");
+      isFetchingRef.current = false;
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const userData = await fetchUserData(authHeaders);
+      setUser(userData);
+      setFriends([]); // Placeholder for friends (not implemented)
+    } catch (err: any) {
+      toast.error("Failed to load user data. Please log in again.");
+      localStorage.removeItem("token");
+      navigate("/login");
+    } finally {
+      setIsLoading(false);
+      isFetchingRef.current = false;
+    }
+  }, [navigate, authHeaders]);
+
+  /* Save user profile: Update user data on the server and refresh local state */
+  const saveUserData = useCallback(
+    async (updatedUser: UserInfo) => {
+      const profileUpdates: Partial<UserInfo> = {};
+      if (updatedUser.name !== user?.name) profileUpdates.name = updatedUser.name;
+      if (updatedUser.username !== user?.username) profileUpdates.username = updatedUser.username;
+      if (updatedUser.password !== user?.password) profileUpdates.password = updatedUser.password;
+
+      await updateUserProfile(
+        profileUpdates,
+        updatedUser.avatar !== user?.avatar ? updatedUser.avatar : undefined,
+        authHeaders
+      );
+      const updatedUserData = await fetchUserData(authHeaders);
+      setUser(updatedUserData);
+      toast.success("Profile updated successfully!");
+    },
+    [user, authHeaders]
+  );
+
+  /* Handle profile save: Merge updated data with existing user and save */
+  const handleSaveProfile = useCallback(
+    async (data: Partial<UserInfo>) => {
+      if (!user) return;
+      const updatedUser: UserInfo = {
+        ...user,
+        ...data,
+        password: data.password || user.password,
+      };
+      await saveUserData(updatedUser);
+      setIsModalOpen(false);
+    },
+    [user, saveUserData]
+  );
+
+  /* Handle game end: Save game result, update user data, and show result notification */
+  const handleGameEnd = useCallback(
+    async (result: "win" | "loss", opponent: string) => {
+      if (!user) return;
+
+      const today = new Date().toISOString().split("T")[0];
+      const weekday = new Intl.DateTimeFormat("en-US", {
+        weekday: "short",
+      }).format(new Date());
+
+      const matchResult: MatchResult = { date: today, weekday, result };
+
+      try {
+        await saveGameResult(matchResult, authHeaders);
+        const updatedUserData = await fetchUserData(authHeaders);
+        setUser(updatedUserData);
+        toast.success(`Game over! You ${result} against ${opponent}!`);
+      } catch (err: any) {
+        toast.error("Failed to save game result. Please try again.");
+      }
+    },
+    [user, authHeaders]
+  );
+
+  /* Handle game play: Simulate a game with a random or selected bot and process result */
+  const handlePlay = useCallback(() => {
+    const opponent = selectedBot || bots[Math.floor(Math.random() * bots.length)];
+    const result = Math.random() > 0.5 ? "win" : "loss";
+
+    handleGameEnd(result, opponent.name);
+
+    if (!selectedBot) {
+      setSelectedBot(null);
+    }
+  }, [selectedBot, handleGameEnd]);
+
+  /* Fetch initial data: Load user data on component mount and clean up on unmount */
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchData = async () => {
+      if (isMounted) {
+        await loadData();
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [loadData]);
+
+  /* Return hook API: Expose state and functions for use in components */
+  return {
+    user,
+    friends,
+    players,
+    selectedBot,
+    isModalOpen,
+    isLoading,
+    setSelectedBot,
+    setIsModalOpen,
+    setFriends,
+    setPlayers,
+    handleSaveProfile,
+    handlePlay,
   };
+};
 
 
 	  
@@ -816,6 +832,8 @@ export default MainPage;
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/types/api.ts
 
+
+
 import axios, { AxiosInstance, AxiosError } from "axios";
 import { toast } from "react-hot-toast";
 import { UserInfo, MatchResult } from "./UserInfo";
@@ -823,81 +841,84 @@ import { UserInfo, MatchResult } from "./UserInfo";
 const BASE_URL = "http://localhost:3000";
 
 const api: AxiosInstance = axios.create({
-    baseURL: BASE_URL,
-    headers: {
-        "Content-Type": "application/json",
-    },
+  baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 api.interceptors.response.use(
-    (response) => response,
-    (error: AxiosError) => {
-        if (error.response?.status === 401) {
-            toast.error("Session expired. Please log in again.");
-            localStorage.removeItem("token");
-            window.location.href = "/login"; // Изменил на /login вместо /signup
-        }
-        return Promise.reject(error);
+  (response) => response,
+  (error: AxiosError) => {
+    if (error.response?.status === 401) {
+      toast.error("Session expired. Please log in again.");
+      localStorage.removeItem("token");
+      window.location.href = "/login";
     }
+    return Promise.reject(error);
+  }
 );
 
 export const getAuthHeaders = (): { Authorization: string } | {} => {
-    const token = localStorage.getItem("token");
-    return token ? { Authorization: `Bearer ${token}` } : {};
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-export const fetchUserData = async (headers: { Authorization: string } | {} = getAuthHeaders()): Promise<UserInfo> => {
-    const response = await api.get("/users/me", { headers });
-    const currentUser = response.data.user;
+export const fetchUserData = async (
+  headers: { Authorization: string } | {} = getAuthHeaders()
+): Promise<UserInfo> => {
+  const response = await api.get("/users/me", { headers });
+  const currentUser = response.data.user;
 
-    return {
-        id: currentUser.id || "unknown",
-        username: currentUser.username || currentUser.name || "Unknown",
-        avatar: currentUser.image ? `data:image/jpeg;base64,${currentUser.image}` : "/prof_img/avatar1.png",
-        email: currentUser.email || "",
-        name: currentUser.name || "",
-        password: currentUser.password || "",
-        wins: currentUser.wins || 0, // Теперь берём с сервера
-        losses: currentUser.losses || 0, // Теперь берём с сервера
-        online: !!currentUser.online,
-        history: currentUser.history || [], // Теперь берём с сервера
-    };
+  return {
+    id: currentUser.id || "unknown",
+    username: currentUser.username || currentUser.name || "Unknown",
+    avatar: currentUser.image ? `data:image/jpeg;base64,${currentUser.image}` : "/prof_img/avatar1.png",
+    email: currentUser.email || "",
+    name: currentUser.name || "",
+    password: currentUser.password || "",
+    wins: currentUser.wins || 0,
+    losses: currentUser.losses || 0,
+    online: !!currentUser.online,
+    history: currentUser.history || [],
+  };
 };
 
 export const updateUserProfile = async (
-    profileUpdates: Partial<UserInfo>,
-    avatar?: string,
-    headers: { Authorization: string } | {} = getAuthHeaders()
+  profileUpdates: Partial<UserInfo>,
+  avatar?: string,
+  headers: { Authorization: string } | {} = getAuthHeaders()
 ): Promise<void> => {
-    const updates: Partial<UserInfo> = {};
-    if (profileUpdates.name) updates.name = profileUpdates.name;
-    if (profileUpdates.username) updates.username = profileUpdates.username;
-    if (profileUpdates.password) updates.password = profileUpdates.password;
+  const updates: Partial<UserInfo> = {};
+  if (profileUpdates.name) updates.name = profileUpdates.name;
+  if (profileUpdates.username) updates.username = profileUpdates.username;
+  if (profileUpdates.password) updates.password = profileUpdates.password;
 
-    if (Object.keys(updates).length > 0) {
-        await api.patch("/updateProfile", updates, { headers });
-    }
+  if (Object.keys(updates).length > 0) {
+    await api.patch("/updateProfile", updates, { headers });
+  }
 
-    if (avatar && avatar.startsWith("data:image")) {
-        const base64Data = avatar.split(",")[1];
-        const blob = await (await fetch(`data:image/jpeg;base64,${base64Data}`)).blob();
-        const formData = new FormData();
-        formData.append("file", blob, "avatar.jpg");
+  if (avatar && avatar.startsWith("data:image")) {
+    const base64Data = avatar.split(",")[1];
+    const blob = await (await fetch(`data:image/jpeg;base64,${base64Data}`)).blob();
+    const formData = new FormData();
+    formData.append("file", blob, "avatar.jpg");
 
-        await api.post("/uploadPicture", formData, {
-            headers: {
-                ...headers,
-                "Content-Type": "multipart/form-data",
-            },
-        });
-    }
+    await api.post("/uploadPicture", formData, {
+      headers: {
+        ...headers,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
 };
 
 export const saveGameResult = async (
-    matchResult: MatchResult,
-    headers: { Authorization: string } | {} = getAuthHeaders()
+  matchResult: MatchResult,
+  headers: { Authorization: string } | {} = getAuthHeaders()
 ): Promise<void> => {
-    await api.post("/game/result", matchResult, { headers });
+  await api.post("/game/result", matchResult, { headers });
+};
 
 
 
@@ -1047,70 +1068,71 @@ export const defaultPlayers: UserInfo[] = defaultFriends.map((player) => ({
 
   import React, { ReactNode, ButtonHTMLAttributes } from "react";
 
-  // ==== Primary Button ====
-  type PrimaryButtonProps = {
-	children: ReactNode;
-  } & ButtonHTMLAttributes<HTMLButtonElement>;
-  
-  export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
-	children,
-	...props
-  }) => {
-	return (
-	  <button
-		className="
-		  bg-white
-		  text-black
-		  font-bold
-		  py-2
-		  px-8
-		  rounded
-		  text-xl
-		  shadow-md
-		  hover:bg-gray-300
-		"
-		{...props}
-	  >
-		{children}
-	  </button>
-	);
-  };
-  
-  
-  
-  
-  // ==== Card Wrapper ====
-  type CardWrapperProps = {
-	children: ReactNode;
-	onClick?: () => void;
-  };
-  
-  export const CardWrapper: React.FC<CardWrapperProps> = ({
-	children,
-	onClick,
-  }) => {
-	return (
-	  <div
-		className="
-		  bg-gray-800
-		  rounded-lg
-		  p-3
-		  shadow-sm
-		  transition
-		  hover:bg-gray-700
-		  cursor-pointer
-		  w-full
-		  min-w-[240px]
-		  max-w-[260px]
-		  duration-200
-		  ease-in-out
-		"
-		onClick={onClick}
-	  >
-		{children}
-	  </div>
-	);
-  };
+// ==== Primary Button ====
+type PrimaryButtonProps = {
+  children: ReactNode;
+} & ButtonHTMLAttributes<HTMLButtonElement>;
+
+export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
+  children,
+  ...props
+}) => {
+  return (
+    <button
+      className="
+        bg-white
+        text-black
+        font-bold
+        py-2
+        px-8
+        rounded
+        text-xl
+        shadow-md
+        hover:bg-gray-300
+      "
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
+
+
+
+
+// ==== Card Wrapper ====
+type CardWrapperProps = {
+  children: ReactNode;
+  onClick?: () => void;
+};
+
+export const CardWrapper: React.FC<CardWrapperProps> = ({
+  children,
+  onClick,
+}) => {
+  return (
+    <div
+      className="
+        bg-gray-800
+        rounded-lg
+        p-3
+        shadow-sm
+        transition
+        hover:bg-gray-700
+        cursor-pointer
+        w-full
+        min-w-[240px]
+        max-w-[260px]
+        duration-200
+        ease-in-out
+      "
+      onClick={onClick}
+    >
+      {children}
+    </div>
+  );
+};
+
   
   
 //! PROFILE
@@ -1122,30 +1144,73 @@ import BotCard from "./BotCard";
 import { bots } from "./types/botsData";
 
 interface BotSelectorProps {
-  selectedBot: (typeof bots)[0] | null;
-  setSelectedBot: (bot: (typeof bots)[0]) => void;
+	selectedBot: (typeof bots)[0] | null;
+	setSelectedBot: (bot: (typeof bots)[0]) => void;
 }
 
 const BotSelector: React.FC<BotSelectorProps> = ({ selectedBot, setSelectedBot }) => {
-  return (
-    <div className="bg-gray-900 bg-opacity-70 w-full flex flex-col text-center pt-2 px-4 pb-5 mt-4">
-      <p className="text-lg text-purple-400 font-extrabold uppercase tracking-wide drop-shadow-[0_0_8px_white]">
-        Fighters — Choose Your Opponent!
-      </p>
-      <div className="pt-2">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 w-full px-2 sm:px-4">
-          {bots.map((bot, idx) => (
-            <BotCard
-              key={idx}
-              {...bot}
-              onSelect={() => setSelectedBot(bot)}
-              selected={selectedBot?.image === bot.image}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+	return (
+		<div
+			className={`
+        bg-gray-900
+        bg-opacity-70
+        w-full
+        flex
+        flex-col
+        text-center
+        pt-2
+        px-4
+        pb-5
+        mt-4
+      `}
+		/* Main container: Creates a semi-transparent dark background for the bot selector with centered content */
+		>
+			<p
+				className={`
+          text-lg
+          text-purple-400
+          font-extrabold
+          uppercase
+          tracking-wide
+          drop-shadow-[0_0_8px_white]
+        `}
+			/* Title: Styles the heading text to highlight the bot selection prompt */
+			>
+				Fighters — Choose Your Opponent!
+			</p>
+			<div
+				className={`
+          pt-2
+        `}
+			/* Bot grid wrapper: Adds top padding to separate the title from the bot cards */
+			>
+				<div
+					className={`
+            grid
+            grid-cols-1
+            sm:grid-cols-2
+            md:grid-cols-3
+            lg:grid-cols-4
+            xl:grid-cols-5
+            gap-3
+            w-full
+            px-2
+            sm:px-4
+          `}
+				/* Bot grid: Arranges bot cards in a responsive grid layout with varying columns by screen size */
+				>
+					{bots.map((bot, idx) => (
+						<BotCard
+							key={idx}
+							{...bot}
+							onSelect={() => setSelectedBot(bot)}
+							selected={selectedBot?.image === bot.image}
+						/>
+					))}
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default BotSelector;
@@ -1344,6 +1409,7 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({
 };
 
 export default DesktopLayout;
+
 
 
 
@@ -1573,6 +1639,7 @@ export default MobileLayout;
 
 
 
+
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/Avatar.tsx
 
 import React, { useEffect, useState } from 'react';
@@ -1593,7 +1660,14 @@ const Avatar: React.FC<AvatarProps> = ({ user, className }) => {
   }, [user.avatar]);
 
   return (
-    <div className="flex flex-col items-center">
+    <div
+      className={`
+        flex
+        flex-col
+        items-center
+      `}
+      /* Main container: Centers the avatar vertically and horizontally */
+    >
       <div
         className={`
           rounded-full
@@ -1608,16 +1682,31 @@ const Avatar: React.FC<AvatarProps> = ({ user, className }) => {
           text-center
           ${className}
         `}
+        /* Avatar wrapper: Styles the circular avatar with border, background, and custom size */
       >
         {isImageLoaded ? (
           <img
             src={imgSrc}
             alt={user.username}
-            className="w-full h-full object-cover"
+            className={`
+              w-full
+              h-full
+              object-cover
+            `}
+            /* Avatar image: Ensures the image fills the circular container and covers it */
             onError={() => setIsImageLoaded(false)}
           />
         ) : (
-          <span className="text-sm font-semibold px-2">{user.username}</span>
+          <span
+            className={`
+              text-sm
+              font-semibold
+              px-2
+            `}
+            /* Fallback text: Displays username in small, bold text when image fails to load */
+          >
+            {user.username}
+          </span>
         )}
       </div>
     </div>
@@ -1631,7 +1720,6 @@ export default Avatar;
 
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/BotCard.tsx
-
 
 
 
@@ -1677,7 +1765,7 @@ const BotCard: React.FC<BotCardProps> = ({
         xl:min-h-[190px]
         overflow-hidden
 		hover:scale-105
-		hover:shadow-[0_0_20px_#00ff7f]
+		hover:shadow-[0_0_20px_#ff008c]
 
         ${selected ? 'ring-2 ring-purple-400' : ''}
       `}
@@ -1735,6 +1823,7 @@ export default BotCard;
 
 
 
+
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/EnhancedFriendsList.tsx
 
 
@@ -1744,19 +1833,19 @@ import PlayerCard from "./PlayerCard";
 import { CardWrapper } from "./types/ui";
 
 interface Props {
-  friends: UserInfo[];
+	friends: UserInfo[];
 }
 
 const EnhancedFriendsList: React.FC<Props> = ({ friends }) => {
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+	const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
-  const toggleExpand = (index: number) => {
-    setExpandedIndex((prev) => (prev === index ? null : index));
-  };
+	const toggleExpand = (index: number) => {
+		setExpandedIndex((prev) => (prev === index ? null : index));
+	};
 
-  return (
-    <div
-      className="
+	return (
+		<div
+			className={`
         flex
         flex-col
         gap-2
@@ -1766,36 +1855,57 @@ const EnhancedFriendsList: React.FC<Props> = ({ friends }) => {
         scrollbar-thin
         scrollbar-thumb-white/60
         scrollbar-track-transparent
-      "
-    >
-      {friends.map((friend, index) => {
-        const isExpanded = expandedIndex === index;
+      `}
+		/* Main container: Displays a scrollable list of friends with a fixed maximum height */
+		>
+			{friends.map((friend, index) => {
+				const isExpanded = expandedIndex === index;
 
-        return (
-          <CardWrapper key={index} onClick={() => toggleExpand(index)}>
-            <div className="flex justify-between items-center">
-              <div className="font-bold text-base">{friend.username}</div>
-              <div
-                className={`text-sm ${friend.online ? "text-green-400" : "text-gray-400"}`}
-              >
-                {friend.online ? "Online" : "Offline"}
-              </div>
-            </div>
-            <div
-              className={`
+				return (
+					<CardWrapper key={index} onClick={() => toggleExpand(index)}>
+						<div
+							className={`
+                flex
+                justify-between
+                items-center
+              `}
+						/* Friend header: Aligns username and online status horizontally */
+						>
+							<div
+								className={`
+                  font-bold
+                  text-base
+                `}
+							/* Username: Styles the friend’s username with bold text */
+							>
+								{friend.username}
+							</div>
+							<div
+								className={`
+                  text-sm
+                  ${friend.online ? "text-green-400" : "text-gray-400"}
+                `}
+							/* Online status: Displays online/offline status with color coding */
+							>
+								{friend.online ? "Online" : "Offline"}
+							</div>
+						</div>
+						<div
+							className={`
                 transition-all
                 duration-300
                 overflow-hidden
                 ${isExpanded ? "max-h-[600px] mt-3" : "max-h-0"}
               `}
-            >
-              <PlayerCard user={friend} />
-            </div>
-          </CardWrapper>
-        );
-      })}
-    </div>
-  );
+						/* Expandable content: Toggles visibility of the player card with smooth animation */
+						>
+							<PlayerCard user={friend} />
+						</div>
+					</CardWrapper>
+				);
+			})}
+		</div>
+	);
 };
 
 export default EnhancedFriendsList;
@@ -1875,11 +1985,8 @@ export default GameModeSelector;
 
 
 
-
-
-
-
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/PlayArena.tsx
+
 
 
 
@@ -2014,6 +2121,7 @@ export default Arena;
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/PlayerCard.tsx
 
 
+
 import React from "react";
 import UserHeader from "./UserHeader";
 import { UserInfo } from "./types/UserInfo";
@@ -2117,8 +2225,8 @@ export default PlayerCard;
 
 
 
-
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/PlayersList.tsx
+
 
 
 import React, { useState } from "react";
@@ -2185,58 +2293,6 @@ export default PlayersList;
 
 
 
-const WinLossChart: React.FC<WinLossChartProps> = ({ history = [] }) => {
-  const data = transformHistoryToChartData(history);
-
-  return (
-    <div
-      className="
-        w-full
-        h-[min(360px,40vw)]
-        bg-gray-800
-        bg-opacity-50
-        rounded-2xl
-        p-4
-        shadow-lg
-      "
-    >
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} barGap={4} barCategoryGap={16}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-          <XAxis
-            dataKey="day"
-            stroke="#ccc"
-            tick={{ fill: '#ccc', fontSize: 14 }}
-          />
-          <YAxis
-            allowDecimals={false}
-            stroke="#ccc"
-            tick={{ fill: '#ccc', fontSize: 14 }}
-          />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: '#222',
-              borderColor: '#00ffcc',
-              color: '#fff',
-              fontSize: '14px',
-            }}
-          />
-          <Legend />
-          <Bar dataKey="wins" fill="#10b981" name="Wins" />
-          <Bar dataKey="losses" fill="#ef4444" name="Losses" />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
-  );
-};
-
-export default WinLossChart;
-
-
-
-
-
-
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/Profile.tsx
 import React from "react";
@@ -2248,79 +2304,110 @@ import BotSelector from "./BotSelector";
 import { useProfile } from "./hooks/useProfile";
 
 const Profile: React.FC = () => {
-  const {
-    user,
-    friends,
-    players,
-    selectedBot,
-    isModalOpen,
-    isLoading,
-    setSelectedBot,
-    setIsModalOpen,
-    handleSaveProfile,
-    handlePlay,
-  } = useProfile();
+	const {
+		user,
+		friends,
+		players,
+		selectedBot,
+		isModalOpen,
+		isLoading,
+		setSelectedBot,
+		setIsModalOpen,
+		handleSaveProfile,
+		handlePlay,
+	} = useProfile();
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen w-full flex items-center justify-center text-white">
-        Loading data, please wait...
-      </div>
-    );
-  }
+	if (isLoading) {
+		return (
+			<div
+				className={`
+          min-h-screen
+          w-full
+          flex
+          items-center
+          justify-center
+          text-white
+        `}
+			/* Loading screen: Centers a loading message on a full-screen background */
+			>
+				Loading data, please wait...
+			</div>
+		);
+	}
 
-  if (!user) {
-    return (
-      <div className="min-h-screen w-full flex items-center justify-center text-white">
-        Failed to load user data.
-      </div>
-    );
-  }
+	if (!user) {
+		return (
+			<div
+				className={`
+          min-h-screen
+          w-full
+          flex
+          items-center
+          justify-center
+          text-white
+        `}
+			/* Error screen: Centers an error message when user data fails to load */
+			>
+				Failed to load user data.
+			</div>
+		);
+	}
 
-  return (
-    <>
-      <div className="min-h-screen w-full text-white flex flex-col overflow-y-auto justify-between">
-        <Header
-          user={{
-            username: user.username,
-            online: user.online,
-            email: user.email,
-          }}
-          onProfileClick={() => setIsModalOpen(true)}
-        />
-        <DesktopLayout
-          user={user}
-          friends={friends}
-          players={players}
-          selectedBot={selectedBot}
-          handlePlay={handlePlay}
-        />
-        <MobileLayout
-          user={user}
-          friends={friends}
-          players={players}
-          selectedBot={selectedBot}
-          handlePlay={handlePlay}
-        />
-        <BotSelector
-          selectedBot={selectedBot}
-          setSelectedBot={setSelectedBot}
-        />
-      </div>
+	return (
+		<>
+			<div
+				className={`
+          min-h-screen
+          w-full
+          text-white
+          flex
+          flex-col
+          overflow-y-auto
+          justify-between
+        `}
+			/* Main container: Creates a full-screen, scrollable layout for the profile page */
+			>
+				<Header
+					user={{
+						username: user.username,
+						online: user.online,
+						email: user.email,
+					}}
+					onProfileClick={() => setIsModalOpen(true)}
+				/>
+				<DesktopLayout
+					user={user}
+					friends={friends}
+					players={players}
+					selectedBot={selectedBot}
+					handlePlay={handlePlay}
+				/>
+				<MobileLayout
+					user={user}
+					friends={friends}
+					players={players}
+					selectedBot={selectedBot}
+					handlePlay={handlePlay}
+				/>
+				<BotSelector
+					selectedBot={selectedBot}
+					setSelectedBot={setSelectedBot}
+				/>
+			</div>
 
-      {isModalOpen && (
-        <ProfileModal
-          onClose={() => setIsModalOpen(false)}
-          userData={{
-            avatar: user.avatar,
-            username: user.username,
-            name: user.name,
-          }}
-          onSave={handleSaveProfile}
-        />
-      )}
-    </>
-  );
+			{isModalOpen && (
+				<ProfileModal
+					onClose={() => setIsModalOpen(false)}
+					userData={{
+						avatar: user.avatar,
+						username: user.username,
+						name: user.name,
+					}}
+					onSave={handleSaveProfile}
+				/>
+			)}
+		</>
+	);
 };
 
 export default Profile;
@@ -2333,71 +2420,121 @@ import React from "react";
 import { UserInfo } from "./types/UserInfo";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { getAuthHeaders } from "./types/api"; // Импорт функции
+import { getAuthHeaders } from "./types/api";
 
 interface ProfileActionsProps {
-  user: Pick<UserInfo, "username" | "online" | "email">;
-  onProfileClick: () => void;
+	user: Pick<UserInfo, "username" | "online" | "email">;
+	onProfileClick: () => void;
 }
 
 const ProfileActions: React.FC<ProfileActionsProps> = ({ user, onProfileClick }) => {
-  const navigate = useNavigate();
+	const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...getAuthHeaders(), // Используем функцию без приведения типов
-        },
-        body: JSON.stringify({ email: user.email }),
-      });
-      if (!response.ok) throw new Error("Failed to logout");
-      toast.success("Logged out successfully!");
-      localStorage.removeItem("token"); // Очищаем токен
-      navigate("/login"); // Перенаправляем на страницу логина
-    } catch (err) {
-      console.error("Logout error:", err);
-      toast.error("Failed to logout. Please try again.");
-    }
-  };
+	const handleLogout = async () => {
+		try {
+			const response = await fetch("http://localhost:3000/logout", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					...getAuthHeaders(),
+				},
+				body: JSON.stringify({ email: user.email }),
+			});
+			if (!response.ok) throw new Error("Failed to logout");
+			toast.success("Logged out successfully!");
+			localStorage.removeItem("token");
+			navigate("/login");
+		} catch (err) {
+			console.error("Logout error:", err);
+			toast.error("Failed to logout. Please try again.");
+		}
+	};
 
-  return (
-    <div className="flex items-center gap-4">
-      <span className={`text-sm font-bold ${user.online ? "text-green-400" : "text-gray-400"}`}>
-        {user.username}
-      </span>
-      <button
-        onClick={onProfileClick}
-        className="px-4 py-2 rounded-2xl text-base font-bold bg-transparent outline-3 outline-offset-2 outline-double border border-emerald-200 text-white transition-all duration-300 ease-in-out hover:scale-110"
-        style={{
-          textShadow: `
+	return (
+		<div
+			className={`
+        flex
+        items-center
+        gap-4
+      `}
+		/* Actions container: Aligns username and buttons horizontally with spacing */
+		>
+			<span
+				className={`
+          text-sm
+          font-bold
+          ${user.online ? "text-green-400" : "text-gray-400"}
+        `}
+			/* Username: Displays the username with color indicating online status */
+			>
+				{user.username}
+			</span>
+			<button
+				onClick={onProfileClick}
+				className={`
+          px-4
+          py-2
+          rounded-2xl
+          text-base
+          font-bold
+          bg-transparent
+          outline-3
+          outline-offset-2
+          outline-double
+          border
+          border-emerald-200
+          text-white
+          transition-all
+          duration-300
+          ease-in-out
+          hover:scale-110
+        `}
+				style={{
+					textShadow: `
             0 0 4px rgba(102, 0, 255, 0.9),
             0 0 8px rgba(102, 0, 255, 0.7),
             0 0 16px rgba(102, 0, 255, 0.5),
             0 0 32px rgba(102, 0, 255, 0.3)
           `,
-        }}
-      >
-        Profile
-      </button>
-      <button
-        onClick={handleLogout}
-        className="px-4 py-2 rounded-2xl text-base font-bold bg-transparent outline-3 outline-offset-2 outline-double border border-emerald-200 text-white transition-all duration-300 ease-in-out hover:scale-110"
-        style={{
-          textShadow: `
+				}}
+			/* Profile button: Styles the profile button with neon effects and hover scaling */
+			>
+				Profile
+			</button>
+			<button
+				onClick={handleLogout}
+				className={`
+          px-4
+          py-2
+          rounded-2xl
+          text-base
+          font-bold
+          bg-transparent
+          outline-3
+          outline-offset-2
+          outline-double
+          border
+          border-emerald-200
+          text-white
+          transition-all
+          duration-300
+          ease-in-out
+          hover:scale-110
+        `}
+				style={{
+					textShadow: `
             0 0 4px rgba(102, 0, 255, 0.9),
             0 0 8px rgba(102, 0, 255, 0.7),
             0 0 16px rgba(102, 0, 255, 0.5),
             0 0 32px rgba(102, 0, 255, 0.3)
           `,
-        }}
-      >
-        LogOut
-      </button>
-    </div>
-  );
+				}}
+			/* Logout button: Styles the logout button with neon effects and hover scaling */
+			>
+				LogOut
+			</button>
+		</div>
+	);
 };
 
 export default ProfileActions;
@@ -2411,47 +2548,47 @@ import { UserInfo } from "./types/UserInfo";
 import { toast } from "react-hot-toast";
 
 interface ProfileModalProps {
-  onClose: () => void;
-  onSave: (data: Partial<UserInfo>) => void;
-  userData: Pick<UserInfo, "avatar" | "username" | "name">;
+	onClose: () => void;
+	onSave: (data: Partial<UserInfo>) => void;
+	userData: Pick<UserInfo, "avatar" | "username" | "name">;
 }
 
 const ProfileModal: React.FC<ProfileModalProps> = ({
-  onClose,
-  onSave,
-  userData,
+	onClose,
+	onSave,
+	userData,
 }) => {
-  const [avatar, setAvatar] = useState(userData.avatar);
-  const [username, setUsername] = useState(userData.username);
-  const [name] = useState(userData.name); // Read-only, не обновляется
-  const [password, setPassword] = useState("");
+	const [avatar, setAvatar] = useState(userData.avatar);
+	const [username, setUsername] = useState(userData.username);
+	const [name] = useState(userData.name); // Read-only, не обновляется
+	const [password, setPassword] = useState("");
 
-  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB max
+	const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB max
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+	const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
 
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error("File is too big! Max size: 10 MB.");
-      return;
-    }
+		if (file.size > MAX_FILE_SIZE) {
+			toast.error("File is too big! Max size: 10 MB.");
+			return;
+		}
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setAvatar(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
+		const reader = new FileReader();
+		reader.onloadend = () => {
+			setAvatar(reader.result as string);
+		};
+		reader.readAsDataURL(file);
+	};
 
-  const handleSave = () => {
-    console.log("Saving data:", { avatar, username, name, password }); // Отладка
-    onSave({ avatar, username, name, password });
-  };
+	const handleSave = () => {
+		console.log("Saving data:", { avatar, username, name, password }); // Отладка
+		onSave({ avatar, username, name, password });
+	};
 
-  return (
-    <div
-      className="
+	return (
+		<div
+			className={`
         fixed
         inset-0
         z-50
@@ -2460,10 +2597,11 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
         justify-center
         bg-black
         bg-opacity-60
-      "
-    >
-      <div
-        className="
+      `}
+		/* Modal overlay: Creates a centered, full-screen backdrop with semi-transparent background */
+		>
+			<div
+				className={`
           bg-gray-900
           text-white
           rounded-xl
@@ -2472,73 +2610,197 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
           max-w-md
           space-y-4
           shadow-2xl
-        "
-      >
-        <h2 className="text-2xl font-bold text-center">Edit Profile</h2>
+        `}
+			/* Modal content: Styles the modal window with a dark background and shadow */
+			>
+				<h2
+					className={`
+            text-2xl
+            font-bold
+            text-center
+          `}
+				/* Modal title: Centers the heading for the edit profile form */
+				>
+					Edit Profile
+				</h2>
 
-        <div className="flex flex-col items-center gap-2">
-          <img
-            src={avatar}
-            alt="Avatar"
-            className="w-24 h-24 rounded-full object-cover border-2 border-white"
-          />
-          <input
-            type="file"
-            accept="image/jpeg,image/png"
-            onChange={handleAvatarChange}
-            className="text-sm text-gray-300"
-          />
-        </div>
+				<div
+					className={`
+            flex
+            flex-col
+            items-center
+            gap-2
+          `}
+				/* Avatar section: Centers the avatar image and file input vertically */
+				>
+					<img
+						src={avatar}
+						alt="Avatar"
+						className={`
+              w-24
+              h-24
+              rounded-full
+              object-cover
+              border-2
+              border-white
+            `}
+					/* Avatar image: Displays a circular avatar with a white border */
+					/>
+					<input
+						type="file"
+						accept="image/jpeg,image/png"
+						onChange={handleAvatarChange}
+						className={`
+              text-sm
+              text-gray-300
+            `}
+					/* File input: Styles the file input for avatar uploads */
+					/>
+				</div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm text-gray-400">Name</label>
-          <input
-            type="text"
-            value={name}
-            readOnly
-            className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-gray-400 cursor-not-allowed"
-          />
-        </div>
+				<div
+					className={`
+            flex
+            flex-col
+            gap-1
+          `}
+				/* Name field container: Groups the name label and read-only input */
+				>
+					<label
+						className={`
+              text-sm
+              text-gray-400
+            `}
+					/* Name label: Styles the label for the name input */
+					>
+						Name
+					</label>
+					<input
+						type="text"
+						value={name}
+						readOnly
+						className={`
+              w-full
+              p-2
+              rounded
+              bg-gray-800
+              border
+              border-gray-600
+              text-gray-400
+              cursor-not-allowed
+            `}
+					/* Name input: Styles the read-only name input with disabled cursor */
+					/>
+				</div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm text-gray-400">Username</label>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full p-2 rounded bg-gray-800 border border-gray-600"
-          />
-        </div>
+				<div
+					className={`
+            flex
+            flex-col
+            gap-1
+          `}
+				/* Username field container: Groups the username label and input */
+				>
+					<label
+						className={`
+              text-sm
+              text-gray-400
+            `}
+					/* Username label: Styles the label for the username input */
+					>
+						Username
+					</label>
+					<input
+						type="text"
+						placeholder="Username"
+						value={username}
+						onChange={(e) => setUsername(e.target.value)}
+						className={`
+              w-full
+              p-2
+              rounded
+              bg-gray-800
+              border
+              border-gray-600
+            `}
+					/* Username input: Styles the editable username input */
+					/>
+				</div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm text-gray-400">New Password</label>
-          <input
-            type="password"
-            placeholder="New Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 rounded bg-gray-800 border border-gray-600"
-          />
-        </div>
+				<div
+					className={`
+            flex
+            flex-col
+            gap-1
+          `}
+				/* Password field container: Groups the password label and input */
+				>
+					<label
+						className={`
+              text-sm
+              text-gray-400
+            `}
+					/* Password label: Styles the label for the password input */
+					>
+						New Password
+					</label>
+					<input
+						type="password"
+						placeholder="New Password"
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
+						className={`
+              w-full
+              p-2
+              rounded
+              bg-gray-800
+              border
+              border-gray-600
+            `}
+					/* Password input: Styles the editable password input */
+					/>
+				</div>
 
-        <div className="flex justify-end gap-3 pt-4">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave} // Используем отдельную функцию для отладки
-            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
-          >
-            Save
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+				<div
+					className={`
+            flex
+            justify-end
+            gap-3
+            pt-4
+          `}
+				/* Button group: Aligns the cancel and save buttons to the right */
+				>
+					<button
+						onClick={onClose}
+						className={`
+              px-4
+              py-2
+              bg-gray-600
+              hover:bg-gray-700
+              rounded
+            `}
+					/* Cancel button: Styles the cancel button with hover effect */
+					>
+						Cancel
+					</button>
+					<button
+						onClick={handleSave}
+						className={`
+              px-4
+              py-2
+              bg-green-500
+              hover:bg-green-600
+              text-white
+              rounded
+            `}
+					/* Save button: Styles the save button with hover effect */
+					>
+						Save
+					</button>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default ProfileModal;
@@ -2557,19 +2819,19 @@ import Avatar from "./Avatar";
 import { UserInfo, calculateUserStats } from "./types/UserInfo";
 
 interface UserHeaderProps {
-  user: Pick<UserInfo, "username" | "avatar" | "wins" | "losses" | "history">;
+	user: Pick<UserInfo, "username" | "avatar" | "wins" | "losses" | "history">;
 }
 
 const UserHeader: React.FC<UserHeaderProps> = ({ user }) => {
-  const { winRate, latestDate, winsToday, lossesToday } = calculateUserStats(
-    user.wins,
-    user.losses,
-    user.history
-  );
+	const { winRate, latestDate, winsToday, lossesToday } = calculateUserStats(
+		user.wins,
+		user.losses,
+		user.history
+	);
 
-  return (
-    <div
-      className="
+	return (
+		<div
+			className={`
         flex
         flex-col
         items-center
@@ -2578,28 +2840,86 @@ const UserHeader: React.FC<UserHeaderProps> = ({ user }) => {
         max-w-md
         mx-auto
         text-center
-      "
-    >
-      <Avatar user={user} className="w-24 h-24 sm:w-32 sm:h-32" />
-      <h2 className="text-xl sm:text-2xl font-bold">{user.username}</h2>
-      <div className="text-sm sm:text-base space-y-1">
-        <p>
-          Wins: <span className="text-green-400">{user.wins}</span> | Losses:{" "}
-          <span className="text-red-400">{user.losses}</span>
-        </p>
-        <p>
-          Win Rate: <span className="text-cyan-400">{winRate}%</span>
-        </p>
-        {latestDate && (
-          <p>
-            Last Game: {latestDate} — Wins:{" "}
-            <span className="text-green-400">{winsToday}</span>, Losses:{" "}
-            <span className="text-red-400">{lossesToday}</span>
-          </p>
-        )}
-      </div>
-    </div>
-  );
+      `}
+		/* Header container: Centers user info vertically with constrained width */
+		>
+			<Avatar
+				user={user}
+				className={`
+          w-32
+          h-32
+          sm:w-40
+          sm:h-40
+        `}
+			/* Avatar: Displays a responsive user avatar with larger size on sm screens */
+			/>
+			<h2
+				className={`
+          text-xl
+          sm:text-2xl
+          font-bold
+        `}
+			/* Username: Styles the user's username with responsive font size */
+			>
+				{user.username}
+			</h2>
+			<div
+				className={`
+          text-sm
+          sm:text-base
+          space-y-1
+        `}
+			/* Stats container: Groups user statistics with responsive text size */
+			>
+				<p>
+					Wins: <span
+						className={`
+              text-green-400
+            `}
+					/* Wins count: Highlights the number of wins in green */
+					>
+						{user.wins}
+					</span> | Losses: <span
+						className={`
+              text-red-400
+            `}
+					/* Losses count: Highlights the number of losses in red */
+					>
+						{user.losses}
+					</span>
+				</p>
+				<p>
+					Win Rate: <span
+						className={`
+              text-cyan-400
+            `}
+					/* Win rate: Highlights the win rate percentage in cyan */
+					>
+						{winRate}%
+					</span>
+				</p>
+				{latestDate && (
+					<p>
+						Last Game: {latestDate} — Wins: <span
+							className={`
+                text-green-400
+              `}
+						/* Today's wins: Highlights today's wins in green */
+						>
+							{winsToday}
+						</span>, Losses: <span
+							className={`
+                text-red-400
+              `}
+						/* Today's losses: Highlights today's losses in red */
+						>
+							{lossesToday}
+						</span>
+					</p>
+				)}
+			</div>
+		</div>
+	);
 };
 
 export default UserHeader;
@@ -2633,6 +2953,7 @@ export default UserHeader;
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/index.css
 
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -2662,7 +2983,6 @@ export default UserHeader;
     background-attachment: fixed;
   }
 
-  /* Скрываем стандартный курсор только для устройств без сенсорного ввода */
   @media (hover: hover) {
     body {
       cursor: none;
@@ -2695,7 +3015,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 // /home/ogoman/HIVE/Projects/ft_transcendence/server/controllers/auth.js
 
 // import HttpError from "../http-error.js";
-import db from "../database/database.js";
+import db from "../database/database.js"; // Using better-sqlite3
 
 export async function signup(req, reply) {
   console.log("We are in SIGNUP middleware");
@@ -2704,7 +3024,7 @@ export async function signup(req, reply) {
 
   // Validate request body
   if (!name || !password || !email || !username) {
-    return reply.code(400).send({ message: "No pass or name or email" });
+    return reply.code(400).send({ message: "No pass or name or email or username" });
   }
 
   try {
@@ -2717,29 +3037,29 @@ export async function signup(req, reply) {
         "INSERT INTO users (name, username, email, password) VALUES (?, ?, ?, ?)"
       );
       const result = users.run(name, username, email, password);
-
-      // result.lastInsertRowid  ID for new player
-      const token = req.jwt.sign({ id: result.lastInsertRowid });
+      const token = req.jwt.sign({ 
+        id: result.lastInsertRowid });
 
       console.log("TOKEN_ID", token);
 
-      console.log("22222 =>", result.lastInsertRowid);
+      console.log("USER_ID =>", result.lastInsertRowid);
 
+      // Set user online
       const online = db
         .prepare("UPDATE users SET online = ? WHERE id = ?")
         .run(1, result.lastInsertRowid);
 
-      // JUST CHECKING ONLINE
+      // Verify online status
       const updated = db
         .prepare("SELECT id, online FROM users WHERE id = ?")
         .get(result.lastInsertRowid);
 
       console.log("ONLINE? =>", updated);
 
-      return reply.code(201).send({ message: "USER created", accessToken: token }); // TOKEN DELETE LATER!!!!!!!!!!!!
+      return reply.code(201).send({ accessToken: token });
     } else {
-      console.log("User already exist");
-      return reply.code(400).send({ message: "User already exist" });
+      console.log("User already exists");
+      return reply.code(400).send({ message: "User already exists" });
     }
   } catch (err) {
     console.error("Database error:", err.message);
@@ -2756,25 +3076,25 @@ export async function login(req, reply) {
 
   try {
     const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
-    console.log("Query result:", user);  // Log the result
+    console.log("Query result:", user); // Log the result
 
     if (user) {
       console.log("Email", user.email);
       console.log("Pass", user.password);
-	  // reply.code(200).send({ message: "There is such a user", user });
+      // reply.code(200).send({ message: "There is such a user", user });
       const kuku = db
         .prepare("SELECT * FROM users WHERE email = ? AND password = ?")
         .get(email, password);
 
-		// const token = jwt.sign(
-        //   { userId: user.id },
-        //   { expiresIn: "2h" }
-        // );
+      // const token = jwt.sign(
+      //   { userId: user.id },
+      //   { expiresIn: "2h" }
+      // );
       // console.log("kuku", kuku);
 
-      const token = req.jwt.sign ({
-		id: user.id
-	  });
+      const token = req.jwt.sign({ 
+        id: user.id 
+      });
       if (kuku) {
         console.log("WE are logged in");
         const userOnline = db
@@ -2784,18 +3104,18 @@ export async function login(req, reply) {
         console.log("ID=>", user.id);
         // Put Online
         const online = db
-          .prepare("UPDATE users SET online = '1' WHERE id = ?")
-          .run(user.id);
+          .prepare("UPDATE users SET online = ? WHERE id = ?")
+          .run(1, user.id);
 
         console.log("ONLINE =>", online.changes);
 
-        return reply.code(200).send({ message: "We are logged in", accessToken: token }); // TOKEN DELETE LATER
+        return reply.code(200).send({ accessToken: token });
       } else {
-        console.log("Wrong pass ");
+        console.log("Wrong pass");
         return reply.code(401).send({ message: "Wrong pass" });
       }
     } else {
-      return reply.code(400).send({ message: "No such user?" });
+      return reply.code(400).send({ message: "No such user" });
     }
   } catch (err) {
     console.error("Database error:", err.message);
@@ -2808,16 +3128,50 @@ export async function logout(req, reply) {
   try {
     const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
 
+    if (!user) {
+      return reply.code(400).send({ message: "No such user" });
+    }
+
     console.log("ID=>", user.id);
 
-    const offline = db.prepare("UPDATE users SET online = ? WHERE email = ?").run(0, email);
-    console.log("Offline =>", offline);
-    return reply.code(200).send({ message: "We are logout", user });
+    const offline = db
+      .prepare("UPDATE users SET online = ? WHERE email = ?")
+      .run(0, email);
+    console.log("Offline =>", offline.changes);
+    return reply.code(200).send({ message: "We are logged out" });
   } catch (err) {
     console.error("Database error:", err.message);
     return reply.code(500).send({ message: "Something went wrong" });
   }
 }
+
+export async function getCurrentUser(req, reply) {
+  try {
+    const userId = req.user.id;
+    const user = db
+      .prepare("SELECT id, name, username, email, online, image FROM users WHERE id = ?")
+      .get(userId);
+
+    if (!user) {
+      return reply.code(404).send({ message: "User not found" });
+    }
+
+    return reply.code(200).send({
+      user: {
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        online: user.online,
+        image: user.image ? Buffer.from(user.image).toString("base64") : null,
+      },
+    });
+  } catch (err) {
+    console.error("Database error:", err.message);
+    return reply.code(500).send({ message: "Something went wrong" });
+  }
+}
+
 
 
 
@@ -2883,130 +3237,132 @@ export async function friendsAdd(req, reply) {
   }
   
 
+  
 
-  // /home/ogoman/HIVE/Projects/ft_transcendence/server/controllers/profile.js
+// /home/ogoman/HIVE/Projects/ft_transcendence/server/controllers/users.js
 
-
-  import db from "../database/database.js";
-
-// Helper function for searching user by ID
-const findUserById = (id) => {
-  try {
-    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(id);
-    return user;
-  } catch (err) {
-    console.error("Database error in findUserById:", err.message);
-    throw new Error(`Database error while finding user: ${err.message}`);
-  }
-};
-
-export async function updateProfile(req, reply) {
-  console.log("WE in Update Profile MW");
-  const { name, username, password } = req.body;
-
-  if (!name && !username && !password) {
-    return reply.code(400).send({ message: "Nothing to change" });
-  }
-
-  const id = req.user.id; // ID from JWT-token
-
-  // console.log("name", name);
-  console.log("idddd", id);
-  try {
-    if (name) {
-      const updateName = db
-        .prepare("UPDATE users SET name = ? WHERE id = ?")
-        .run(name, id);
-      console.log("NAME UPDATED =>", updateName.changes);
-	  // return reply.code(200).send({message: "Name updated"})
-    }
-    if (password) {
-      const updatePassword = db
-        .prepare("UPDATE users SET password = ? WHERE id = ?")
-        .run(password, id);
-      console.log("password UPDATED =>", updatePassword.changes);
-	  // return reply.code(200).send({message: "password updated"})
-    }
-    if (username) {
-      console.log("we are in nick change");
-      const nickExist = db
-        .prepare("SELECT * FROM users WHERE username = ?")
-        .get(username);
-      console.log("NickExist =>", nickExist);
-      if (nickExist) {
-        return reply.code(400).send({ message: "Nick already exists" });
-      }
-      const updateusername = db
-        .prepare("UPDATE users SET username = ? WHERE id = ?")
-        .run(username, id);
-      console.log("username UPDATED =>", updateusername.changes);
-	  // return reply.code(200).send({message: "Nick updated"})
-    }
-    return reply.code(200).send({ message: "updated" });
-  } catch (err) {
-    console.error("Database error:", err.message);
-    return reply.code(500).send({ message: `Failed to update profile: ${err.message}` });
-  }
-}
-
-export async function uploadPicture(req, reply) {
-  console.log("Kuku from upload pictures");
-
-  const allowedTypes = ["image/jpeg", "image/png"];
-  const pic = req.file;
-
-  if (!pic) {
-    return reply.code(400).send({ message: "No image to upload" });
-  }
-
-  if (!allowedTypes.includes(pic.mimetype)) {
-    return reply.code(400).send({ message: "Invalid image format" });
-  }
-
-  // const email = pic.fields?.email;
-  // if (!email) {
-  //   return reply.code(400).send({ message: "no email provided" });
-  // }
-  const id = req.user.id; // ID from JWT-token
-  try {
-	console.log("eeeeeeeeeeeeeee");
-    console.log("id=>", id);
-    const buffer = await pic.toBuffer();
-    const result = db
-      .prepare("UPDATE users SET image = ? WHERE id = ?")
-      .run(buffer, id);
-    console.log("IMAGE UPDATED =>", result.changes);
-    return reply.code(200).send({ message: "Image uploaded successfully" });
-  } catch (err) {
-    console.error("Database error:", err.message);
-    return reply.code(500).send({ message: `Failed to upload image: ${err.message}` });
-  }
-}
+import db from "../database/database.js";
 
 export async function getCurrentUser(req, reply) {
-  const userId = req.user.id;
-  console.log("Looking for user with id:", userId);
-
   try {
-    const user = findUserById(userId);
+    const userId = req.user.id;
+    const user = db
+      .prepare("SELECT id, name, username, email, online, image FROM users WHERE id = ?")
+      .get(userId);
+
     if (!user) {
-      console.log("User not found for id:", userId);
       return reply.code(404).send({ message: "User not found" });
     }
 
-    // image to Base64
-    const userResponse = {
-      ...user,
-      image: user.image ? Buffer.from(user.image).toString("base64") : null,
-    };
-    
-    console.log("User found:", userResponse);
-    return reply.code(200).send({ user: userResponse });
+    return reply.code(200).send({
+      user: {
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        online: user.online,
+        image: user.image ? Buffer.from(user.image).toString("base64") : null,
+      },
+    });
   } catch (err) {
     console.error("Database error:", err.message);
-    return reply.code(500).send({ message: `Failed to fetch user: ${err.message}` });
+    return reply.code(500).send({ message: "Something went wrong" });
   }
 }
+
+
+
+
+
+  // /home/ogoman/HIVE/Projects/ft_transcendence/server/controllers/profile.js
+
+  
+  import db from "../database/database.js";
+
+  export async function updateProfile(req, reply) {
+    console.log("WE in Update Profile MW");
+    const { name, username, password } = req.body;
+    const userId = req.user.id;
+  
+    if (!name && !username && !password) {
+      return reply.code(400).send({ message: "Nothing to change" });
+    }
+    // // console.log("name", name);
+    // console.log("idddd", id);
+    try {
+      const user = db.prepare("SELECT * FROM users WHERE id = ?").get(userId); ///Here we need id not id!!!!!!
+      console.log("user ok => ", user.id);
+      if (!user) {
+        return reply.code(404).send({ message: "User not found" });
+      }
+  
+      if (name) {
+        const updateName = db
+          .prepare("UPDATE users SET name = ? WHERE id = ?")
+          .run(name, userId);
+        console.log("NAME UPDATED =>", updateName);
+        // return reply.code(200).send({message: "Name updated"})
+      }
+      if (password) {
+        const updatePassword = db
+          .prepare("UPDATE users SET password = ? WHERE id = ?")
+          .run(password, userId);
+        console.log("PASSWORD UPDATED =>", updatePassword);
+        // return reply.code(200).send({message: "password updated"})
+      }
+      if (username) {
+        console.log("we are in nick change");
+        const nickExist = db
+          .prepare("SELECT * FROM users WHERE username = ?")
+          .get(username);
+        console.log("NickExist =>", nickExist);
+        if (nickExist) {
+          return reply.code(400).send({ message: "Nick already exists" });
+        } else {
+          const updateUsername = db
+            .prepare("UPDATE users SET username = ? WHERE id = ?")
+            .run(username, userId);
+          console.log("USERNAME UPDATED =>", updateUsername);
+          // return reply.code(200).send({message: "Nick updated"})
+        }
+      }
+      return reply.code(200).send({ message: "Profile updated" });
+    } catch (err) {
+      console.error("Database error:", err.message);
+      return reply.code(500).send({ message: "Something went wrong" });
+    }
+  }
+  
+  export async function uploadPicture(data, reply) {
+    console.log("Kuku from upload pictures");
+    const allowedTypes = ["image/jpeg", "image/png"];
+    const userId = reply.request.user.id;
+  
+    if (!data) {
+      return reply.code(400).send({ message: "No image to upload" });
+    }
+  
+    if (!allowedTypes.includes(data.mimetype)) {
+      return reply.code(400).send({ message: "Invalid image format" });
+    }
+    // const email = pic.fields?.email;
+    // if (!email) {
+    //   return reply.code(400).send({ message: "no email provided" });
+    // }
+  
+    try {
+      const user = db.prepare("SELECT * FROM users WHERE id = ?").get(userId);
+      console.log("user ok => ", user.id);
+  
+      const buffer = await data.toBuffer();
+  
+      db.prepare("UPDATE users SET image = ? WHERE id = ?").run(buffer, userId);
+      return reply.code(200).send({ message: "Image uploaded" });
+    } catch (err) {
+      console.error("Database error:", err.message);
+      return reply.code(500).send({ message: "Something went wrong" });
+    }
+  }
   
 
 
@@ -3037,28 +3393,27 @@ export default db;
 
 
 
+
 // /home/ogoman/HIVE/Projects/ft_transcendence/server/database/users.db
 
 
 
 // /home/ogoman/HIVE/Projects/ft_transcendence/server/routes/AuthRoutes.js
 
-import { signup, login, logout } from "../controllers/auth.js";
+import { signup, login, logout, getCurrentUser } from "../controllers/auth.js";
 import db from "../database/database.js";
-import { SignUpSchema, LoginSchema} from "../schema/user.schema.js";
+import { SignUpSchema, LoginSchema } from "../schema/user.schema.js";
 
 async function authRoutes(fastify) {
-  fastify.post("/login", async (req, reply) =>
-  {
+  fastify.post("/login", async (req, reply) => {
     const validated = LoginSchema.safeParse(req.body);
-    if(!validated.success)
-    {
+    if (!validated.success) {
       return reply.code(400).send({
         message: "Validation error",
         errors: validated.error.errors,
       });
     }
-    return login ({...req, body:validated.data}, reply);
+    return login({ ...req, body: validated.data }, reply);
   });
 
   fastify.post("/signup", async (req, reply) => {
@@ -3070,16 +3425,24 @@ async function authRoutes(fastify) {
         errors: validated.error.errors,
       });
     }
-    return signup({...req, body:validated.data}, reply);
+    return signup({ ...req, body: validated.data }, reply);
   });
 
   fastify.post("/logout", logout);
 
   ///for debug???? or delete later
+  fastify.get(
+    "/users/me",
+    {
+      preHandler: fastify.authenticate,
+    },
+    getCurrentUser
+  );
+
+  // For debug, keep as is
   fastify.get("/users", async (req, reply) => {
     try {
       const rows = db.prepare("SELECT * FROM users").all();
-
       // console.log("!!!!", rows);
       return reply.code(200).send({ users: rows });
     } catch (err) {
@@ -3090,6 +3453,7 @@ async function authRoutes(fastify) {
 }
 
 export default authRoutes;
+
 
 
 
@@ -3139,63 +3503,59 @@ export default friendsRoutes;
 
 import { ProfileSchema } from "../schema/profile.schema.js";
 import fastifyMultipart from "@fastify/multipart";
-import { updateProfile, uploadPicture, getCurrentUser } from "../controllers/profile.js";
-
-// Middleware for token verification using @fastify/jwt
-const authenticateToken = async (req, reply) => {
-  try {
-    const decoded = await req.jwt.verify(req.headers["authorization"]?.split(" ")[1]);
-    console.log("Decoded token:", decoded);
-    req.user = decoded;
-  } catch (err) {
-    console.error("Token verification error:", err);
-    return reply.code(403).send({ message: "Invalid token" });
-  }
-};
+import { updateProfile, uploadPicture } from "../controllers/profile.js";
 
 async function profileRoutes(fastify) {
   fastify.register(fastifyMultipart, {
     limits: {
-      fileSize: 10 * 1024 * 1024, // 10 MB
+      fileSize: 10 * 1024 * 1024, // max (10MB)
     },
   });
 
-  // Apply middleware to all routes
-  fastify.addHook("preHandler", authenticateToken);
-
-  fastify.patch("/updateProfile", async (req, reply) => {
-    const validated = ProfileSchema.safeParse(req.body);
-    if (!validated.success) {
-      return reply.code(400).send({
-        message: "Validation error",
-        errors: validated.error.errors,
-      });
+  fastify.patch(
+    "/updateProfile",
+    {
+      preHandler: fastify.authenticate,
+    },
+    async (req, reply) => {
+      const validated = ProfileSchema.safeParse(req.body);
+      if (!validated.success) {
+        return reply.code(400).send({
+          message: "Validation error",
+          errors: validated.error.errors,
+        });
+      }
+      return updateProfile({ ...req, body: validated.data }, reply);
     }
-    return updateProfile({ ...req, body: validated.data }, reply);
-  });
+  );
 
-  fastify.post("/uploadPicture", async (req, reply) => {
-    const pic = await req.file();
-	// const email = pic.fields?.email.value;
+  fastify.post(
+    "/uploadPicture",
+    {
+      preHandler: fastify.authenticate,
+      config: {
+        multipart: true,
+      },
+    },
+    async (req, reply) => {
+      const data = await req.file();
+    // const email = pic.fields?.email.value;
     // console.log("email:", email);
+      if (!data) {
+        return reply.code(400).send({ message: "No picture uploaded" });
+      }
 
-    if (!pic) {
-      return reply.code(400).send({ message: "No picture uploaded" });
-    }
-
-	// if (!email) {
+    // if (!email) {
     //   return reply.code(400).send({ message: "No email provided" });
     // }
-    
-    return uploadPicture({ ...req, file: pic }, reply);
-  });
-
-  fastify.get("/users/me", async (req, reply) => {
-    return getCurrentUser(req, reply);
-  });
+      return uploadPicture(data, reply);
+    }
+  );
 }
 
 export default profileRoutes;
+
+
 
 
 
@@ -3217,21 +3577,15 @@ export const FriendsAddSchema = z.object({
 
 // /home/ogoman/HIVE/Projects/ft_transcendence/server/schema/profile.schema.js
 
-import { z } from "zod"
+import { z } from "zod";
 
-export const ProfileSchema = z.object
-(
-    {
-		name: z.string().max(20).optional(),
-		username: z.string().max(20).optional(),
-		password: z.string().min(4).max(40).optional(),
-        // id: z.string(),
-        // image: z.string(),
-    }
-)
-
-
-
+export const ProfileSchema = z
+  .object({
+    username: z.string().max(20).optional(),
+    password: z.string().min(4).max(40).optional(),
+    name: z.string().max(20).optional(),
+    avatar: z.string().optional(),
+  });
 
 
 
@@ -3294,7 +3648,9 @@ class HttpError extends Error {
     "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^11.0.1",
     "@fastify/jwt": "^9.1.0",
+    "@fastify/multipart": "^9.0.3",
     "@fastify/view": "^11.0.0",
+    "axios": "^1.9.0",
     "better-sqlite3": "^11.9.1",
     "dotenv": "^16.5.0",
     "ejs": "^3.1.10",
@@ -3309,15 +3665,16 @@ class HttpError extends Error {
 
 
 
+
 // /home/ogoman/HIVE/Projects/ft_transcendence/server/server.js
 
 import Fastify from "fastify";
 import authRoutes from "./routes/AuthRoutes.js";
 import friendsRoutes from "./routes/FriendsRoutes.js";
 import profileRoutes from "./routes/ProfileRoutes.js";
-import cors from '@fastify/cors';
-import dotenv from 'dotenv';
-import jwt from '@fastify/jwt';
+import cors from "@fastify/cors";
+import dotenv from "dotenv";
+import jwt from "@fastify/jwt";
 
 dotenv.config();
 
@@ -3326,19 +3683,27 @@ const fastify = Fastify({
 });
 
 // JWT
-fastify.register(jwt, { secret: 'kuku' });
+fastify.register(jwt, { secret: "kuku" });
 
-fastify.addHook('preHandler', (req, res, next) => {
+fastify.addHook("preHandler", (req, res, next) => {
   req.jwt = fastify.jwt;
-  next();
+  return next();
+});
+
+// JWT Authentication
+fastify.decorate("authenticate", async (request, reply) => {
+  try {
+    await request.jwtVerify();
+  } catch (err) {
+    reply.code(401).send({ message: "Unauthorized" });
+  }
 });
 
 // CORS
-await fastify.register(cors, {
-  origin: 'http://localhost:5173',
+fastify.register(cors, {
+  origin: "http://localhost:5173",
   credentials: true,
-  methods: ['GET', 'POST', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ["GET", "POST", "PATCH"],
 });
 
 // Routes
@@ -3357,4 +3722,3 @@ const start = async () => {
 };
 
 start();
-
