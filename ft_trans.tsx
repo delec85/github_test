@@ -2,7 +2,7 @@
 
 //* all bots img
 
-// client/public/prof_img/avatar1.webp
+// client/public/prof_img/avatar1.png
 
 
 
@@ -569,10 +569,334 @@ export default MainPage;
 
 
 
+//! GAMESELECTOR
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/TournamentModal.tsx
+
+
+import React from "react";
+
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+  names: string[];
+  updateName: (idx: number, value: string) => void;
+  onStart: () => void;
+  canStart: boolean;
+}
+
+const TournamentModal: React.FC<Props> = ({
+  isOpen,
+  onClose,
+  names,
+  updateName,
+  onStart,
+  canStart,
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    // Overlay: dim background and center the modal
+    <div
+      className={`
+        fixed
+        inset-0
+        bg-black
+        bg-opacity-70
+        flex
+        items-center
+        justify-center
+        z-50
+      `}
+    >
+      {/* Modal container: neon gradient background with padding and rounded corners */}
+      <div
+        className={`
+          bg-gradient-to-br
+          from-purple-800
+          via-indigo-900
+          to-pink-800
+          p-6
+          rounded-2xl
+          shadow-neon-lg
+          w-full
+          max-w-lg
+        `}
+      >
+        {/* Title: gradient clipped text, centered, bold */}
+        <h2
+          className={`
+            text-2xl
+            text-center
+            text-transparent
+            bg-clip-text
+            bg-gradient-to-r
+            from-cyan-300
+            via-blue-400
+            to-purple-500
+            font-bold
+            mb-4
+          `}
+        >
+          Enter players for tournament
+        </h2>
+
+        {/* Input grid: two columns with gap */}
+        <div
+          className={`
+            grid
+            grid-cols-2
+            gap-4
+            mb-6
+          `}
+        >
+          {names.map((value, idx) => (
+            <input
+              key={idx}
+              type="text"
+              value={value}
+              onChange={e => updateName(idx, e.target.value)}
+              placeholder={`Player ${idx + 1}`}
+              className={`
+                bg-gray-900
+                bg-opacity-50
+                text-white
+                placeholder-gray-400
+                p-2
+                rounded-xl
+                focus:outline-none
+                focus:ring-2
+                focus:ring-purple-500
+                transition-shadow
+                duration-200
+              `}
+            />
+          ))}
+        </div>
+
+        {/* Actions row: cancel and start buttons spaced apart */}
+        <div
+          className={`
+            flex
+            justify-between
+          `}
+        >
+          {/* Cancel button: red outline turning solid on hover */}
+          <button
+            onClick={onClose}
+            className={`
+              px-4
+              py-2
+              rounded-xl
+              border
+              border-red-400
+              text-red-400
+              hover:bg-red-500
+              hover:text-white
+              transition
+            `}
+          >
+            Cancel
+          </button>
+
+          {/* Start button: green when enabled, gray when disabled */}
+          <button
+            onClick={onStart}
+            disabled={!canStart}
+            className={`
+              px-6
+              py-2
+              rounded-xl
+              font-bold
+              transition-all
+              ${
+                canStart
+                  ? `
+                    bg-green-400
+                    hover:shadow-[0_0_15px_#4ade80]
+                  `
+                  : `
+                    bg-gray-600
+                    cursor-not-allowed
+                    opacity-50
+                  `
+              }
+            `}
+          >
+            Start
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default TournamentModal;
+
+
+
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/GameSelector.tsx
+
+import React from "react";
+import GameModeSelector from "./GameModeSelector";
+import TournamentModal from "./TournamentModal";
+import { useGameSelector } from "./useGameSelector";
+
+const GameSelector: React.FC = () => {
+  const {
+    isTournamentOpen,
+    openTournament,
+    closeTournament,
+    names,
+    updateName,
+    canStart
+  } = useGameSelector();
+
+  const handleStart = () => {
+    const players = names.filter(n => n.trim());
+    console.log("Tournament names:", players);
+    // TODO: next window
+    closeTournament();
+  };
+
+  // Для остальных режимов заглушки
+  const handleSingle = () => alert("Single Player clicked");
+  const handleMulti  = () => alert("Multiplayer clicked");
+
+  return (
+    <>
+      <GameModeSelector
+        onSingleClick={handleSingle}
+        onMultiClick={handleMulti}
+        onTournamentClick={openTournament}
+      />
+      <TournamentModal
+        isOpen={isTournamentOpen}
+        onClose={closeTournament}
+        names={names}
+        updateName={updateName}
+        onStart={handleStart}
+        canStart={canStart()}
+      />
+    </>
+  );
+};
+
+export default GameSelector;
+
+
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/GameModeSelector.tsx
+
+
+import React from "react";
+
+const modes = [
+  { name: "Single Player", img: "/button_img/single.png" },
+  { name: "Multiplayer",   img: "/button_img/mlti.png"   },
+  { name: "Tournament",    img: "/button_img/tourn.png"  },
+];
+
+interface Props {
+  onSingleClick: () => void;
+  onMultiClick: () => void;
+  onTournamentClick: () => void;
+}
+
+const GameModeSelector: React.FC<Props> = ({
+  onSingleClick,
+  onMultiClick,
+  onTournamentClick
+}) => {
+  const handleClick = (modeName: string) => {
+    switch (modeName) {
+      case "Single Player": onSingleClick();     break;
+      case "Multiplayer":   onMultiClick();     break;
+      case "Tournament":    onTournamentClick(); break;
+      default: break;
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-9">
+      {modes.map((mode) => (
+        <button
+          key={mode.name}
+          onClick={() => handleClick(mode.name)}
+          className="
+            bg-transparent
+            rounded-xl
+            shadow-md
+            overflow-hidden
+            transform
+            transition
+            duration-300
+            hover:scale-110
+            hover:shadow-[0_0_20px_#00ff7f]
+          "
+        >
+          <img
+            src={mode.img}
+            alt={mode.name}
+            className="
+              w-[240px]
+              h-auto
+              object-contain
+              block
+              transition
+              duration-300
+              hover:brightness-110
+            "
+          />
+        </button>
+      ))}
+    </div>
+  );
+};
+
+export default GameModeSelector;
+
+
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/useGameSelector.tsx
+
+import { useState } from "react";
+
+export const useGameSelector = () => {
+  const [isTournamentOpen, setTournamentOpen] = useState(false);
+  const [names, setNames] = useState<string[]>(Array(8).fill(""));
+
+  const openTournament = () => setTournamentOpen(true);
+  const closeTournament = () => setTournamentOpen(false);
+
+  const updateName = (idx: number, value: string) => {
+    setNames(prev => {
+      const next = [...prev];
+      next[idx] = value;
+      return next;
+    });
+  };
+
+  const canStart = () => names.filter(n => n.trim()).length >= 3;
+
+  return {
+    isTournamentOpen, openTournament, closeTournament,
+    names, updateName, canStart
+  };
+};
+
+
+
+
 //!HOOKS
 
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/hooks/useProfile.ts
+
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -580,7 +904,9 @@ import { UserInfo, MatchResult } from "../types/UserInfo";
 import { fetchUserData, updateUserProfile, getAuthHeaders, saveGameResult } from "../types/api";
 import { bots } from "../types/botsData";
 
+// Custom hook to manage profile-related state and interactions
 export const useProfile = () => {
+  // Initialize state for user profile, bot selection, and UI controls
   const [selectedBot, setSelectedBot] = useState<(typeof bots)[0] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -590,8 +916,19 @@ export const useProfile = () => {
   const navigate = useNavigate();
   const isFetchingRef = useRef(false);
 
+  // Memoize authentication headers for API requests
   const authHeaders = useMemo(() => getAuthHeaders(), []);
 
+  // Validate Base64 strings for avatar processing
+  const isValidBase64 = (str: string) => {
+    try {
+      return btoa(atob(str)) === str;
+    } catch {
+      return false;
+    }
+  };
+
+  // Fetch and process all users, converting server data to UserInfo format
   const fetchAllUsers = useCallback(async () => {
     try {
       console.log("Fetching all users...");
@@ -607,13 +944,35 @@ export const useProfile = () => {
         throw new Error(data.message || "Failed to fetch users");
       }
 
-      const mappedUsers: UserInfo[] = data.users.map((u: any) => {
-        // Проверяем, является ли u.image объектом или строкой
-        const imageBase64 = typeof u.image === "object" && u.image?.data ? u.image.data : u.image;
-        return {
-          id: u.id.toString(),
+      const mappedUsers: UserInfo[] = (data.users || []).map((u: any) => {
+        let avatar = "/prof_img/avatar1.png"; // default avatar
+
+        if (u.image) {
+          if (typeof u.image === "string" && isValidBase64(u.image)) {
+            avatar = `data:image/jpeg;base64,${u.image}`;
+          } else if (
+            typeof u.image === "object" &&
+            Array.isArray((u.image as any).data)
+          ) {
+            const byteArray: number[] = (u.image as any).data;
+            let binary = "";
+            byteArray.forEach((byte) => {
+              binary += String.fromCharCode(byte);
+            });
+            const base64String = btoa(binary);
+            avatar = `data:image/jpeg;base64,${base64String}`;
+          } else {
+            console.warn(
+              `Invalid avatar data for user ${u.username || u.id}:`,
+              u.image
+            );
+          }
+        }
+
+        const userInfo: UserInfo = {
+          id: (u.id || "").toString(),
           username: u.username || u.name || "Unknown",
-          avatar: imageBase64 ? `data:image/jpeg;base64,${imageBase64}` : "/prof_img/avatar1.png",
+          avatar,
           email: u.email || "",
           name: u.name || "",
           password: "",
@@ -622,16 +981,23 @@ export const useProfile = () => {
           online: !!u.online,
           history: [],
         };
+        console.log(`Mapped user ${userInfo.username} avatar:`, userInfo.avatar);
+        return userInfo;
       });
 
-      console.log("Mapped players:", mappedUsers);
-      setPlayers(mappedUsers);
+      const sortedUsers = mappedUsers.sort((a, b) =>
+        a.online === b.online ? 0 : a.online ? -1 : 1
+      );
+
+      console.log("Sorted players (online first):", sortedUsers);
+      setPlayers(sortedUsers);
     } catch (err: any) {
       console.error("Failed to fetch users:", err);
       toast.error("Failed to load players list.");
     }
   }, [authHeaders]);
 
+  // Load user data and players list with authentication checks
   const loadData = useCallback(async () => {
     if (isFetchingRef.current) {
       return;
@@ -665,12 +1031,15 @@ export const useProfile = () => {
     }
   }, [navigate, authHeaders, fetchAllUsers]);
 
+  // Update user profile data and refresh related state
   const saveUserData = useCallback(
     async (updatedUser: UserInfo) => {
       const profileUpdates: Partial<UserInfo> = {};
       if (updatedUser.name !== user?.name) profileUpdates.name = updatedUser.name;
-      if (updatedUser.username !== user?.username) profileUpdates.username = updatedUser.username;
-      if (updatedUser.password !== user?.password) profileUpdates.password = updatedUser.password;
+      if (updatedUser.username !== user?.username)
+        profileUpdates.username = updatedUser.username;
+      if (updatedUser.password !== user?.password)
+        profileUpdates.password = updatedUser.password;
 
       await updateUserProfile(
         profileUpdates,
@@ -685,6 +1054,7 @@ export const useProfile = () => {
     [user, authHeaders, fetchAllUsers]
   );
 
+  // Handle profile updates and close the edit modal
   const handleSaveProfile = useCallback(
     async (data: Partial<UserInfo>) => {
       if (!user) return;
@@ -699,6 +1069,7 @@ export const useProfile = () => {
     [user, saveUserData]
   );
 
+  // Process game results and update user stats
   const handleGameEnd = useCallback(
     async (result: "win" | "loss", opponent: string) => {
       if (!user) return;
@@ -722,6 +1093,7 @@ export const useProfile = () => {
     [user, authHeaders]
   );
 
+  // Simulate a game with a random bot and outcome
   const handlePlay = useCallback(() => {
     const opponent = selectedBot || bots[Math.floor(Math.random() * bots.length)];
     const result = Math.random() > 0.5 ? "win" : "loss";
@@ -733,22 +1105,21 @@ export const useProfile = () => {
     }
   }, [selectedBot, handleGameEnd]);
 
+  // Initialize data fetching on component mount
   useEffect(() => {
     let isMounted = true;
-
     const fetchData = async () => {
       if (isMounted) {
         await loadData();
       }
     };
-
     fetchData();
-
     return () => {
       isMounted = false;
     };
   }, [loadData]);
 
+  // Expose state and handlers for use in components
   return {
     user,
     friends,
@@ -764,7 +1135,6 @@ export const useProfile = () => {
     handlePlay,
   };
 };
-
 
 
 
@@ -811,7 +1181,7 @@ export const fetchUserData = async (
   const currentUser = response.data.user;
 
   return {
-    id: currentUser.id || "unknown",
+    id: String(currentUser.id || "unknown"),
     username: currentUser.username || currentUser.name || "Unknown",
     avatar: currentUser.image ? `data:image/jpeg;base64,${currentUser.image}` : "/prof_img/avatar1.png",
     email: currentUser.email || "",
@@ -1019,6 +1389,7 @@ export type UserInfo = {
   history: MatchResult[];
   onRemove?: () => void;
   onChallenge?: () => void;
+  onAdd?: () => void;
 };
 
 // *** Block: Calculate User Stats ***
@@ -1304,79 +1675,83 @@ export default BotSelector;
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/DesktopLayout.tsx
 
+
 import React from "react";
-import EnhancedFriendsList from "./EnhancedFriendsList";
-import PlayersList from "./PlayersList";
+import UserList from "./UserList";
 import UserHeader from "./UserHeader";
 import PlayArena from "./PlayArena";
-import GameModeSelector from "./GameModeSelector";
+import GameSelector from "./GameSelector/GameSelector";
 import { PrimaryButton } from "./types/ui";
 import { UserInfo } from "./types/UserInfo";
 import { bots } from "./types/botsData";
 
+// Define props for DesktopLayout component
 interface DesktopLayoutProps {
-  user: UserInfo;
-  friends: UserInfo[];
-  players: UserInfo[];
-  selectedBot: (typeof bots)[0] | null;
-  handlePlay: () => void;
+  user: UserInfo; // Current user's data
+  friends: UserInfo[]; // List of friends
+  players: UserInfo[]; // List of other players
+  selectedBot: (typeof bots)[0] | null; // Currently selected bot for gameplay
+  handlePlay: () => void; // Callback to start the game
+  expandUsername?: string; // Optional username to auto-expand a user's card in UserList
 }
 
+// DesktopLayout component for rendering the profile page layout on desktop screens
 const DesktopLayout: React.FC<DesktopLayoutProps> = ({
   user,
   friends,
   players,
   selectedBot,
   handlePlay,
+  expandUsername,
 }) => {
+  // Render a 6-column grid layout visible only on extra-large screens
   return (
     <div
-      className={`
+      className="
         hidden
         xl:grid
         xl:grid-cols-6
         gap-4
         px-4
         flex-grow
-      `}
-      /* Main container: Creates a responsive grid layout visible only on extra-large screens */
+      "
     >
+      {/* Friends list section (left column) */}
       <div
-        className={`
+        className="
           pt-4
           flex
           flex-col
           items-start
           col-span-1
           max-w-[220px]
-        `}
-        /* Friends section: Aligns the friends list vertically on the left side with constrained width */
+        "
       >
         <h2
-          className={`
+          className="
             text-lg
             font-semibold
             mb-2
             text-left
             drop-shadow-[0_0_8px_red]
-          `}
-          /* Friends title: Styles the heading for the friends list with a red glow */
+          "
         >
           Friends
         </h2>
-        <EnhancedFriendsList friends={friends} />
+        {/* Render list of friends with optional auto-expansion */}
+        <UserList users={friends} variant="friends" expandUsername={expandUsername} />
       </div>
 
+      {/* Video section (decorative animation) */}
       <div
-        className={`
+        className="
           pt-6
           col-span-1
           mx-auto
-        `}
-        /* Video section: Centers the video container with top padding */
+        "
       >
         <div
-          className={`
+          className="
             w-full
             max-w-[750px]
             bg-gray-800
@@ -1386,27 +1761,27 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({
             shadow-lg
             ml-14
             mt-32
-          `}
-          /* Video wrapper: Styles the video container with a semi-transparent background and shadow */
+          "
         >
+          {/* Auto-playing looped video for visual effect */}
           <video
             src="/videos/fight_gif.mp4"
             autoPlay
             loop
             muted
             playsInline
-            className={`
+            className="
               w-full
               h-auto
               rounded-lg
-            `}
-            /* Video: Ensures the video fills the container with rounded corners */
+            "
           />
         </div>
       </div>
 
+      {/* Central section: User info, play button, and game arena */}
       <div
-        className={`
+        className="
           pt-8
           flex
           flex-col
@@ -1414,9 +1789,9 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({
           justify-start
           gap-6
           col-span-2
-        `}
-        /* Central section: Centers user info, play button, and arena with vertical spacing */
+        "
       >
+        {/* Display user's profile header with stats */}
         <UserHeader
           user={{
             username: user.username,
@@ -1426,7 +1801,9 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({
             history: user.history,
           }}
         />
+        {/* Button to trigger the game */}
         <PrimaryButton onClick={handlePlay}>PLAY</PrimaryButton>
+        {/* Game arena displaying user and opponent (bot) info */}
         <PlayArena
           user={{ username: user.username, avatar: user.avatar }}
           opponentImage={selectedBot ? selectedBot.image : null}
@@ -1434,17 +1811,17 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({
         />
       </div>
 
+      {/* Game mode selector section */}
       <div
-        className={`
+        className="
           pt-8
           flex
           justify-center
           col-span-1
-        `}
-        /* Game mode section: Centers the game mode selector */
+        "
       >
         <div
-          className={`
+          className="
             flex
             flex-col
             items-center
@@ -1455,15 +1832,16 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({
             w-full
             max-w-[320px]
             xl:max-w-full
-          `}
-          /* Game mode wrapper: Styles the container for the game mode selector with responsive padding */
+          "
         >
-          <GameModeSelector />
+          {/* Component for selecting game mode */}
+          <GameSelector />
         </div>
       </div>
 
+      {/* Players list section (right column) */}
       <div
-        className={`
+        className="
           pt-4
           flex
           flex-col
@@ -1471,22 +1849,21 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({
           col-span-1
           max-w-[220px]
           ml-auto
-        `}
-        /* Players section: Aligns the players list vertically on the right side with constrained width */
+        "
       >
         <h2
-          className={`
+          className="
             text-lg
             font-semibold
             mb-2
             text-right
             drop-shadow-[0_0_8px_red]
-          `}
-          /* Players title: Styles the heading for the players list with a red glow */
+          "
         >
           Players
         </h2>
-        <PlayersList players={players} />
+        {/* Render list of players with optional auto-expansion */}
+        <UserList users={players} variant="players" expandUsername={expandUsername} />
       </div>
     </div>
   );
@@ -1494,165 +1871,6 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({
 
 export default DesktopLayout;
 
-
-
-
-
-// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/EnhancedFriendsList.tsx
-
-
-import React, { useState } from "react";
-import { UserInfo } from "./types/UserInfo";
-import PlayerCard from "./PlayerCard";
-import { CardWrapper } from "./types/ui";
-
-interface Props {
-	friends: UserInfo[];
-}
-
-const EnhancedFriendsList: React.FC<Props> = ({ friends }) => {
-	const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-
-	const toggleExpand = (index: number) => {
-		setExpandedIndex((prev) => (prev === index ? null : index));
-	};
-
-	return (
-		<div
-			className={`
-        flex
-        flex-col
-        gap-2
-        overflow-y-auto
-        max-h-[500px]
-        pr-1
-        scrollbar-thin
-        scrollbar-thumb-white/60
-        scrollbar-track-transparent
-      `}
-		/* Main container: Displays a scrollable list of friends with a fixed maximum height */
-		>
-			{friends.map((friend, index) => {
-				const isExpanded = expandedIndex === index;
-
-				return (
-					<CardWrapper key={index} onClick={() => toggleExpand(index)}>
-						<div
-							className={`
-                flex
-                justify-between
-                items-center
-              `}
-						/* Friend header: Aligns username and online status horizontally */
-						>
-							<div
-								className={`
-                  font-bold
-                  text-base
-                `}
-							/* Username: Styles the friend’s username with bold text */
-							>
-								{friend.username}
-							</div>
-							<div
-								className={`
-                  text-sm
-                  ${friend.online ? "text-green-400" : "text-gray-400"}
-                `}
-							/* Online status: Displays online/offline status with color coding */
-							>
-								{friend.online ? "Online" : "Offline"}
-							</div>
-						</div>
-						<div
-							className={`
-                transition-all
-                duration-300
-                overflow-hidden
-                ${isExpanded ? "max-h-[600px] mt-3" : "max-h-0"}
-              `}
-						/* Expandable content: Toggles visibility of the player card with smooth animation */
-						>
-							<PlayerCard user={friend} />
-						</div>
-					</CardWrapper>
-				);
-			})}
-		</div>
-	);
-};
-
-export default EnhancedFriendsList;
-
-
-
-
-
-// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameModelSelector.tsx
-
-import React from "react";
-
-const modes = [
-  {
-    name: "Single Player",
-    img: "/button_img/single.png",
-  },
-  {
-    name: "Multiplayer",
-    img: "/button_img/mlti.png",
-  },
-  {
-    name: "Tournament",
-    img: "/button_img/tourn.png",
-  },
-];
-
-const GameModeSelector: React.FC = () => {
-  return (
-    <div
-      className="
-        flex
-        flex-col
-        items-center
-        gap-9
-      "
-    >
-      {modes.map((mode, index) => (
-        <button
-          key={index}
-          onClick={() => alert(`${mode.name} clicked!`)}
-          className="
-            bg-transparent
-            rounded-xl
-            shadow-md
-            overflow-hidden
-            transform
-            transition
-            duration-300
-            hover:scale-110
-            hover:shadow-[0_0_20px_#00ff7f]
-          "
-        >
-          <img
-            src={mode.img}
-            alt={mode.name}
-            className="
-              w-[240px]
-              h-auto
-              object-contain
-              block
-              transition
-              duration-300
-              hover:brightness-110
-            "
-          />
-        </button>
-      ))}
-    </div>
-  );
-};
-
-export default GameModeSelector;
 
 
 
@@ -1665,24 +1883,24 @@ import ProfileActions from "./ProfileActions";
 import { UserInfo } from "./types/UserInfo";
 
 interface HeaderProps {
-	user: Pick<UserInfo, "username" | "online" | "email">;
-	onProfileClick: () => void;
+  user: Pick<UserInfo, "username" | "online" | "email">;
+  onProfileClick: () => void;
+  onSearch?: (username: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ user, onProfileClick }) => {
-	return (
-		<div
-			className={`
+const Header: React.FC<HeaderProps> = ({ user, onProfileClick, onSearch }) => {
+  return (
+    <div
+      className="
         flex
         justify-between
         items-center
         px-6
         py-4
-      `}
-		/* Main container: Aligns the title and profile actions horizontally with padding */
-		>
-			<div
-				className={`
+      "
+    >
+      <div
+        className="
           text-transparent
           bg-clip-text
           bg-gradient-to-r
@@ -1696,33 +1914,32 @@ const Header: React.FC<HeaderProps> = ({ user, onProfileClick }) => {
           duration-300
           ease-in-out
           hover:scale-110
-        `}
-				style={{
-					textShadow:
-						"0 0 20px rgba(255, 255, 255, 0.3), 0 0 32px rgba(255, 0, 255, 0.3)",
-				}}
-			/* Title: Styles the "NEON PONG" logo with a gradient, hover effect, and custom shadow */
-			>
-				NEON PONG
-			</div>
-			<ProfileActions user={user} onProfileClick={onProfileClick} />
-		</div>
-	);
+        "
+        style={{
+          textShadow:
+            "0 0 20px rgba(255, 255, 255, 0.3), 0 0 32px rgba(255, 0, 255, 0.3)",
+        }}
+      >
+        NEON PONG
+      </div>
+      <ProfileActions user={user} onProfileClick={onProfileClick} onSearch={onSearch} />
+    </div>
+  );
 };
 
 export default Header;
 
 
 
-
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/MobileLayout.tsx
 
+
+
 import React from "react";
-import EnhancedFriendsList from "./EnhancedFriendsList";
-import PlayersList from "./PlayersList";
+import UserList from "./UserList";
 import UserHeader from "./UserHeader";
 import PlayArena from "./PlayArena";
-import GameModeSelector from "./GameModeSelector";
+import GameSelector from "./GameSelector/GameSelector";
 import { PrimaryButton } from "./types/ui";
 import { UserInfo } from "./types/UserInfo";
 import { bots } from "./types/botsData";
@@ -1733,6 +1950,7 @@ interface MobileLayoutProps {
   players: UserInfo[];
   selectedBot: (typeof bots)[0] | null;
   handlePlay: () => void;
+  expandUsername?: string;
 }
 
 const MobileLayout: React.FC<MobileLayoutProps> = ({
@@ -1741,18 +1959,18 @@ const MobileLayout: React.FC<MobileLayoutProps> = ({
   players,
   selectedBot,
   handlePlay,
+  expandUsername,
 }) => {
   return (
     <div
-      className={`
+      className="
         flex
         xl:hidden
         flex-col
         items-center
         px-4
         gap-4
-      `}
-      /* Main container: Creates a centered, vertical layout for mobile screens, hidden on xl screens */
+      "
     >
       <UserHeader
         user={{
@@ -1770,83 +1988,76 @@ const MobileLayout: React.FC<MobileLayoutProps> = ({
         opponentName={selectedBot ? selectedBot.name : undefined}
       />
       <div
-        className={`
+        className="
           w-full
           max-w-xs
           mt-4
-        `}
-        /* Game mode section: Constrains the width of the game mode selector with top margin */
+        "
       >
-        <GameModeSelector />
+        <GameSelector />
       </div>
       <div
-        className={`
+        className="
           w-full
           flex
           flex-col
           sm:flex-row
           sm:justify-between
           gap-4
-        `}
-        /* Friends and players container: Arranges friends and players lists vertically on mobile, horizontally on sm screens */
+        "
       >
         <div
-          className={`
+          className="
             w-full
             sm:w-1/2
             min-w-0
-          `}
-          /* Friends section: Styles the friends list container, taking half width on sm screens */
+          "
         >
           <h2
-            className={`
+            className="
               text-lg
               font-semibold
               mb-2
               text-left
               drop-shadow-[0_0_8px_red]
-            `}
-            /* Friends title: Styles the heading for the friends list with a red glow */
+            "
           >
             Friends
           </h2>
-          <EnhancedFriendsList friends={friends} />
+          <UserList users={friends} variant="friends" expandUsername={expandUsername} />
         </div>
         <div
-          className={`
+          className="
             w-full
             sm:w-1/2
             min-w-0
             flex
             flex-col
             items-end
-          `}
-          /* Players section: Styles the players list container, aligned right, taking half width on sm screens */
+          "
         >
           <h2
-            className={`
+            className="
               text-lg
               font-semibold
               mb-2
               text-right
               drop-shadow-[0_0_8px_red]
-            `}
-            /* Players title: Styles the heading for the players list with a red glow */
+            "
           >
             Players
           </h2>
-          <PlayersList players={players} />
+          <UserList users={players} variant="players" expandUsername={expandUsername} />
         </div>
       </div>
       <div
-        className={`
+        className="
           w-full
           mt-8
-        `}
-        /* Video section: Centers the video container with top margin */
+        "
       >
         <div
-          className={`
+          className="
             w-full
             max-w-[600px]
             bg-gray-800
@@ -1855,8 +2066,7 @@ const MobileLayout: React.FC<MobileLayoutProps> = ({
             p-4
             shadow-lg
             mx-auto
-          `}
-          /* Video wrapper: Styles the video container with a semi-transparent background and shadow */
+          "
         >
           <video
             src="/videos/fight_gif.mp4"
@@ -1864,12 +2074,11 @@ const MobileLayout: React.FC<MobileLayoutProps> = ({
             loop
             muted
             playsInline
-            className={`
+            className="
               w-full
               h-auto
               rounded-lg
-            `}
-            /* Video: Ensures the video fills the container with rounded corners */
+            "
           />
         </div>
       </div>
@@ -1878,6 +2087,7 @@ const MobileLayout: React.FC<MobileLayoutProps> = ({
 };
 
 export default MobileLayout;
+
 
 
 
@@ -2018,7 +2228,6 @@ export default Arena;
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/PlayerCard.tsx
 
-
 import React from "react";
 import UserHeader from "./UserHeader";
 import { UserInfo } from "./types/UserInfo";
@@ -2060,6 +2269,32 @@ const PlayerCard: React.FC<Props> = ({ user }) => {
           pt-2
         "
       >
+        {user.onAdd && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              user.onAdd!();
+            }}
+            className="
+              px-4
+              py-2
+              rounded-md
+              text-sm
+              font-semibold
+              text-green-400
+              border-2
+              border-green-500
+              hover:bg-green-600
+              hover:text-white
+              transition
+              duration-300
+              shadow-[0_0_12px_#00ff00]
+              hover:shadow-[0_0_18px_#00ff00]
+            "
+          >
+            Add
+          </button>
+        )}
         {user.onRemove && (
           <button
             onClick={(e) => {
@@ -2122,138 +2357,99 @@ export default PlayerCard;
 
 
 
-// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/PlayersList.tsx
-
-
-import React, { useState } from "react";
-import PlayerCard from "./PlayerCard";
-import { CardWrapper } from "./types/ui";
-import { UserInfo } from "./types/UserInfo";
-
-type Props = {
-  players: UserInfo[];
-};
-
-const PlayersList: React.FC<Props> = ({ players }) => {
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-
-  const toggleExpand = (index: number) => {
-    setExpandedIndex((prev) => (prev === index ? null : index));
-  };
-
-  return (
-    <div
-      className="
-        flex
-        flex-col
-        gap-2
-        overflow-y-auto
-        max-h-[500px]
-        pr-1
-        scrollbar-thin
-        scrollbar-thumb-white/60
-        scrollbar-track-transparent
-      "
-    >
-      {players.map((player, index) => {
-        const isExpanded = expandedIndex === index;
-
-        return (
-          <CardWrapper key={index} onClick={() => toggleExpand(index)}>
-            <div className="flex justify-between items-center">
-              <div className="font-bold text-base">{player.username}</div>
-              <div
-                className={`text-sm ${player.online ? "text-green-400" : "text-gray-400"}`}
-              >
-                {player.online ? "Online" : "Offline"}
-              </div>
-            </div>
-            <div
-              className={`
-                transition-all
-                duration-300
-                overflow-hidden
-                ${isExpanded ? "max-h-[600px] mt-3" : "max-h-0"}
-              `}
-            >
-              <PlayerCard user={player} />
-            </div>
-          </CardWrapper>
-        );
-      })}
-    </div>
-  );
-};
-
-export default PlayersList;
-
-
-
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/Profile.tsx
 
-import React from "react";
+import React, { useState } from "react";
 import ProfileModal from "./ProfileModal";
 import Header from "./Header";
 import DesktopLayout from "./DesktopLayout";
 import MobileLayout from "./MobileLayout";
 import BotSelector from "./BotSelector";
 import { useProfile } from "./hooks/useProfile";
+import { toast } from "react-hot-toast";
 
+// Profile component serves as the main page for user profile management
 const Profile: React.FC = () => {
-	const {
-		user,
-		friends,
-		players,
-		selectedBot,
-		isModalOpen,
-		isLoading,
-		setSelectedBot,
-		setIsModalOpen,
-		handleSaveProfile,
-		handlePlay,
-	} = useProfile();
+  // Destructure user data, state, and handlers from custom useProfile hook
+  const {
+    user, // Current user's data
+    friends, // List of friends
+    players, // List of all players
+    selectedBot, // Currently selected bot for gameplay
+    isModalOpen, // State for profile modal visibility
+    isLoading, // Loading state for data fetching
+    setSelectedBot, // Function to update selected bot
+    setIsModalOpen, // Function to toggle profile modal
+    handleSaveProfile, // Handler to save profile changes
+    handlePlay, // Handler to start a game
+  } = useProfile();
 
-	if (isLoading) {
-		return (
-			<div
-				className={`
+  // State to store username for auto-expanding a user card
+  const [expandUsername, setExpandUsername] = useState<string | undefined>(undefined);
+
+  // Handle search for a user by username (case-insensitive)
+  const handleSearch = (username: string) => {
+    // Check if the username exists in players or friends lists
+    const foundInPlayers = players.find(
+      (p) => p.username.toLowerCase() === username.toLowerCase()
+    );
+    const foundInFriends = friends.find(
+      (f) => f.username.toLowerCase() === username.toLowerCase()
+    );
+
+    // If found, set expandUsername to trigger card expansion and show success toast
+    if (foundInPlayers || foundInFriends) {
+      setExpandUsername(username);
+      toast.success(`Found user: ${username}`);
+    } else {
+      // If not found, clear expandUsername and show error toast
+      setExpandUsername(undefined);
+      toast.error(`User ${username} not found`);
+    }
+  };
+
+  // Display loading state while fetching data
+  if (isLoading) {
+    return (
+      <div
+        className="
           min-h-screen
           w-full
           flex
           items-center
           justify-center
           text-white
-        `}
-			/* Loading screen: Centers a loading message on a full-screen background */
-			>
-				Loading data, please wait...
-			</div>
-		);
-	}
+        "
+      >
+        Loading data, please wait...
+      </div>
+    );
+  }
 
-	if (!user) {
-		return (
-			<div
-				className={`
+  // Display error if user data failed to load
+  if (!user) {
+    return (
+      <div
+        className="
           min-h-screen
           w-full
           flex
           items-center
           justify-center
           text-white
-        `}
-			/* Error screen: Centers an error message when user data fails to load */
-			>
-				Failed to load user data.
-			</div>
-		);
-	}
+        "
+      >
+        Failed to load user data.
+      </div>
+    );
+  }
 
-	return (
-		<>
-			<div
-				className={`
+  // Render the main profile page layout
+  return (
+    <>
+      <div
+        className="
           min-h-screen
           w-full
           text-white
@@ -2261,50 +2457,57 @@ const Profile: React.FC = () => {
           flex-col
           overflow-y-auto
           justify-between
-        `}
-			/* Main container: Creates a full-screen, scrollable layout for the profile page */
-			>
-				<Header
-					user={{
-						username: user.username,
-						online: user.online,
-						email: user.email,
-					}}
-					onProfileClick={() => setIsModalOpen(true)}
-				/>
-				<DesktopLayout
-					user={user}
-					friends={friends}
-					players={players}
-					selectedBot={selectedBot}
-					handlePlay={handlePlay}
-				/>
-				<MobileLayout
-					user={user}
-					friends={friends}
-					players={players}
-					selectedBot={selectedBot}
-					handlePlay={handlePlay}
-				/>
-				<BotSelector
-					selectedBot={selectedBot}
-					setSelectedBot={setSelectedBot}
-				/>
-			</div>
+        "
+      >
+        {/* Header with user info, profile toggle, and search functionality */}
+        <Header
+          user={{
+            username: user.username,
+            online: user.online,
+            email: user.email,
+          }}
+          onProfileClick={() => setIsModalOpen(true)} // Open profile modal on click
+          onSearch={handleSearch} // Pass search handler
+        />
+        {/* Desktop-specific layout for large screens */}
+        <DesktopLayout
+          user={user}
+          friends={friends}
+          players={players.filter((p) => p.id !== user.id)} // Exclude current user from players list
+          selectedBot={selectedBot}
+          handlePlay={handlePlay}
+          expandUsername={expandUsername} // Pass username for card expansion
+        />
+        {/* Mobile-specific layout for smaller screens */}
+        <MobileLayout
+          user={user}
+          friends={friends}
+          players={players.filter((p) => p.id !== user.id)} // Exclude current user from players list
+          selectedBot={selectedBot}
+          handlePlay={handlePlay}
+          expandUsername={expandUsername} // Pass username for card expansion
+        />
+        {/* Bot selector for choosing game opponent */}
+        <BotSelector
+          selectedBot={selectedBot}
+          setSelectedBot={setSelectedBot}
+        />
+      </div>
 
-			{isModalOpen && (
-				<ProfileModal
-					onClose={() => setIsModalOpen(false)}
-					userData={{
-						avatar: user.avatar,
-						username: user.username,
-						name: user.name,
-					}}
-					onSave={handleSaveProfile}
-				/>
-			)}
-		</>
-	);
+      {/* Conditionally render profile modal for editing user data */}
+      {isModalOpen && (
+        <ProfileModal
+          onClose={() => setIsModalOpen(false)} // Close modal on dismiss
+          userData={{
+            avatar: user.avatar,
+            username: user.username,
+            name: user.name,
+          }}
+          onSave={handleSaveProfile} // Save profile changes
+        />
+      )}
+    </>
+  );
 };
 
 export default Profile;
@@ -2313,125 +2516,243 @@ export default Profile;
 
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/ProfileActions.tsx
-import React from "react";
+
+import React, { useState } from "react";
 import { UserInfo } from "./types/UserInfo";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { getAuthHeaders } from "./types/api";
 
+// Define the props accepted by the ProfileActions component
 interface ProfileActionsProps {
-	user: Pick<UserInfo, "username" | "online" | "email">;
-	onProfileClick: () => void;
+  user: Pick<UserInfo, "username" | "online" | "email">; // Basic user info for display and API calls
+  onProfileClick: () => void;                           // Callback to open profile modal
+  onSearch?: (username: string) => void;                // Optional callback for search action
 }
 
-const ProfileActions: React.FC<ProfileActionsProps> = ({ user, onProfileClick }) => {
-	const navigate = useNavigate();
+// Main component rendering search, user info, and action buttons
+const ProfileActions: React.FC<ProfileActionsProps> = ({
+  user,
+  onProfileClick,
+  onSearch,
+}) => {
+  const navigate = useNavigate();               // Hook for navigation after logout
+  const [searchQuery, setSearchQuery] = useState("");  // Local state for search input
 
-	const handleLogout = async () => {
-		try {
-			const response = await fetch("http://localhost:3000/logout", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					...getAuthHeaders(),
-				},
-				body: JSON.stringify({ email: user.email }),
-			});
-			if (!response.ok) throw new Error("Failed to logout");
-			toast.success("Logged out successfully!");
-			localStorage.removeItem("token");
-			navigate("/login");
-		} catch (err) {
-			console.error("Logout error:", err);
-			toast.error("Failed to logout. Please try again.");
-		}
-	};
+  /**
+   * Logout handler
+   * Sends POST to /logout, clears token, and navigates to login on success
+   */
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders(),                    // Attach authorization header
+        },
+        body: JSON.stringify({ email: user.email }),
+      });
+      if (!response.ok) throw new Error("Failed to logout");
+      toast.success("Logged out successfully!");
+      localStorage.removeItem("token");          // Remove JWT to prevent unauthorized access
+      navigate("/login");                       // Redirect to login page
+    } catch (err) {
+      console.error("Logout error:", err);
+      toast.error("Failed to logout. Please try again.");
+    }
+  };
 
-	return (
-		<div
-			className={`
-        flex
-        items-center
-        gap-4
-      `}
-		/* Actions container: Aligns username and buttons horizontally with spacing */
-		>
-			<span
-				className={`
-          text-sm
-          font-bold
-          ${user.online ? "text-green-400" : "text-gray-400"}
-        `}
-			/* Username: Displays the username with color indicating online status */
-			>
-				{user.username}
-			</span>
-			<button
-				onClick={onProfileClick}
-				className={`
-          px-4
-          py-2
-          rounded-2xl
-          text-base
-          font-bold
-          bg-transparent
-          outline-3
-          outline-offset-2
-          outline-double
-          border
-          border-emerald-200
-          text-white
-          transition-all
-          duration-300
-          ease-in-out
-          hover:scale-110
-        `}
-				style={{
-					textShadow: `
-            0 0 4px rgba(102, 0, 255, 0.9),
-            0 0 8px rgba(102, 0, 255, 0.7),
-            0 0 16px rgba(102, 0, 255, 0.5),
-            0 0 32px rgba(102, 0, 255, 0.3)
-          `,
-				}}
-			/* Profile button: Styles the profile button with neon effects and hover scaling */
-			>
-				Profile
-			</button>
-			<button
-				onClick={handleLogout}
-				className={`
-          px-4
-          py-2
-          rounded-2xl
-          text-base
-          font-bold
-          bg-transparent
-          outline-3
-          outline-offset-2
-          outline-double
-          border
-          border-emerald-200
-          text-white
-          transition-all
-          duration-300
-          ease-in-out
-          hover:scale-110
-        `}
-				style={{
-					textShadow: `
-            0 0 4px rgba(102, 0, 255, 0.9),
-            0 0 8px rgba(102, 0, 255, 0.7),
-            0 0 16px rgba(102, 0, 255, 0.5),
-            0 0 32px rgba(102, 0, 255, 0.3)
-          `,
-				}}
-			/* Logout button: Styles the logout button with neon effects and hover scaling */
-			>
-				LogOut
-			</button>
-		</div>
-	);
+  /**
+   * Search handler
+   * Validates input and calls parent onSearch callback
+   */
+  const handleSearch = () => {
+    if (!searchQuery.trim()) {
+      toast.error("Please enter a username to search.");
+      return;
+    }
+    onSearch?.(searchQuery.trim());             // Trigger search in parent component
+  };
+
+  /** Clear the current search input */
+  const handleClear = () => {
+    setSearchQuery("");
+  };
+
+  /**
+   * Keyboard handler for search
+   * Triggers search on Enter key press
+   */
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
+  return (
+    // Container: switches layout from column (mobile) to row (desktop)
+    <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+
+      {/*
+        Search Group:
+        - Input field for username
+        - Search and Clear buttons
+      */}
+      <div className="flex items-center gap-2 flex-col sm:flex-row">
+        <input
+          type="text"
+          placeholder="Search user..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyPress={handleKeyPress}
+          className="
+            px-3
+            py-1
+            rounded-2xl
+            text-sm
+            bg-gray-800
+            border
+            border-emerald-200
+            text-white
+            focus:outline-none
+            focus:ring-2
+            focus:ring-indigo-800
+            transition-all
+            duration-300
+            ease-in-out
+            hover:scale-105
+            w-32
+            sm:w-40
+          "
+          style={{
+            textShadow: `
+              0 0 4px rgba(102, 0, 255, 0.9),
+              0 0 8px rgba(102, 0, 255, 0.7),
+              0 0 16px rgba(102, 0, 255, 0.5),
+              0 0 32px rgba(102, 0, 255, 0.3)
+            `,
+          }}
+        />
+        <div className="flex gap-2">
+          <button
+            onClick={handleSearch}
+            className="
+              px-3
+              rounded-2xl
+              text-sm
+              font-bold
+              bg-transparent
+              outline-3
+              outline-offset-2
+              outline-double
+              border
+              border-emerald-200
+              text-white
+              transition-all
+              duration-300
+              ease-in-out
+              hover:scale-110
+            "
+          >
+            Search
+          </button>
+          <button
+            onClick={handleClear}
+            className="
+              px-3
+              rounded-2xl
+              text-sm
+              font-bold
+              bg-transparent
+              outline-3
+              outline-offset-2
+              outline-double
+              border
+              border-red-400
+              text-white
+              transition-all
+              duration-300
+              ease-in-out
+              hover:scale-110
+            "
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+
+      {/*
+        User Info & Actions:
+        - Display username with online status color
+        - Buttons for opening profile modal and logging out
+      */}
+      <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+        <span
+          className={`
+            text-xl
+            sm:text-2xl
+            font-bold
+            ${user.online ? "text-green-400" : "text-gray-400"}
+            truncate
+            max-w-[150px]
+            sm:max-w-[200px]
+            sm:order-1
+          `}
+        >
+          {user.username}
+        </span>
+        <div className="flex gap-3 sm:order-2">
+          <button
+            onClick={onProfileClick}
+            className="
+              px-3
+              py-2
+              rounded-2xl
+              text-sm
+              font-bold
+              bg-transparent
+              outline-3
+              outline-offset-2
+              outline-double
+              border
+              border-emerald-200
+              text-white
+              transition-all
+              duration-300
+              ease-in-out
+              hover:scale-110
+            "
+          >
+            Profile
+          </button>
+          <button
+            onClick={handleLogout}
+            className="
+              px-3
+              py-1
+              rounded-2xl
+              text-sm
+              font-bold
+              bg-transparent
+              outline-3
+              outline-offset-2
+              outline-double
+              border
+              border-emerald-200
+              text-white
+              transition-all
+              duration-300
+              ease-in-out
+              hover:scale-110
+            "
+          >
+            LogOut
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ProfileActions;
@@ -2439,54 +2760,68 @@ export default ProfileActions;
 
 
 
+
+
+
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/ProfileModal.tsx
+
 
 import React, { useState } from "react";
 import { UserInfo } from "./types/UserInfo";
 import { toast } from "react-hot-toast";
 
 interface ProfileModalProps {
-	onClose: () => void;
-	onSave: (data: Partial<UserInfo>) => void;
-	userData: Pick<UserInfo, "avatar" | "username" | "name">;
+  onClose: () => void;
+  onSave: (data: Partial<UserInfo>) => void;
+  userData: Pick<UserInfo, "avatar" | "username" | "name">;
 }
 
 const ProfileModal: React.FC<ProfileModalProps> = ({
-	onClose,
-	onSave,
-	userData,
+  onClose,
+  onSave,
+  userData,
 }) => {
-	const [avatar, setAvatar] = useState(userData.avatar);
-	const [username, setUsername] = useState(userData.username);
-	const [name, setName] = useState(userData.name);
-	const [password, setPassword] = useState("");
+  // State for form fields
+  const [avatar, setAvatar] = useState(userData.avatar);
+  const [username, setUsername] = useState(userData.username);
+  const [name, setName] = useState(userData.name);
+  const [password, setPassword] = useState("");
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // Maximum file size: 10 MB
 
-	const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB max
+  // Handler for avatar change
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-	const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (!file) return;
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("File is too large! Maximum size is 10 MB.");
+      return;
+    }
 
-		if (file.size > MAX_FILE_SIZE) {
-			toast.error("File is too big! Max size: 10 MB.");
-			return;
-		}
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatar(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
-		const reader = new FileReader();
-		reader.onloadend = () => {
-			setAvatar(reader.result as string);
-		};
-		reader.readAsDataURL(file);
-	};
+  // Handler for saving changes
+  const handleSave = () => {
+    if (name.length < 2) {
+      toast.error("Name must be at least 2 characters long.");
+      return;
+    }
+    if (username.length < 2) {
+      toast.error("Username must be at least 2 characters long.");
+      return;
+    }
+    console.log("Saving data:", { avatar, username, name, password }); // Debugging
+    onSave({ avatar, username, name, password });
+  };
 
-	const handleSave = () => {
-		console.log("Saving data:", { avatar, username, name, password }); // Отладка
-		onSave({ avatar, username, name, password });
-	};
-
-	return (
-		<div
-			className={`
+  return (
+    <div
+      className={`
         fixed
         inset-0
         z-50
@@ -2496,10 +2831,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
         bg-black
         bg-opacity-60
       `}
-		/* Modal overlay: Creates a centered, full-screen backdrop with semi-transparent background */
-		>
-			<div
-				className={`
+      // Modal overlay: darkens the screen and centers the content
+    >
+      <div
+        className={`
           bg-gray-900
           text-white
           rounded-xl
@@ -2509,32 +2844,32 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
           space-y-4
           shadow-2xl
         `}
-			/* Modal content: Styles the modal window with a dark background and shadow */
-			>
-				<h2
-					className={`
+        // Modal container: dark background with rounded corners
+      >
+        <h2
+          className={`
             text-2xl
             font-bold
             text-center
           `}
-				/* Modal title: Centers the heading for the edit profile form */
-				>
-					Edit Profile
-				</h2>
+          // Header: centered "Edit Profile" text
+        >
+          Edit Profile
+        </h2>
 
-				<div
-					className={`
+        <div
+          className={`
             flex
             flex-col
             items-center
             gap-2
           `}
-				/* Avatar section: Centers the avatar image and file input vertically */
-				>
-					<img
-						src={avatar}
-						alt="Avatar"
-						className={`
+          // Avatar section: centers the image and file input
+        >
+          <img
+            src={avatar}
+            alt="Avatar"
+            className={`
               w-24
               h-24
               rounded-full
@@ -2542,147 +2877,159 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
               border-2
               border-white
             `}
-					/* Avatar image: Displays a circular avatar with a white border */
-					/>
-					<input
-						type="file"
-						accept="image/jpeg,image/png"
-						onChange={handleAvatarChange}
-						className={`
+            // Avatar image: circular with a white border
+          />
+          <input
+            type="file"
+            accept="image/jpeg,image/png"
+            onChange={handleAvatarChange}
+            className={`
               text-sm
               text-gray-300
             `}
-					/* File input: Styles the file input for avatar uploads */
-					/>
-				</div>
+            // File input: for selecting a new avatar
+          />
+        </div>
 
-				<div
-					className={`
+        <div
+          className={`
             flex
             flex-col
             gap-1
           `}
-				/* Name field container: Groups the name label and input */
-				>
-					<label
-						className={`
+          // Name field: contains label and text input
+        >
+          <label
+            className={`
               text-sm
               text-gray-400
             `}
-					/* Name label: Styles the label for the name input */
-					>
-						Name
-					</label>
-					<input
-						type="text"
-						placeholder="Name"
-						value={name}
-						onChange={(e) => setName(e.target.value)} // Добавляем возможность редактирования
-						className={`
+            // Label for the name field
+          >
+            Name
+          </label>
+          <input
+            type="text"
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className={`
               w-full
               p-2
               rounded
               bg-gray-800
               border
               border-gray-600
+              text-white
+              focus:outline-none
+              focus:ring-2
+              focus:ring-indigo-800
             `}
-					/* Name input: Styles the editable name input */
-					/>
-				</div>
+            // Text input for editing the name
+          />
+        </div>
 
-				<div
-					className={`
+        <div
+          className={`
             flex
             flex-col
             gap-1
           `}
-				/* Username field container: Groups the username label and input */
-				>
-					<label
-						className={`
+          // Username field: contains label and text input
+        >
+          <label
+            className={`
               text-sm
               text-gray-400
             `}
-					/* Username label: Styles the label for the username input */
-					>
-						Username
-					</label>
-					<input
-						type="text"
-						placeholder="Username"
-						value={username}
-						onChange={(e) => setUsername(e.target.value)}
-						className={`
+            // Label for the username field
+          >
+            Username
+          </label>
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className={`
               w-full
               p-2
               rounded
               bg-gray-800
               border
               border-gray-600
+              text-white
+              focus:outline-none
+              focus:ring-2
+              focus:ring-indigo-800
             `}
-					/* Username input: Styles the editable username input */
-					/>
-				</div>
+            // Text input for editing the username
+          />
+        </div>
 
-				<div
-					className={`
+        <div
+          className={`
             flex
             flex-col
             gap-1
           `}
-				/* Password field container: Groups the password label and input */
-				>
-					<label
-						className={`
+          // Password field: contains label and password input
+        >
+          <label
+            className={`
               text-sm
               text-gray-400
             `}
-					/* Password label: Styles the label for the password input */
-					>
-						New Password
-					</label>
-					<input
-						type="password"
-						placeholder="New Password"
-						value={password}
-						onChange={(e) => setPassword(e.target.value)}
-						className={`
+            // Label for the new password field
+          >
+            New Password
+          </label>
+          <input
+            type="password"
+            placeholder="New Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={`
               w-full
               p-2
               rounded
               bg-gray-800
               border
               border-gray-600
+              text-white
+              focus:outline-none
+              focus:ring-2
+              focus:ring-indigo-800
             `}
-					/* Password input: Styles the editable password input */
-					/>
-				</div>
+            // Input for entering a new password
+          />
+        </div>
 
-				<div
-					className={`
+        <div
+          className={`
             flex
             justify-end
             gap-3
             pt-4
           `}
-				/* Button group: Aligns the cancel and save buttons to the right */
-				>
-					<button
-						onClick={onClose}
-						className={`
+          // Button container: aligns buttons to the right
+        >
+          <button
+            onClick={onClose}
+            className={`
               px-4
               py-2
               bg-gray-600
               hover:bg-gray-700
               rounded
             `}
-					/* Cancel button: Styles the cancel button with hover effect */
-					>
-						Cancel
-					</button>
-					<button
-						onClick={handleSave}
-						className={`
+            // Cancel button: closes the modal
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            className={`
               px-4
               py-2
               bg-green-500
@@ -2690,17 +3037,18 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
               text-white
               rounded
             `}
-					/* Save button: Styles the save button with hover effect */
-					>
-						Save
-					</button>
-				</div>
-			</div>
-		</div>
-	);
+            // Save button: saves changes
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ProfileModal;
+
 
 
 
@@ -2819,6 +3167,142 @@ const UserHeader: React.FC<UserHeaderProps> = ({ user }) => {
 };
 
 export default UserHeader;
+
+
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/UserList.tsx
+
+
+import React, { useState, useEffect } from "react";
+import PlayerCard from "./PlayerCard";
+import { CardWrapper } from "./types/ui";
+import { UserInfo } from "./types/UserInfo";
+
+// Props definition for UserList component
+// - users: array of UserInfo objects to display
+// - variant: determines if this list is "players" or "friends"
+// - expandUsername: optional username to auto-expand on render
+interface Props {
+  users: UserInfo[];
+  variant: "players" | "friends";
+  expandUsername?: string;
+}
+
+const UserList: React.FC<Props> = ({ users, variant, expandUsername }) => {
+  // State for tracking which card index is expanded
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
+  // When expandUsername changes, find matching user and auto-expand
+  useEffect(() => {
+    if (expandUsername) {
+      const idx = users.findIndex(
+        (u) => u.username.toLowerCase() === expandUsername.toLowerCase()
+      );
+      if (idx !== -1) {
+        setExpandedIndex(idx);
+      }
+    }
+  }, [expandUsername, users]);
+
+  // Toggle expand/collapse state for a given index
+  const toggleExpand = (index: number) => {
+    setExpandedIndex((prev) => (prev === index ? null : index));
+  };
+
+  // Stub handlers for friend/player actions
+  const handleAdd = (username: string) => console.log(`Add ${username}`);
+  const handleRemove = (username: string) => console.log(`Remove ${username}`);
+  const handleChallenge = (username: string) => console.log(`Challenge ${username}`);
+
+  // If no users, render nothing
+  if (users.length === 0) {
+    return null;
+  }
+
+  return (
+    <div
+      className={
+        `
+        flex
+        flex-col
+        gap-2
+        overflow-y-auto
+        max-h-[500px]
+        pr-1
+        scrollbar-hidden
+      `
+      }
+    >
+      {users.map((user, idx) => {
+        const isExpanded = expandedIndex === idx;
+        const expandedStyle = {
+          transition: "all 0.3s ease",
+          overflow: "hidden",
+          maxHeight: isExpanded ? "600px" : "0",
+          marginTop: isExpanded ? "0.75rem" : "0",
+        };
+
+        // Determine avatar source, fallback to default if not base64 data
+        const avatarSrc =
+          user.avatar.startsWith("data:image")
+            ? user.avatar
+            : "/prof_img/avatar1.png";
+
+        // Attach action callbacks based on list variant
+        const userWithActions: UserInfo = {
+          ...user,
+          avatar: avatarSrc,
+          onRemove:
+            variant === "friends"
+              ? () => handleRemove(user.username)
+              : undefined,
+          onChallenge: () => handleChallenge(user.username),
+          onAdd:
+            variant === "players"
+              ? () => handleAdd(user.username)
+              : undefined,
+        };
+
+        return (
+          <CardWrapper key={user.id} onClick={() => toggleExpand(idx)}>
+            {/* Header row: avatar, username, online status */}
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <img
+                  src={avatarSrc}
+                  alt={user.username}
+                  className="w-8 h-8 rounded-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "/prof_img/avatar1.png";
+                  }}
+                />
+                <span className="font-bold text-base">{user.username}</span>
+              </div>
+              <span
+                className={
+                  `text-sm ${
+                    user.online ? "text-green-400" : "text-gray-400"
+                  }`
+                }
+              >
+                {user.online ? "Online" : "Offline"}
+              </span>
+            </div>
+
+            {/* Expandable content container */}
+            <div style={expandedStyle}>
+              <PlayerCard user={userWithActions} />
+            </div>
+          </CardWrapper>
+        );
+      })}
+    </div>
+  );
+};
+
+export default UserList;
+
 
 
 
@@ -2943,40 +3427,51 @@ export default App;
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/index.css
 
 
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   html, body, #root {
-    height: 100 %;
-    width: 100 %;
+    height: 100%;
+    width: 100%;
     margin: 0;
     padding: 0;
-    font - family: system - ui, Avenir, Helvetica, Arial, sans - serif;
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
     color: white;
-    overflow - x: auto;
-    overflow - y: auto;
+    overflow-x: auto;
+    overflow-y: auto;
   }
 
   body {
-    background - color: #1a0a2d;
-    background - image:
-    radial - gradient(circle at 20 % 30 %, rgba(255, 153, 255, 0.4), transparent 50 %),
-      radial - gradient(circle at 80 % 70 %, rgba(102, 255, 255, 0.3), transparent 50 %),
-      radial - gradient(circle at 50 % 80 %, rgba(255, 255, 204, 0.2), transparent 50 %),
-      linear - gradient(135deg, #4b0082, #6a0dad, #1f0036);
-    background - blend - mode: screen, overlay;
-    background - size: cover;
-    background - position: center;
-    background - attachment: fixed;
+    background-color: #1a0a2d;
+    background-image: 
+      radial-gradient(circle at 20% 30%, rgba(255, 153, 255, 0.4), transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(102, 255, 255, 0.3), transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(255, 255, 204, 0.2), transparent 50%),
+      linear-gradient(135deg, #4b0082, #6a0dad, #1f0036);
+    background-blend-mode: screen, overlay;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
   }
 
-  @media(hover: hover) {
+    /* scrollbar invisible players/friends */
+  .scrollbar-hidden {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE и Edge */
+  }
+
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+  }
+/* 
+  @media (hover: hover) {
     body {
       cursor: none;
     }
-  }
+  } */
 }
 
 
