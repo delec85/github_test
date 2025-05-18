@@ -571,8 +571,274 @@ export default MainPage;
 
 //! GAMESELECTOR
 
-// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/TournamentModal.tsx
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/Tournament/TournamentBracket.tsx
 
+import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { LocationState } from './types/tournament';
+import { useTournament } from './utils/useTournament';
+import BracketGrid from './components/BracketGrid';
+import StartButton from './components/StartButton';
+import './styles/neon.css';
+
+const TournamentBracket:React.FC=()=>{
+  const { state } = useLocation() as { state: LocationState };
+  const navigate=useNavigate();
+  const { players, rounds, loading, start } = useTournament(state);
+
+  if(loading) return <div className="h-screen flex items-center justify-center bg-main-neon animate-pulse text-white">Loading tournament bracket…</div>;
+  if(players.length<3) return(
+    <div className="h-screen flex flex-col items-center justify-center bg-main-neon text-white">
+      <p className="text-xl mb-4">Not enough players for the tournament (minimum 3)</p>
+      <button onClick={()=>navigate(-1)} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded">Back</button>
+    </div>
+  );
+nge-300/60 to-amber-300/80',
+  'from-blue-400/80 via-indigo-300/60 to-purple-400/80',
+  'from-yellow-300/80 via-lime-400/60 to-green-400/80',
+  'from-amber-300/80 via-yellow-400/60 to-orange-500/80',
+];
+
+
+
+///Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/Tournament/styles/neon.css 
+
+.winner-glow {
+  position: relative;
+  animation: color-glow 3s infinite ease-in-out;
+}
+@keyframes color-glow {
+  0% { box-shadow: 0 0 10px rgba(0,255,255,.8), 0 0 20px rgba(0,255,255,.6), 0 0 30px rgba(0,255,255,.4); }
+  50%{ box-shadow: 0 0 15px rgba(255,0,255,.8), 0 0 30px rgba(255,0,255,.6), 0 0 45px rgba(255,0,255,.4); }
+  100%{ box-shadow: 0 0 10px rgba(255,255,0,.8), 0 0 20px rgba(255,255,0,.6), 0 0 30px rgba(255,255,0,.4); }
+}
+.winner-glow::before,.winner-glow::after,.winner-glow>span::before,.winner-glow>span::after{
+  content:"";position:absolute;width:8px;height:8px;border-radius:50%;animation:firework-spark 1.5s infinite linear;
+}
+.winner-glow::before{background:rgba(0,255,255,.8);top:50%;left:-10px;animation-delay:0s;transform:translateY(-50%);--spark-x:-80px;--spark-y:0;}
+.winner-glow::after{background:rgba(255,0,255,.8);top:50%;right:-10px;animation-delay:.3s;transform:translateY(-50%);--spark-x:80px;--spark-y:0;}
+.winner-glow>span::before{background:rgba(255,255,0,.8);top:-10px;left:50%;animation-delay:.6s;transform:translateX(-50%);--spark-x:0;--spark-y:-80px;}
+.winner-glow>span::after{background:rgba(255,255,255,.8);bottom:-10px;left:50%;animation-delay:.9s;transform:translateX(-50%);--spark-x:0;--spark-y:80px;}
+@keyframes firework-spark{0%{opacity:1;transform:translate(0,0)scale(1);}100%{opacity:0;transform:translate(var(--spark-x),var(--spark-y))scale(0);}}
+
+.neon-button{animation:pulse-neon 1.5s infinite ease-in-out;}
+@keyframes pulse-neon{0%,100%{box-shadow:0 0 10px rgba(34,197,94,.5),0 0 20px rgba(34,197,94,.3);}50%{box-shadow:0 0 20px rgba(34,197,94,.8),0 0 40px rgba(34,197,94,.6);}}
+
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/Tournament/types/tournament.ts
+
+/** Shared type definitions for the tournament feature. */
+
+export interface LocationState {
+  players?: string[];
+  winner?: string;
+}
+
+export interface Slot {
+  name: string;
+  isPlayerX: boolean;
+}
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/Tournament/utils/array.ts
+
+/** Utility helpers used across the tournament feature. */
+
+/**
+ * Returns a new array with the elements shuffled using Fisher‑Yates.
+ */
+export const shuffleArray = <T,>(array: T[]): T[] => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/Tournament/utils/useTournament.ts
+
+import { useEffect, useState } fr
+  return(
+    <div className="w-full h-screen bg-main-neon relative">
+      <StartButton onClick={start}/>
+      <div className="flex flex-col items-center justify-center h-full px-2 sm:px-4">
+        <BracketGrid rounds={rounds} playersCount={players.length}/>
+        <button onClick={()=>navigate(-1)} className="mt-6 px-4 sm:px-6 py-2 sm:py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg text-base sm:text-lg transition">← Back</button>
+      </div>
+    </div>
+  );
+};
+export default TournamentBracket;
+
+
+
+///Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/Tournament/api/mockDb.ts
+
+/**
+ * In‑memory store that imitates a real backend.
+ * Replace this with real API calls once the server side is ready.
+ */
+export const mockDb = {
+  players: [] as string[],
+  winners: [] as { round: number; pair: number; winner: string }[],
+};
+
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/Tournament/api/tournamentApi.ts
+
+/**
+ * Thin wrapper around the mock DB.  All data‑access logic lives here so
+ * we can swap the implementation later without touching UI code.
+ */
+import { mockDb } from './mockDb';
+
+export const fetchPlayers = async (): Promise<string[]> => {
+  try {
+    return mockDb.players;
+  } catch (error) {
+    console.error('Error loading players:', error);
+    return [];
+  }
+}
+
+export const fetchWinners = async (): Promise<{ round: number; pair: number; winner: string }[]> => {
+  try {
+    return Promise.resolve(mockDb.winners);
+  } catch (error) {
+    console.error('Error loading winners:', error);
+    return [];
+  }
+};
+
+export const saveWinner = async (round: number, pair: number, winner: string): Promise<void> => {
+  try {
+    mockDb.winners.push({ round, pair, winner });
+    return Promise.resolve();
+  } catch (error) {
+    console.error('Error saving winner:', error);
+    throw error;
+  }
+};
+
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/Tournament/components/BracketGrid.tsx
+
+import React from 'react';
+import { Slot } from '../types/tournament';
+import RoundColumn from './RoundColumn';
+import WinnerSlot from './WinnerSlot';
+
+interface Props {
+  rounds: Slot[][];
+  playersCount: number;
+}
+
+const BracketGrid: React.FC<Props> = ({ rounds, playersCount }) => (
+  <div
+    className="grid gap-4 sm:gap-6 mx-auto w-[66.67%] min-h-[50vh]"
+    style={{ gridTemplateColumns: `repeat(${rounds.length}, minmax(150px, 1fr))` }}
+  >
+    {rounds.map((slots,i)=>(
+      i<rounds.length-1?
+        <RoundColumn key={i} slots={slots} roundIndex={i} playersCount={playersCount}/>
+        :<WinnerSlot key={i} slot={slots[0]}/>
+    ))}
+  </div>
+);
+export default BracketGrid;
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/Tournament/components/RoundColumn.tsx
+
+import React from 'react';
+import SlotCard from './SlotCard';
+import { Slot } from '../types/tournament';
+import { gradients } from '../constants/gradients';
+
+interface Props{slots:Slot[];roundIndex:number;playersCount:number;}
+
+const RoundColumn:React.FC<Props>=({slots,roundIndex,playersCount})=>{
+  const title=roundIndex===0?(playersCount>=5?'Quarter‑Final':'Semi‑Final'):
+         roundIndex===1?(playersCount>=5?'Semi‑Final':'Final'):'Final';
+  return(
+    <div className="flex flex-col items-center justify-center min-h-[50vh]">
+      <h3 className="text-lg sm:text-xl text-center text-cyan-300 mb-4">{title}</h3>
+      <div className="flex flex-col space-y-12 w-full">
+        {Array.from({length:Math.ceil(slots.length/2)}).map((_,pairIdx)=>{
+          const [a,b]=[slots[pairIdx*2],slots[pairIdx*2+1]];
+          const grad=gradients[(roundIndex*10+pairIdx)%gradients.length];
+          return(
+            <div key={pairIdx} className="flex flex-col space-y-2 w-full">
+              <SlotCard slot={a} className={`bg-gradient-to-br ${grad} h-[60px] sm:h-[80px]`}/>
+              {b&&<SlotCard slot={b} className={`bg-gradient-to-br ${grad} h-[60px] sm:h-[80px]`}/>}  
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+export default RoundColumn;
+
+
+
+///Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/Tournament/components/SlotCard.tsx
+
+/**
+ * Visual card for a single slot inside the bracket grid.
+ */
+import React from 'react';
+import { Slot } from '../types/tournament';
+
+interface Props {
+  slot: Slot;
+  className?: string;
+}
+
+const SlotCard: React.FC<Props> = ({ slot, className = '' }) => (
+  <div
+    className={`p-3 sm:p-4 rounded-lg text-center italic text-lg sm:text-xl text-white drop-shadow-[0_0_12px_rgba(0,255,200,0.5)] flex items-center justify-center ${className}`}
+  >
+    {slot.isPlayerX ? 'PlayerX' : slot.name || '—'}
+  </div>
+);
+
+export default SlotCard;
+
+
+
+
+///Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/Tournament/components/StartButton.tsx
+
+/**
+ * Centrally positioned neon button that starts the tournament.
+ */
+import React from 'react';
+
+interface Props {
+  onClick: () => void;
+}
+
+const StartButton: React.FC<Props> = ({ onClick }) => (
+  <button
+    onClick={onClick}
+    className="fixed top-[15%] left-1/2 transform -translate-x-1/2 px-16 py-8 bg-green-500 hover:bg-green-600 text-white rounded-lg text-2xl sm:text-3xl font-bold neon-button transition z-10"
+  >
+    Start
+  </button>
+);
+
+export default StartButton;
+
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/Tournament/components/TournamentModal.tsx
 
 import React from "react";
 
@@ -736,15 +1002,149 @@ export default TournamentModal;
 
 
 
+///Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/Tournament/components/WinnerSlot.tsx
+
+import React from 'react';
+import { Slot } from '../types/tournament';
+
+const WinnerSlot:React.FC<{slot:Slot}> = ({slot}) => (
+  <div className="flex flex-col items-center justify-center min-h-[50vh]">
+    <h3 className="text-lg sm:text-xl text-center text-cyan-300 mb-4">Winner</h3>
+    <div className="p-3 sm:p-4 rounded-lg text-center italic text-xl sm:text-2xl text-gray-900 bg-gradient-to-r from-green-400 to-teal-400 winner-glow w-full h-[60px] sm:h-[80px] flex items-center justify-center">
+      <span>{slot.isPlayerX?'PlayerX':slot.name||'—'}</span>
+    </div>
+  </div>
+);
+export default WinnerSlot;
+
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/Tournament/constants/gradients.ts
+
+/**
+ * Tailwind gradient utilities used to color code each pair in the bracket.
+ * Keep visuals identical to the original implementation.
+ */
+export const gradients: string[] = [
+  'from-pink-300/80 via-rose-300/60 to-red-500/80',
+  'from-green-300/80 via-lime-300/60 to-emerald-300/80',
+  'from-teal-400/80 via-cyan-300/60 to-blue-400/80',
+  'from-fuchsia-400/80 via-pink-500/60 to-red-400/80',
+  'from-red-300/80 via-oraom 'react';
+import { fetchPlayers, fetchWinners, saveWinner } from '../api/tournamentApi';
+import { shuffleArray } from './array';
+import { LocationState, Slot } from '../types/tournament';
+
+export interface UseTournament {
+  players: string[];
+  rounds: Slot[][];
+  loading: boolean;
+  start: () => void;
+}
+
+export const useTournament = (state: LocationState): UseTournament => {
+  const [players, setPlayers] = useState<string[]>([]);
+  const [winners, setWinners] = useState<{ round: number; pair: number; winner: string }[]>([]);
+  const [rounds, setRounds] = useState<Slot[][]>([]);
+  const [loading, setLoading] = useState(true);
+  const [started, setStarted] = useState(false);
+
+  // helper: rebuild grid
+  const buildRounds = (pl: string[], win: typeof winners) => {
+    const shuffled = shuffleArray(pl);
+    const grid: Slot[][] = [];
+    const first: Slot[] = shuffled.map(p => ({ name: p, isPlayerX: false }));
+    if ([3,5,7].includes(pl.length)) first.push({ name: 'PlayerX', isPlayerX: true });
+    grid.push(first);
+
+    const max = pl.length <= 4 ? 2 : 3;
+    for (let i = 1; i < max; i++) {
+      grid.push(Array(Math.ceil(grid[i-1].length/2)).fill({ name:'', isPlayerX:false }));
+    }
+    grid.push([{ name:'', isPlayerX:false }]);
+
+    const merged = grid.map((round,rIdx)=>{
+      if (rIdx===0) return round;
+      const copy=[...round];
+      win.filter(w=>w.round===rIdx).forEach(w=>{
+        const ix=w.pair*(rIdx<max-1?2:1);
+        copy[ix]={name:w.winner,isPlayerX:false};
+      });
+      return copy;
+    });
+    setRounds(merged);
+  };
+
+  // players
+  useEffect(()=>{
+    (async()=>{
+      setLoading(true);
+      let pl = await fetchPlayers();
+      if(state?.players?.length&&state.players.length>=3&&state.players.length<=8) pl=state.players;
+      if(pl.length>=3&&pl.length<=8) setPlayers(pl);
+      setLoading(false);
+    })();
+  },[state.players]);
+
+  // winners
+  useEffect(()=>{(async()=>setWinners(await fetchWinners()))();},[]);
+
+  // grid rebuild
+  useEffect(()=>{ if(players.length>=3) buildRounds(players,winners); },[players,winners]);
+
+  // auto‑advance & 3‑man semi
+  useEffect(()=>{ if(!started||rounds.length===0) return;
+    const advance=async()=>{
+      const first=rounds[0];
+      for(let i=0;i<first.length;i+=2){
+        const [a,b]=[first[i],first[i+1]];
+        if(a.isPlayerX&&b&&!b.isPlayerX) await saveWinner(1,i/2,b.name);
+        else if(b?.isPlayerX&&!a.isPlayerX) await saveWinner(1,i/2,a.name);
+      }
+      setWinners(await fetchWinners());
+    };
+    advance();
+
+    if(rounds[1]?.length===3){
+      const real=rounds[1].filter(s=>!s.isPlayerX&&s.name);
+      if(real.length===3){
+        const finalist=real[Math.floor(Math.random()*real.length)];
+        saveWinner(2,0,finalist.name).then(async()=>setWinners(await fetchWinners()));
+      }
+    }
+  },[started,rounds]);
+
+  // game callback
+  useEffect(()=>{ if(!started||!state?.winner) return;
+    (async()=>{
+      const rIdx=rounds.findIndex(r=>r.some(s=>s.name===''&&!s.isPlayerX));
+      if(rIdx>0){
+        const pIdx=Math.floor(rounds[rIdx-1].findIndex(s=>s.name===state.winner)/2);
+        await saveWinner(rIdx,pIdx,state.winner!);
+        setWinners(await fetchWinners());
+      }
+    })();
+  },[state.winner,started,rounds]);
+
+  return { players, rounds, loading, start: ()=>setStarted(true) };
+};
+
+
+
 
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/Profile/GameSelector/GameSelector.tsx
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import GameModeSelector from "./GameModeSelector";
-import TournamentModal from "./TournamentModal";
+import TournamentModal from "./Tournament/components/TournamentModal";
 import { useGameSelector } from "./useGameSelector";
 
 const GameSelector: React.FC = () => {
+  // Hook for navigation
+  const navigate = useNavigate();
+
+  // Manage tournament modal state and player name inputs
   const {
     isTournamentOpen,
     openTournament,
@@ -754,24 +1154,28 @@ const GameSelector: React.FC = () => {
     canStart
   } = useGameSelector();
 
+  // Called when "Start" is clicked: filter out empty entries and proceed
   const handleStart = () => {
-    const players = names.filter(n => n.trim());
-    console.log("Tournament names:", players);
-    // TODO: next window
+    const playersList = names.filter(n => n.trim());
+    console.log("Tournament names:", playersList);
+    navigate('/tournament', { state: { players: playersList } });
     closeTournament();
   };
 
-  // Для остальных режимов заглушки
+  // Stub handlers for other game modes
   const handleSingle = () => alert("Single Player clicked");
   const handleMulti  = () => alert("Multiplayer clicked");
 
   return (
     <>
+      {/* Buttons to choose game mode */}
       <GameModeSelector
         onSingleClick={handleSingle}
         onMultiClick={handleMulti}
         onTournamentClick={openTournament}
       />
+
+      {/* Modal for entering up to 8 player names */}
       <TournamentModal
         isOpen={isTournamentOpen}
         onClose={closeTournament}
@@ -785,6 +1189,9 @@ const GameSelector: React.FC = () => {
 };
 
 export default GameSelector;
+
+
+
 
 
 
@@ -3311,6 +3718,7 @@ export default UserList;
 
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/router/AppRouter.tsx
 
+import TournamentBracket from '../pages/Profile/GameSelector/Tournament/TournamentBracket'; //!
 import MainPage from '../pages/MainPage/MainPage';
 import Profile from '../pages/Profile/Profile';
 import AuthPage from '../pages/AuthPage/AuthPage';
@@ -3327,6 +3735,7 @@ const AppRouter = () => {
           <Route path="/login" element={<AuthPage mode="login" onClose={() => {}} />} />
           <Route path="/signup" element={<AuthPage mode="signup" onClose={() => {}} />} />
           <Route path="*" element={<Navigate to="/" />} />
+		  <Route path="/tournament" element={<TournamentBracket />} /> //!
         </Route>
       </Routes>
     </BrowserRouter>
