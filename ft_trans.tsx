@@ -3810,6 +3810,78 @@ export default AppRouter;
 
 //! SRC
 
+// /Users/olegoman/WORK/HIVE/Projects/ft_transcendense/client/src/App.css
+
+/* #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+} */
+/* 
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+ */
+
+
+
+/* Neon shadows */
+.shadow-neon-lg {
+  box-shadow:
+    0 0 10px rgba(255, 0, 255, 0.7),
+    0 0 20px rgba(0, 255, 255, 0.6),
+    0 0 30px rgba(255, 255, 0, 0.5);
+}
+
+.shadow-neon-button {
+  box-shadow:
+    0 0 6px rgba(0, 255, 128, 0.8),
+    0 0 12px rgba(0, 255, 128, 0.6);
+}
+
+
+
 // /Users/olegoman/WORK/HIVE/ft_transendense/client/src/App.tsx
 
 import AppRouter from './router/AppRouter'
@@ -3900,7 +3972,1124 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
 
 
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/pong/components/Overlays/ByeOverlay.tsx
 
+interface ByeOverlayProps {
+  winner: string;
+  nextPair?: string;
+  onContinue: () => void;
+}
+
+export function ByeOverlay({ winner, nextPair, onContinue }: ByeOverlayProps) {
+  return (
+    <div className={`
+        absolute
+        inset-0
+        z-50
+        flex
+        items-center
+        justify-center
+        bg-black
+        bg-opacity-90
+      `}
+    >
+      <div className={`
+          rounded-2xl
+          border-2
+          border-yellow-400
+          p-6
+          text-center
+          bg-gradient-to-br
+          from-purple-900
+          via-indigo-800
+          to-pink-900
+          shadow-neon-lg
+        `}
+      >
+        <h2 className={`
+            mb-4
+            text-2xl
+            font-bold
+            text-yellow-300
+          `}
+        >
+          BYE Match
+        </h2>
+        <p className={`
+            mb-4
+            text-lg
+            text-white
+          `}
+        >
+          Player <b>{winner}</b> gets a pass to next round!
+        </p>
+        {nextPair && (
+          <p className={`
+              mb-4
+              text-md
+              text-gray-300
+            `}
+          >
+            Next match: {nextPair}
+          </p>
+        )}
+        <button
+          onClick={onContinue}
+          className={`
+            mt-2
+            px-6
+            py-2
+            rounded-lg
+            border-2
+            border-yellow-400
+            shadow-neon-button
+            hover:scale-105
+            transition
+          `}
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+
+
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/pong/components/Overlays/GameOverOverlay.tsx
+
+interface GameOverOverlayProps {
+  winnerName: string;
+  playerScore: number;
+  aiScore: number;
+  onOk: () => void;
+}
+
+export function GameOverOverlay({
+  winnerName,
+  playerScore,
+  aiScore,
+  onOk,
+}: GameOverOverlayProps) {
+  return (
+    <div className={`
+        absolute
+        inset-0
+        z-40
+        flex
+        items-center
+        justify-center
+        bg-black
+        bg-opacity-90
+      `}
+    >
+      <div className={`
+          rounded-2xl
+          border-2
+          border-pink-500
+          p-6
+          text-center
+          bg-gradient-to-br
+          from-pink-900
+          via-red-800
+          to-purple-900
+          shadow-neon-lg
+        `}
+      >
+        <h2 className={`
+            mb-4
+            text-3xl
+            font-bold
+            text-pink-300
+          `}
+        >
+          GAME OVER
+        </h2>
+        <p className={`
+            mb-4
+            text-xl
+            text-white
+          `}
+        >
+          Winner: {winnerName}
+          <br />
+          Score: {playerScore}:{aiScore}
+        </p>
+        <button
+          onClick={onOk}
+          className={`
+            mt-2
+            px-6
+            py-2
+            rounded-lg
+            border-2
+            border-pink-500
+            shadow-neon-button
+            hover:scale-105
+            transition
+          `}
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+
+
+
+// /Users/olegoman/WORK/HIVE/ft_transendense/client/src/pages/pong/components/Overlays/MatchResultOverlay.tsx
+
+interface MatchResultOverlayProps {
+  winner: string;
+  loser: string;
+  isFinal: boolean;
+  nextPair?: string;
+  onContinue: () => void;
+}
+
+export function MatchResultOverlay({
+  winner,
+  loser,
+  isFinal,
+  nextPair,
+  onContinue,
+}: MatchResultOverlayProps) {
+  return (
+    <div className="
+        absolute
+        inset-0
+        z-50
+        flex
+        items-center
+        justify-center
+        bg-black
+        bg-opacity-90
+      "
+    >
+      <div className="
+          rounded-2xl
+          border-2
+          border-yellow-400
+          p-6
+          text-center
+          bg-gradient-to-br
+          from-green-900
+          via-yellow-800
+          to-amber-900
+          shadow-neon-lg
+        "
+      >
+        <h2 className="
+            mb-2
+            text-2xl
+            font-bold
+            text-yellow-300
+          "
+        >
+          Match result
+        </h2>
+        <p className="
+            mb-4
+            text-lg
+            text-white
+          "
+        >
+          Winner: {winner}
+          <br />
+          Loser: {loser}
+        </p>
+        {isFinal ? (
+          <p className="
+              mb-4
+              text-lg
+              text-green-300
+            "
+          >
+            This was final!
+          </p>
+        ) : nextPair ? (
+          <p className="
+              mb-4
+              text-md
+              text-gray-300
+            "
+          >
+            Next match: {nextPair}
+          </p>
+        ) : (
+          <p className="
+              mb-4
+              text-md
+              text-gray-300
+            "
+          >
+            Next match is coming...
+          </p>
+        )}
+        <button
+          onClick={onContinue}
+          className="
+            mt-2
+            px-6
+            py-2
+            rounded-lg
+            border-2
+            border-yellow-400
+            shadow-neon-button
+            hover:scale-105
+            transition
+          "
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+
+
+
+
+// /Users/olegoman/WORK/HIVE/Projects/ft_transcendense/client/src/pong/components/TournamentWinnerOverlay.tsx
+
+
+interface TournamentWinnerOverlayProps {
+  winner: string;
+  onClose: () => void;
+}
+
+export function TournamentWinnerOverlay({
+  winner,
+  onClose,
+}: TournamentWinnerOverlayProps) {
+  return (
+    <div className="
+        absolute
+        inset-0
+        z-50
+        flex
+        items-center
+        justify-center
+        bg-black
+        bg-opacity-90
+      "
+    >
+      <div className="
+          rounded-2xl
+          border-2
+          border-green-500
+          p-6
+          text-center
+          bg-gradient-to-br
+          from-green-900
+          via-teal-800
+          to-blue-900
+          shadow-neon-lg
+        "
+      >
+        <h2 className="
+            mb-4
+            text-3xl
+            font-bold
+            text-green-300
+          "
+        >
+          TOURNAMENT WINNER
+        </h2>
+        <p className="
+            mb-4
+            text-xl
+            text-white
+          "
+        >
+          {winner}
+        </p>
+        <button
+          onClick={onClose}
+          className="
+            mt-2
+            px-6
+            py-2
+            rounded-lg
+            border-2
+            border-green-500
+            shadow-neon-button
+            hover:scale-105
+            transition
+          "
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+
+
+// /Users/olegoman/WORK/HIVE/Projects/ft_transcendense/client/src/pong/components/StarryBackground.tsx
+
+import { useEffect, useRef } from "react";
+
+export function StarryBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const stars: { x: number; y: number; radius: number; alpha: number; fading: boolean }[] = [];
+    const numStars = 100;
+
+    // Initialize stars
+    for (let i = 0; i < numStars; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 1.5 + 0.5,
+        alpha: Math.random(),
+        fading: Math.random() > 0.5,
+      });
+    }
+
+    // Animation loop
+    const animate = () => {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      stars.forEach((star) => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+        ctx.fill();
+
+        // Update alpha for fading effect
+        star.alpha += star.fading ? -0.005 : 0.005;
+        if (star.alpha <= 0) {
+          star.fading = false;
+          star.alpha = 0;
+        } else if (star.alpha >= 1) {
+          star.fading = true;
+          star.alpha = 1;
+        }
+
+        // Occasionally reposition star
+        if (Math.random() < 0.0001) {
+          star.x = Math.random() * canvas.width;
+          star.y = Math.random() * canvas.height;
+          star.radius = Math.random() * 1.5 + 0.5;
+          star.alpha = Math.random();
+          star.fading = Math.random() > 0.5;
+        }
+      });
+
+      requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    // Handle window resize
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 z-[-1]"
+    />
+  );
+}
+
+
+// /Users/olegoman/WORK/HIVE/Projects/ft_transcendense/client/src/pong/components/StartScreen.tsx
+
+import { StarryBackground } from "./StarryBackground";
+
+interface StartScreenProps {
+  onSingleAI: () => void;
+  onLocal2P: () => void;
+  onTournament: () => void;
+}
+
+export function StartScreen({
+  onSingleAI,
+  onLocal2P,
+  onTournament,
+}: StartScreenProps) {
+  return (
+    <div className="absolute inset-0 z-[70] flex items-center justify-center bg-black bg-opacity-80">
+      <StarryBackground />
+      {/* Neon window */}
+      <div
+        className="
+          relative
+          bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900
+          rounded-3xl
+          p-10
+          border-4 border-blue-400
+          shadow-neon-lg
+          text-center
+          max-w-md w-full
+        "
+      >
+        {/* Title */}
+        <h1
+          className="
+            text-5xl md:text-6xl
+            font-extrabold
+            text-transparent
+            bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-indigo-500
+            glow
+            mb-6
+          "
+        >
+          SPACE PONG
+        </h1>
+
+        {/* Subtitle */}
+        <p className="mb-8 text-lg text-purple-300 drop-shadow-md">
+          Defeat the AI in this cosmic battle!
+        </p>
+
+        {/* Buttons */}
+        <div className="flex flex-col space-y-4">
+          <button
+            onClick={onSingleAI}
+            className="
+              glow
+              neon-button
+              border-2 border-green-400
+              rounded-xl
+              px-6 py-3
+              text-xl text-green-300
+              bg-black bg-opacity-20
+              hover:bg-green-900 hover:bg-opacity-30
+              transition-transform duration-200
+              hover:scale-105
+            "
+          >
+            SINGLE PLAYER vs AI
+          </button>
+
+          <button
+            onClick={onLocal2P}
+            className="
+              glow
+              neon-button
+              border-2 border-yellow-400
+              rounded-xl
+              px-6 py-3
+              text-xl text-yellow-300
+              bg-black bg-opacity-20
+              hover:bg-yellow-900 hover:bg-opacity-30
+              transition-transform duration-200
+              hover:scale-105
+            "
+          >
+            LOCAL 2P
+          </button>
+
+          <button
+            onClick={onTournament}
+            className="
+              glow
+              neon-button
+              border-2 border-pink-400
+              rounded-xl
+              px-6 py-3
+              text-xl text-pink-300
+              bg-black bg-opacity-20
+              hover:bg-pink-900 hover:bg-opacity-30
+              transition-transform duration-200
+              hover:scale-105
+            "
+          >
+            TOURNAMENT
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+// /Users/olegoman/WORK/HIVE/Projects/ft_transcendense/client/src/pong/components/TournamentSetup.tsx
+
+import { StarryBackground } from "./StarryBackground";
+
+interface TournamentSetupProps {
+  players: string[];
+  onChangePlayerName: (index: number, value: string) => void;
+  onAddPlayer: () => void;
+  onStartTournament: () => void;
+}
+
+export function TournamentSetup({
+  players,
+  onChangePlayerName,
+  onAddPlayer,
+  onStartTournament,
+}: TournamentSetupProps) {
+  return (
+    <div className="absolute inset-0 z-[80] flex items-center justify-center bg-black">
+      <StarryBackground />
+      {/* Neon dialog */}
+      <div
+        className="
+          relative
+          bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900
+          rounded-3xl
+          p-10
+          border-4 border-pink-400
+          shadow-neon-lg
+          text-center
+          max-w-md w-full
+        "
+      >
+        {/* Title */}
+        <h2
+          className="
+            text-2xl md:text-3xl
+            font-bold
+            text-transparent
+            bg-clip-text bg-gradient-to-r from-pink-300 via-red-400 to-purple-500
+            glow
+            mb-6
+          "
+        >
+          Tournament setup
+        </h2>
+
+        {/* Input list */}
+        <div className="flex flex-col space-y-3 mb-6">
+          {players.map((alias, i) => (
+            <input
+              key={i}
+              value={alias}
+              onChange={(e) => onChangePlayerName(i, e.target.value)}
+              className="
+                w-full
+                bg-black bg-opacity-20
+                border-2 border-pink-400
+                rounded-lg
+                px-4 py-2
+                text-white
+                placeholder-pink-300
+                focus:outline-none focus:ring-2 focus:ring-pink-500
+                transition
+              "
+            />
+          ))}
+        </div>
+
+        {/* Actions */}
+        <div className="flex justify-center gap-6">
+          <button
+            onClick={onAddPlayer}
+            className="
+              glow
+              neon-button
+              border-2 border-pink-300
+              rounded-xl
+              px-5 py-2
+              text-pink-300
+              bg-transparent
+              hover:bg-pink-900 hover:bg-opacity-30
+              transition-transform duration-200
+              hover:scale-105
+            "
+          >
+            + Add player
+          </button>
+
+          <button
+            onClick={onStartTournament}
+            className="
+              glow
+              neon-button
+              border-2 border-pink-400
+              rounded-xl
+              px-8 py-3
+              text-xl text-pink-300
+              bg-transparent
+              hover:bg-pink-900 hover:bg-opacity-30
+              transition-transform duration-200
+              hover:scale-105
+            "
+          >
+            START
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+
+
+
+// /Users/olegoman/WORK/HIVE/Projects/ft_transcendense/client/src/pong/hooks/useTournament.ts
+
+import { useState } from "react";
+import {
+  buildSingleElimNoDoubleByeSym,
+  findNextPairString,
+} from "../tournamentLogic";
+import type { BracketRound } from "../BracketOverlay";
+import type { GameAPI } from "../pong";
+import { stripPredTag } from "../utils/utils";
+
+export interface BetweenMatchesData {
+  winner: string;
+  loser: string;
+  isFinal: boolean;
+  nextPair?: string;
+  rIndex: number;
+  mIndex: number;
+}
+
+export interface ByeOverlayData {
+  winner: string;
+  rIndex: number;
+  mIndex: number;
+  nextPair?: string;
+}
+
+export function useTournament(gameApi: GameAPI | null) {
+  const [rounds, setRounds] = useState<BracketRound[]>([]);
+  const [winner, setWinner] = useState<string | null>(null);
+  const [showBracket, setShowBracket] = useState(false);
+  const [byeInfo, setByeInfo] = useState<ByeOverlayData | null>(null);
+  const [matchInfo, setMatchInfo] = useState<BetweenMatchesData | null>(null);
+
+  function startTourney(players: string[]) {
+    let arr = players.map((s) => s.trim()).filter((s) => s.length > 0);
+    if (arr.length < 2) {
+      alert("Need at least 2 players!");
+      return;
+    }
+    const n = arr.length;
+    const np = Math.pow(2, Math.ceil(Math.log2(n)));
+    while (arr.length < np) {
+      arr.push("BYE");
+    }
+    const bracket = buildSingleElimNoDoubleByeSym(arr);
+    setRounds(bracket);
+    setWinner(null);
+    startNextMatch(bracket, 0, 0);
+  }
+
+  function startNextMatch(
+    bRounds: BracketRound[],
+    rIndex: number,
+    mIndex: number,
+  ) {
+    if (rIndex >= bRounds.length) return;
+    if (mIndex >= bRounds[rIndex].length) {
+      const nr = rIndex + 1;
+      if (nr >= bRounds.length) {
+        const finalM = bRounds[rIndex][0];
+        setWinner(finalM.winner || "???");
+      } else {
+        startNextMatch(bRounds, nr, 0);
+      }
+      return;
+    }
+
+    const match = bRounds[rIndex][mIndex];
+
+    if (match.p1 === "BYE" && match.p2 === "BYE") {
+      bRounds[rIndex][mIndex].winner = "(No match)";
+      setRounds([...bRounds]);
+      startNextMatch(bRounds, rIndex, mIndex + 1);
+      return;
+    }
+
+    if (match.p1 === "BYE") {
+      bRounds[rIndex][mIndex].winner = `(pred) ${match.p2}`;
+      setRounds([...bRounds]);
+      const nextPair = findNextPairString(bRounds, rIndex, mIndex);
+      setByeInfo({ winner: `(pred) ${match.p2}`, rIndex, mIndex, nextPair });
+      return;
+    }
+    if (match.p2 === "BYE") {
+      bRounds[rIndex][mIndex].winner = `(pred) ${match.p1}`;
+      setRounds([...bRounds]);
+      const nextPair = findNextPairString(bRounds, rIndex, mIndex);
+      setByeInfo({ winner: `(pred) ${match.p1}`, rIndex, mIndex, nextPair });
+      return;
+    }
+
+    const isFinal =
+      rIndex === bRounds.length - 1 && mIndex === bRounds[rIndex].length - 1;
+    gameApi?.startTournamentMatch(match.p1, match.p2, isFinal, (w, l) => {
+      const winner = stripPredTag(w);
+      const loser = stripPredTag(l);
+      bRounds[rIndex][mIndex].winner = winner;
+      if (rIndex < bRounds.length - 1) {
+        const nextMIndex = Math.floor(mIndex / 2);
+        if (bRounds[rIndex + 1] && nextMIndex < bRounds[rIndex + 1].length) {
+          if (mIndex % 2 === 0) {
+            bRounds[rIndex + 1][nextMIndex].p1 = stripPredTag(winner);
+          } else {
+            bRounds[rIndex + 1][nextMIndex].p2 = stripPredTag(winner);
+          }
+        }
+      }
+      const updated = [...bRounds];
+      setRounds(updated);
+      const nextPair = findNextPairString(updated, rIndex, mIndex);
+      setMatchInfo({ winner, loser, isFinal, nextPair, rIndex, mIndex });
+    });
+  }
+
+  function continueBye() {
+    if (!byeInfo) return;
+    const { rIndex, mIndex } = byeInfo;
+    setByeInfo(null);
+    const clone = [...rounds];
+    const w = clone[rIndex][mIndex].winner;
+    const realName = stripPredTag(w ?? "");
+    clone[rIndex][mIndex].winner = realName;
+    if (rIndex < clone.length - 1) {
+      const nextMIndex = Math.floor(mIndex / 2);
+      if (clone[rIndex + 1] && nextMIndex < clone[rIndex + 1].length) {
+        if (mIndex % 2 === 0) {
+          clone[rIndex + 1][nextMIndex].p1 = realName;
+        } else {
+          clone[rIndex + 1][nextMIndex].p2 = realName;
+        }
+      }
+    }
+    setRounds(clone);
+    startNextMatch(clone, rIndex, mIndex + 1);
+  }
+
+  function continueMatch() {
+    if (!matchInfo) return;
+    const { rIndex, mIndex, isFinal } = matchInfo;
+    setMatchInfo(null);
+    if (!isFinal) {
+      startNextMatch(rounds, rIndex, mIndex + 1);
+    } else {
+      const finalMat = rounds[rIndex][mIndex];
+      setWinner(finalMat.winner || "???");
+    }
+  }
+
+  function resetTourney() {
+    setRounds([]);
+    setWinner(null);
+    setByeInfo(null);
+    setMatchInfo(null);
+    setShowBracket(false);
+  }
+
+  return {
+    rounds,
+    winner,
+    showBracket,
+    setShowBracket,
+    byeInfo,
+    matchInfo,
+    startTourney,
+    continueBye,
+    continueMatch,
+    resetTourney,
+  } as const;
+}
+
+
+
+// /Users/olegoman/WORK/HIVE/Projects/ft_transcendense/client/src/pong/utils
+
+export function stripPredTag(name: string): string {
+  return name.startsWith("(pred) ") ? name.replace("(pred) ", "") : name;
+}
+
+
+
+// /Users/olegoman/WORK/HIVE/Projects/ft_transcendense/client/src/pong/BracketOverlay.tsx
+import { StarryBackground } from "./components/StarryBackground";
+
+/** Single bracket match */
+export interface BracketMatch {
+  p1: string; // 'Player X' or '(pred) Player X'
+  p2: string;
+  winner: string | null; // name of winner if match played
+}
+
+/** Round: array of matches */
+export type BracketRound = BracketMatch[];
+
+interface BracketOverlayProps {
+  rounds: BracketRound[];
+  onClose: () => void;
+}
+
+export default function BracketOverlay({
+  rounds,
+  onClose,
+}: BracketOverlayProps) {
+  function parsePredName(name: string) {
+    const prefix = "(pred) ";
+    if (name.startsWith(prefix)) {
+      return {
+        isPred: true,
+        display: name.slice(prefix.length),
+      };
+    }
+    return {
+      isPred: false,
+      display: name,
+    };
+  }
+
+  /**
+   * Simplified labels:
+   * - if rounds.length=1 => Final
+   * - if rounds.length=2 => R1=Semifinals, R2=Final
+   * - if rounds.length=3 => R1=Quarterfinals, R2=Semifinals, R3=Final
+   */
+  function getRoundLabel(rIndex: number, totalRounds: number): string {
+    if (totalRounds === 1) {
+      return "Final";
+    } else if (totalRounds === 2) {
+      if (rIndex === 0) return "Semifinals";
+      return "Final";
+    } else if (totalRounds === 3) {
+      if (rIndex === 0) return "Quarterfinals";
+      if (rIndex === 1) return "Semifinals";
+      return "Final";
+    } else {
+      return `Round ${rIndex + 1}`;
+    }
+  }
+
+  const totalRounds = rounds.length;
+
+  return (
+    <div className="
+      absolute
+      inset-0
+      z-[999]
+      flex
+      items-center
+      justify-center
+      bg-black
+      bg-opacity-80"
+    >
+      <StarryBackground />
+      <div
+        className="
+          relative
+          h-[90%]
+          w-[90%]
+          overflow-auto
+          rounded
+          border-2
+          border-blue-500
+          p-4
+          text-white
+          flex
+          flex-col
+          items-center"
+      >
+        <h2 className="
+          mb-4
+          text-center
+          text-2xl
+          text-blue-300"
+        >
+          Single-Elimination Bracket
+        </h2>
+
+        <div
+          className="
+            flex
+            flex-col
+            md:flex-row
+            justify-center
+            items-center
+            gap-12
+            w-full
+            h-full"
+        >
+          {rounds.map((round, rIndex) => {
+            const label = getRoundLabel(rIndex, totalRounds);
+            const matchStyle =
+              label === "Quarterfinals"
+                ? `
+                  border-2
+                  border-pink-400
+                  bg-gradient-to-br
+                  from-pink-900
+                  to-purple-900
+                  shadow-[0_0_10px_rgba(244,114,182,0.6)]`
+                : label === "Semifinals"
+                ? `
+                  border-2
+                  border-purple-400
+                  bg-gradient-to-br
+                  from-purple-900
+                  to-indigo-900
+                  shadow-[0_0_10px_rgba(147,51,234,0.6)]`
+                : `
+                  border-2
+                  border-cyan-400
+                  bg-gradient-to-br
+                  from-green-900
+                  to-red-900
+                  shadow-[0_0_10px_rgba(0,255,255,0.6)]`;
+
+            return (
+              <div
+                key={rIndex}
+                className="
+                  flex
+                  flex-col
+                  items-center
+                  justify-center
+                  min-w-[150px]"
+              >
+                <h3 className="
+                  mb-2
+                  text-lg
+                  text-center"
+                >
+                  {label}
+                </h3>
+
+                <div
+                  className="
+                    flex
+                    flex-col
+                    items-center
+                    justify-center
+                    gap-6"
+                >
+                  {round.map((match, mIndex) => {
+                    const p1 = parsePredName(match.p1);
+                    const p2 = parsePredName(match.p2);
+
+                    return (
+                      <div
+                        key={mIndex}
+                        className={`
+                          flex
+                          min-w-[143px]
+                          flex-col
+                          items-center
+                          rounded-xl
+                          p-[9px]
+                          ${matchStyle}`}
+                      >
+                        <div
+                          className={
+                            p1.isPred
+                              ? `
+                                italic
+                                text-orange-300
+                                text-[17.6px]
+                                text-shadow-[0_0_4px_rgba(255,147,0,0.6)]`
+                              : `
+                                text-cyan-300
+                                text-[17.6px]
+                                text-shadow-[0_0_4px_rgba(0,255,255,0.6)]`
+                          }
+                        >
+                          {p1.display}
+                        </div>
+                        <div className="
+                          text-[15.4px]
+                          text-purple-300
+                          text-shadow-[0_0_4px_rgba(147,51,234,0.6)]"
+                        >
+                          vs
+                        </div>
+                        <div
+                          className={
+                            p2.isPred
+                              ? `
+                                italic
+                                text-orange-300
+                                text-[17.6px]
+                                text-shadow-[0_0_4px_rgba(255,147,0,0.6)]`
+                              : `
+                                text-cyan-300
+                                text-[17.6px]
+                                text-shadow-[0_0_4px_rgba(0,255,255,0.6)]`
+                          }
+                        >
+                          {p2.display}
+                        </div>
+                        {match.winner && (
+                          <div className="
+                            mt-2
+                            text-[15.4px]
+                            text-green-400
+                            text-shadow-[0_0_4px_rgba(74,222,128,0.6)]"
+                          >
+                            Winner: {match.winner}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <button
+          onClick={onClose}
+          className="
+            absolute
+            right-4
+            top-4
+            rounded
+            border
+            border-white
+            px-4
+            py-2
+            hover:bg-gray-600"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+
+
+// /Users/olegoman/WORK/HIVE/Projects/ft_transcendense/client/src/pong/Pong3D.tsx
 
 
 //! SERVER
