@@ -1,0 +1,12 @@
+node_modules
+dist
+.vscode
+*.log
+.env
+
+# не тянем локальные node_modules
+server/node_modules
+client/node_modules
+
+# прочие
+**/.DS_Store

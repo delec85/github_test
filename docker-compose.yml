@@ -1,0 +1,60 @@
+# version: "3.8"
+
+# services:
+#   backend:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#       target: backend
+#     env_file:
+#       - server/.env
+#     ports:
+#       - "3000:3000"
+#     volumes:
+#       - ./server/database:/app/server/database
+
+#   frontend:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#       target: frontend
+#     depends_on:
+#       - backend
+#     ports:
+#       - "8080:80"
+
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend
+    env_file:
+      - server/.env
+    volumes:
+      # монтируем код для моментального обновления
+      - ./server:/app/server
+      - ./shared:/app/shared
+      # чтобы не затирать node_modules пустой директорией
+      - /app/server/node_modules
+    working_dir: /app/server
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: frontend
+    environment:
+      # URL вашего API — подхватится в клиентском коде как import.meta.env.VITE_API_URL
+      VITE_API_URL: "https://localhost:3000"
+    volumes:
+      - ./client:/app/client
+      - ./shared:/app/shared
+      - ./server/cert:/app/server/cert
+      - /app/client/node_modules
+    working_dir: /app/client
+    ports:
+      - "5173:5173"

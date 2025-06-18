@@ -160,6 +160,44 @@ module.exports = {
 }
 
 
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/tsconfig.app.json
+
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "types": ["node"],
+
+    /* 🙏 Импорты без ./ ада */
+    "baseUrl": "./src"
+  },
+  "include": ["src"]
+}
+
+
+
+
+
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/vite.config.ts
 
 import { defineConfig } from 'vite'
@@ -204,10 +242,11 @@ export default defineConfig({
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/chat/components/ChatModal.css
 
 .message-bubble {
+  /* padding-left: 200rem; */
   max-width: 70%;
   margin-bottom: 0.5rem;
   padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
+  border-radius: 30px 30px 1px 30px;
   background: rgba(0, 0, 0, 0.4);
   color: #e9f4fb;
   word-break: break-word;
@@ -394,7 +433,9 @@ const ChatModal: React.FC<ChatModalProps> = ({ onClose, currentUserId, players }
           <div className="chat-area flex flex-col flex-1">
             {selected && (
               <div className="p-2 border-b border-gray-700 flex justify-between items-center">
-                <span className="font-orbitron">{selected.username}</span>
+                <span className="font-orbitron">
+                  <img className="rounded-full w-16 h-10 object-cover" src={selected.avatar}/>
+                  {selected.username}</span>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setShowProfile(true)}
@@ -428,11 +469,12 @@ const ChatModal: React.FC<ChatModalProps> = ({ onClose, currentUserId, players }
                 messages.map((m) => (
                   <div
                     key={m.id}
-                    className={`message-bubble ${
+                    className={`message-bubble px-6 ${
                       m.sender_id === Number(currentUserId) ? "sent" : "received"
                     }`}
                   >
-                    <p className="break-words font-ubuntu">{m.text}</p>
+                    <p className="flex break-words font-ubuntu justify-start">{m.text}</p>
+                    <p className="text-xs text-end text-gray-600">{new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                   </div>
                 ))
               ) : (
@@ -489,6 +531,9 @@ const ChatModal: React.FC<ChatModalProps> = ({ onClose, currentUserId, players }
 export default ChatModal;
 
 
+
+
+
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/chat/components/ChatProfileModal.tsx
 
 import React, { useMemo, useCallback, useState } from "react";
@@ -522,7 +567,7 @@ const ChatProfileModal: React.FC<ChatProfileModalProps> = ({
   onToggleBlock,
 }) => {
   const recentHistory = useMemo(() => user.history.slice(-5).reverse(), [user.history]);
-  const [isFriend, setIsFriend] = useState(false);
+  const [isFriend, setIsFriend] = useState(true);
   const handleAddFavorite = useCallback(async () => {
     try {
       await addToFavorites(user.username);
@@ -617,12 +662,12 @@ const ChatProfileModal: React.FC<ChatProfileModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <OverlayButton
-              color="blue"
+              color="green"
               onClick={isFriend ? handleRemoveFavorite : handleAddFavorite}
               className="w-full flex items-center justify-center"
             >
               <i
-                className={`fa-solid ${isFriend ? 'fa-user-minus' : 'fa-user-plus'} mr-2`}
+                className={`fa-solid ${isFriend ? 'fa-solid fa-heart-crack' : 'fa-heart'} mr-2`}
               />
               {isFriend ? 'Remove friend' : 'Add friend'}
             </OverlayButton>
@@ -646,6 +691,7 @@ const ChatProfileModal: React.FC<ChatProfileModalProps> = ({
 };
 
 export default ChatProfileModal;
+
 
 
 
@@ -692,15 +738,18 @@ const ChatUserList: React.FC<Props> = ({ players, onSelect }) => {
       {players
         .filter((u) => u.username.toLowerCase().includes(search.toLowerCase()))
         .map((u) => (
-          <div
-            key={u.id}
-            className="conversation-item cursor-pointer hover:text-blue-300 font-ubuntu"
-            onClick={() => {
-              onSelect(u);
-              setSearch("");
-            }}
-          >
-            {highlightName(u.username)}
+          <div className="columns-3xs" key={u.id}>
+            <div
+              className="conversation-item cursor-pointer hover:text-blue-300 font-ubuntu aspect-3/2 flex items-center space-x-2"
+              onClick={() => {
+                onSelect(u);
+                setSearch("");
+              }}
+            >
+              <img className="rounded-full w-10 h-10 object-cover" src={u.avatar}  />  
+              <h2>     </h2>
+                  {highlightName(u.username)}
+          </div>
           </div>
         ))}
     </div>
@@ -708,6 +757,7 @@ const ChatUserList: React.FC<Props> = ({ players, onSelect }) => {
 };
 
 export default ChatUserList;
+
 
 
 
@@ -1482,46 +1532,46 @@ export default NeonCursor;
 
 
 
-// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/components/TabButton.tsx
+// // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/components/TabButton.tsx
 
-import React from "react";
+// import React from "react";
 
-export interface TabButtonProps<T>
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  value: T;
-  active: boolean;
-  onSelect: (val: T) => void;
-  children: React.ReactNode;
-}
+// export interface TabButtonProps<T>
+//   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+//   value: T;
+//   active: boolean;
+//   onSelect: (val: T) => void;
+//   children: React.ReactNode;
+// }
 
-function InnerTabButton<T>(
-  { value, active, onSelect, className = "", children, ...rest }: TabButtonProps<T>,
-  ref: React.ForwardedRef<HTMLButtonElement>
-) {
-  const base =
-    "px-6 py-3 cursor-pointer border-b-2 transition-colors text-[#aaa] hover:text-white focus:outline-none focus:text-white";
-  const activeClasses = active ? "text-[#00a1ff] border-b-[#00a1ff]" : "border-transparent";
+// function InnerTabButton<T>(
+//   { value, active, onSelect, className = "", children, ...rest }: TabButtonProps<T>,
+//   ref: React.ForwardedRef<HTMLButtonElement>
+// ) {
+//   const base =
+//     "px-6 py-3 cursor-pointer border-b-2 transition-colors text-[#aaa] hover:text-white focus:outline-none focus:text-white";
+//   const activeClasses = active ? "text-[#00a1ff] border-b-[#00a1ff]" : "border-transparent";
 
-  return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={active}
-      className={`${base} ${activeClasses} ${className}`}
-      onClick={() => onSelect(value)}
-      ref={ref}
-      {...rest}
-    >
-      {children}
-    </button>
-  );
-}
+//   return (
+//     <button
+//       type="button"
+//       role="tab"
+//       aria-selected={active}
+//       className={`${base} ${activeClasses} ${className}`}
+//       onClick={() => onSelect(value)}
+//       ref={ref}
+//       {...rest}
+//     >
+//       {children}
+//     </button>
+//   );
+// }
 
-const TabButton = React.forwardRef(InnerTabButton) as <T>(
-  props: TabButtonProps<T> & { ref?: React.Ref<HTMLButtonElement> }
-) => JSX.Element;
+// const TabButton = React.forwardRef(InnerTabButton) as <T>(
+//   props: TabButtonProps<T> & { ref?: React.Ref<HTMLButtonElement> }
+// ) => JSX.Element;
 
-export default TabButton;
+// export default TabButton;
 
 
 
@@ -1534,6 +1584,7 @@ import {
   ReactNode,
   useEffect,
 } from "react";
+import api from "../pages/Profile/types/api";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
@@ -1557,10 +1608,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      setIsAuthenticated(true);
-    }
-  }, []);
+    if (!token) return;
+
+    const verifyToken = async () => {
+      try {
+        const { data } = await api.get("/users/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (data?.user?.id) {
+          localStorage.setItem("id", String(data.user.id));
+          setIsAuthenticated(true);
+        } else {
+          throw new Error("User not found");
+        }
+      } catch (err) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("id");
+        setIsAuthenticated(false);
+        navigate("/login", { replace: true });
+      }
+    };
+
+    verifyToken();
+  }, [navigate]);
 
   const login = (token: string) => {
     localStorage.setItem("token", token);
@@ -1595,6 +1665,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       localStorage.removeItem("token");
       localStorage.removeItem("id");
+      localStorage.removeItem("challenge_id");
       setIsAuthenticated(false);
       navigate("/login", { replace: true }); // Avoid double push
     }
@@ -1606,6 +1677,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     </AuthContext.Provider>
   );
 };
+
 
 
 
@@ -1939,6 +2011,7 @@ export default SignUpForm;
 
 
 
+
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pages/MainPage/MainPage.tsx
 
 //import myImage from '../../assets/mainPageImages/Main_Image.png';
@@ -1973,13 +2046,12 @@ const MainPage = () => {
               playsInline
               className="w-full h-auto rounded-xl transition-shadow duration-300 ease-in-out"
             />
-          <div className=" absolute sm:bottom-2 bottom-2 md:bottom-2 lg:bottom-4 
-                  right-20 sm:right-32 md:right-44 lg:right-64 xl:right-72 2xl:right-96 
-                  transform -translate-x-1/2 z-20">
+          <div className=" flex sm:bottom-2 bottom-2 md:bottom-2 lg:bottom-4
+                            justify-center">
             <button
-              className="rounded-xl o border-2 px-5 py-2 border-blue-300
+              className=" rounded-xl border-2 px-5 py-2 border-blue-300
                         lg:px-5 lg:py-2 md:px-5 md:py-2 2xl:px-5 2xl:py-3 xl:py-3
-                        font-bold text-transparent text-md sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl
+                        font-bold text-transparent text-3xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl
                         bg-clip-text bg-gradient-to-r from-indigo-300 via-blue-300 to-sky-500
                         hover:from-red-50 hover:via-indigo-200 hover:to-purple-100
                         animate-bounce [animation-duration:1s] hover:animate-none
@@ -1993,7 +2065,7 @@ const MainPage = () => {
               // }}
               onClick={() => openModal('login')}
             >
-              GO
+              PLAY
             </button>
           </div>
         </div>
@@ -2004,16 +2076,19 @@ const MainPage = () => {
 
 export default MainPage;
 
+
+
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pages/Profile/GameSelector/GameModeSelector.tsx
 
 import React from "react";
-import { OverlayButton } from "../../../pong/components/Overlays/OverlayComponents";
+//import { OverlayButton } from "../../../pong/components/Overlays/OverlayComponents";
+import {FaGlobe, FaUserFriends, FaTrophy} from "react-icons/fa"
 
 
 const modes = [
-  { name: "Random Match", color: "green" }, 
-  { name: "Local Duel", color: "blue" },
-  { name: "Local Tournament", color: "magenta" },
+  { name: ["RANDOM", "MATCH"], icon: <FaGlobe/>, color: "text-blue-500", border:"hover:border-blue-400 hover:shadow-[0_0_15px_#60a5fa]", animation: "animate-pulse hover:animate-none [animation-duration:3s] "}, 
+  { name: ["LOCAL", "DUEL"], icon: <FaUserFriends/> ,color: "text-purple-500", border:"hover:border-purple-400 hover:shadow-[0_0_15px_#c084fc]", animation:"animate-pulse hover:animate-none [animation-duration:3s] "},
+  { name: ["LOCAL", "TOURNAMENT"], icon: <FaTrophy/>, color: "text-pink-600", border: "hover:border-pink-600 hover:shadow-[0_0_15px_#db2777]", animation:"animate-pulse hover:animate-none [animation-duration:3s] "},
 ];
 
 interface Props {
@@ -2028,15 +2103,16 @@ const GameModeSelector: React.FC<Props> = ({
   onTournamentClick
 }) => {
   // Dispatch click to the correct handler based on mode name
-  const handleClick = (modeName: string) => {
-    switch (modeName) {
-      case "Random Match":
+  const handleClick = (modeName: string[]) => {
+    const joined = modeName.join(" ");
+    switch (joined) {
+      case "RANDOM MATCH":
         onSingleClick();
         break;
-      case "Local Duel":
+      case "LOCAL DUEL":
         onMultiClick();
         break;
-      case "Local Tournament":
+      case "LOCAL TOURNAMENT":
         onTournamentClick();
         break;
       default:
@@ -2045,19 +2121,26 @@ const GameModeSelector: React.FC<Props> = ({
   };
 
   return (
-    // Vertical list of mode buttons with hover animations
-    <div className="flex flex-col items-center gap-6">
+    <div className="flex justify-center items-center w-full px-4 py-8">
+    <div className="flex flex-row gap-6">
       {modes.map((mode) => (
-        <OverlayButton
-          key={mode.name}
-          color={mode.color} // Passing color for styling
-          onClick={() => handleClick(mode.name)} // Handling button clicks
-          className="w-full sm:w-[250px] md:w-[350px] xl:w-[400px] 2xl:w-[500px] py-4" // Adjust width
+        <button
+          key={mode.name.join("")}
+          onClick={() => handleClick(mode.name)}
+          className={`flex flex-col items-center justify-center gap-2
+            bg-transparent ${mode.color} ${mode.border} ${mode.animation} border-transparent border-2 rounded-xl 
+            transition duration-200 text-center
+            w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 xl:w-48 xl:h-48`}
         >
-          {mode.name}
-        </OverlayButton>
+          <span className="text-3xl sm:text-4xl md:text-5xl">{mode.icon}</span>
+          <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-semibold font-orbitron leading-tight text-center">
+            {mode.name[0]} <br /> {mode.name[1]}
+          </span>
+        </button>
       ))}
     </div>
+  </div>
+
   );
 };
 
@@ -2075,7 +2158,7 @@ import { useNavigate } from "react-router-dom";
 const GameSelector: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleSingle = () => navigate("/pong?mode=ai");
+  const handleSingle = () => navigate("/pong?mode=remote2p");
   const handleMulti = () => navigate("/pong?mode=local2p");
   const handleTournament = () => navigate("/pong?mode=tournament");
 
@@ -2085,11 +2168,11 @@ const GameSelector: React.FC = () => {
       onMultiClick={handleMulti}
       onTournamentClick={handleTournament}
     />
-
   );
 };
 
 export default GameSelector;
+
 
 
 
@@ -2230,19 +2313,19 @@ export function useNotifications(userId: string | null) {
   }, [userId]);
   console.log("Notification length: ", notifications.length);
 
-   useEffect(() => {
-    if (!userId) return;
+  //  useEffect(() => {
+  //   if (!userId) return;
 
-    // Check immediately on mount
-    checkNotifications();
+  //   // Check immediately on mount
+  //   checkNotifications();
 
-    // Poll every 10 seconds
-    const interval = setInterval(() => {
-      checkNotifications();
-    }, 10000);
+  //   // Poll every 10 seconds
+  //   const interval = setInterval(() => {
+  //     checkNotifications();
+  //   }, 10000);
 
-    return () => clearInterval(interval);
-  }, [userId, checkNotifications]);
+  //   return () => clearInterval(interval);
+  // }, [userId, checkNotifications]);
 
   const handleAcceptChallenge = useCallback(async (friendId: string) => {
     if (!userId) return;
@@ -2290,6 +2373,7 @@ export function useNotifications(userId: string | null) {
 
 
 
+
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pages/Profile/hooks/useProfile.ts
 
 import { useEffect } from "react";
@@ -2311,7 +2395,7 @@ export const useProfile = () => {
     notifications,
     isNotificationModalOpen,
     setIsNotificationModalOpen,
-    //checkNotifications,
+    checkNotifications,
     handleAcceptChallenge,
     handleDeclineChallenge,
   } = useNotifications(userId);
@@ -2328,9 +2412,11 @@ export const useProfile = () => {
 
   // Refresh user data and notifications periodically
   useEffect(() => {
+  if (userId)
+    checkNotifications();
   // Only fetch users once on mount or when really needed
   fetchAllUsers();
-}, [fetchAllUsers]);
+}, [fetchAllUsers, checkNotifications]);
   
   return {
     user,
@@ -2353,6 +2439,8 @@ export const useProfile = () => {
     setUser,
   };
 };
+
+
 
 
 
@@ -2631,7 +2719,10 @@ export const recordWin = async (
 ): Promise<void> => {
   const id = getUserIdFromToken();
   if (id === null) throw new Error("No user id");
-  await api.post("/winUser", { user_id: id }, { headers });
+    const challenge_id = localStorage.getItem("challenge_id")
+  console.log("TYYYYYYYYYYYYYYYYYYYYYYY=>", challenge_id)
+  console.log(typeof challenge_id)
+  await api.post("/winUser", { user_id: id , challenge_id :challenge_id}, { headers });
 };
 
 export const recordLoss = async (
@@ -2639,7 +2730,9 @@ export const recordLoss = async (
 ): Promise<void> => {
   const id = getUserIdFromToken();
   if (id === null) throw new Error("No user id");
-  await api.post("/loseUser", { user_id: id }, { headers });
+  const challenge_id = localStorage.getItem("challenge_id")
+  console.log("TYYYYYYYYYYYYYYYYYYYYYYY=>", challenge_id)
+  await api.post("/loseUser", { user_id: id , challenge_id :challenge_id}, { headers });
 };
 
 export interface ChatMessage {
@@ -2698,34 +2791,72 @@ export default api;
 
 
 
+
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pages/Profile/types/botsData.ts
 
-export const bots = [
-	{
-	  name: 'Vampire (Vegetarian)',
-	  image: '/boots_img/vampire.png',
-	  strengths: 'Charming, peaceful',
-	  weaknesses: 'Avoids blood, distracted by veggies',
-	},
-	{
-	  name: 'Zombie Hygienist',
-	  image: '/boots_img/zombie.png',
-	  strengths: 'Clean freak, fast hands',
-	  weaknesses: 'Avoids dirt, hates brains',
-	},
-	{
-	  name: 'Werewolf (Fur Allergy)',
-	  image: '/boots_img/wolf.png',
-	  strengths: 'Sniffs danger',
-	  weaknesses: 'Sneezes every full moon',
-	},
-	{
-	  name: 'Cowboy (Scared of Horses)',
-	  image: '/boots_img/cowboy.png',
-	  strengths: 'Great aim',
-	  weaknesses: 'Avoids ranches, prefers bikes',
-	},
-  ];
+import { PowerUpType } from "../../../pong/powerups";
+
+export type BotInfo = {
+  name: string;
+  image: string;
+  strengths: string;
+  weaknesses: string;
+  error: number;
+  /** Difficulty rating represented as number of stars */
+  stars: number;
+  /** Optional z-target center bias when ball moves toward the bot */
+  center?: number;
+  /** Optional overshoot amount when predicting target */
+  overshoot?: number;
+  /** Preferred power-up type */
+  favorite?: PowerUpType;
+};
+
+export const bots: BotInfo[] = [
+  {
+    name: "Steady Chef",
+    image: "/boots_img/chef.png",
+    strengths: "Never panics, always in the right place",
+    weaknesses: "Too lazy to attack quickly",
+    error: 0.01,
+    stars: 3,
+    center: 0.2,
+    overshoot: 0.1,
+    favorite: PowerUpType.MegaPaddle,
+  },
+  {
+    name: "Speedy Ghost",
+    image: "/boots_img/ghost.png",
+    strengths: "Aggressive pressure and fast reactions",
+    weaknesses: "Rushes so hard it leaves holes",
+    error: 0.03,
+    stars: 3,
+    center: 0.15,
+    overshoot: 0.5,
+    favorite: PowerUpType.Speed,
+  },
+  {
+    name: "Drama Bot",
+    image: "/boots_img/robot.png",
+    strengths: "Jumps everywhere, pure chaos",
+    weaknesses: "Panics and misses when things get real",
+    error: 0.08,
+    stars: 2,
+    overshoot: 0.2,
+    favorite: PowerUpType.PowerShot,
+  },
+  {
+    name: "Shadow Ninja",
+    image: "/boots_img/ninja.png",
+    strengths: "Reads every move with perfect precision",
+    weaknesses: "None discovered so far",
+    error: 0,
+    stars: 4,
+    center: 0.1,
+    overshoot: 0.3,
+    favorite: PowerUpType.PowerShot,
+  },
+];
 
 
 
@@ -2980,6 +3111,8 @@ export default Avatar;
 
 
 
+
+
 import React from 'react';
 
 interface BotCardProps {
@@ -2987,6 +3120,8 @@ interface BotCardProps {
   image: string;
   strengths: string;
   weaknesses: string;
+  /** Difficulty rating from 2 to 4 represented as stars */
+  stars: number;
   onSelect: () => void;
   selected: boolean;
 }
@@ -2996,6 +3131,7 @@ const BotCard: React.FC<BotCardProps> = ({
   image,
   strengths,
   weaknesses,
+  stars,
   onSelect,
   selected
 }) => {
@@ -3062,6 +3198,9 @@ const BotCard: React.FC<BotCardProps> = ({
         ">
           {name}
         </h3>
+        <div className="text-yellow-400 text-sm mb-1">
+          {'\u2B50'.repeat(stars)}
+        </div>
         <p className="text-sm sm:text-base text-green-300 mb-1 break-words">
           + {strengths}
         </p>
@@ -3074,6 +3213,7 @@ const BotCard: React.FC<BotCardProps> = ({
 };
 
 export default BotCard;
+
 
 
 
@@ -3156,6 +3296,7 @@ const BotSelector: React.FC<BotSelectorProps> = ({ selectedBot, setSelectedBot }
 };
 
 export default BotSelector;
+
 
 
 
@@ -3922,6 +4063,24 @@ const Profile: React.FC = () => {
     }
   };
 
+  // Display loading state while fetching data
+  // if (isLoading) {
+  //   return (
+  //     <SpaceBackground>
+  //       <div
+  //         className="h-screen
+  //                     w-full 
+  //                     flex 
+  //                     items-center 
+  //                     justify-center
+  //                     text-white"
+  //       >
+  //         Loading data, please wait...
+  //       </div>
+  //     </SpaceBackground>
+  //   );
+  // }
+
   // Display error if user data failed to load
   if (!user) {
     return (
@@ -4020,7 +4179,7 @@ const Profile: React.FC = () => {
           <ChatModal
             onClose={() => setIsChatOpen(false)}
             currentUserId={user.id}
-            players={players.filter((p) => p.id !== user.id)}
+            players={friends.filter((p) => p.id !== user.id)}
           />
         </ChatProvider>
       )}
@@ -5085,13 +5244,21 @@ export default function BracketOverlay({
 import { resetScores, resetPositions } from "./physics";
 import type { SceneObjects } from "./scene";
 import { removeAllKeyListeners, setupKeyListeners } from "./utils";
+import { AI_KEYS } from "./ai";
 import type { GameState } from "./pong";
 import { GameMode } from "./pong";
+import { PADDLE_SPEED } from "../../../shared/constants.js";
 
 /**
  * SINGLE vs AI
  */
-export function startSinglePlayerAI(state: GameState, scene: SceneObjects) {
+import type { BotInfo } from "../pages/Profile/types/botsData";
+
+export function startSinglePlayerAI(
+  state: GameState,
+  scene: SceneObjects,
+  bot?: BotInfo,
+) {
   removeAllKeyListeners(state);
 
   state.currentMode = GameMode.AI;
@@ -5105,11 +5272,20 @@ export function startSinglePlayerAI(state: GameState, scene: SceneObjects) {
   state.onEscMenuChange?.(false);
 
   state.match.leftName = "YOU";
-  state.match.rightName = "AI";
+  state.match.rightName = bot?.name || "AI";
+  state.bot = bot ?? null;
+
+  state.physics.AI_SPEED = PADDLE_SPEED;
+  state.physics.AI_REACTION = 1;
+  state.physics.AI_ERROR = bot?.error ?? 0;
   // Notify React
   state.onPlayersUpdate?.(state.match.leftName, state.match.rightName);
 
-  setupKeyListeners(state, { up: "ArrowUp", down: "ArrowDown" });
+  setupKeyListeners(
+    state,
+    { up: "ArrowUp", down: "ArrowDown" },
+    AI_KEYS,
+  );
 }
 
 /**
@@ -5146,6 +5322,7 @@ export async function startRemote2P(
   state: GameState,
   scene: SceneObjects,
   url = "wss://localhost:3000/ws",
+  onHost?: () => void,
 ) {
   removeAllKeyListeners(state);
 
@@ -5180,7 +5357,7 @@ export async function startRemote2P(
   if (token) {
     connectUrl += connectUrl.includes("?") ? `&token=${token}` : `?token=${token}`;
   }
-  state.remoteCleanup = connect(state, connectUrl, scene);
+  state.remoteCleanup = connect(state, connectUrl, scene, onHost);
 }
 
 /**
@@ -5230,6 +5407,7 @@ export function startTournamentLocal2P(
 }
 
 
+
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/physics.ts
 
 // client/src/pong/physics.ts
@@ -5240,14 +5418,46 @@ import { clamp } from "./utils";
 import type { GameState } from "./pong";
 import { GameMode } from "./pong";
 import { playPaddleSound } from "./sound";
+import { updateAI } from "./ai";
+import {
+  updatePowerUps,
+  resetPowerUps,
+  POWER_UPS,
+  DEFAULT_EFFECTS,
+} from "./powerups";
+import type { Side } from "./types";
 
 export function stepPhysics(state: GameState, objs: SceneObjects, dt: number) {
   if (!state.gameStarted || state.paused) return;
   const { leftPaddle, rightPaddle, ball, scene } = objs;
+  const chefMode = state.bot?.name === "Steady Chef";
+
+  updatePowerUps(state, dt);
+
+  const powerShotActive =
+    state.powerUpEffects.powerShot.left || state.powerUpEffects.powerShot.right;
+  if (!powerShotActive && state.input.ballPowered) {
+    state.input.ballDX =
+      Math.sign(state.input.ballDX) * state.input.ballBaseSpeed;
+    state.input.ballDZ =
+      Math.sign(state.input.ballDZ) * state.input.ballBaseSpeed;
+    state.input.ballPowered = false;
+  }
 
   if (state.currentMode === GameMode.Remote2P) {
     const s = state.remoteState;
     if (s) {
+      // Update paddle length based on active power-ups from the server
+      const leftScale =
+        s.activeLeft && POWER_UPS[s.activeLeft as keyof typeof POWER_UPS]?.effect.scale
+          ? (POWER_UPS[s.activeLeft as keyof typeof POWER_UPS].effect.scale as number)
+          : DEFAULT_EFFECTS.scale;
+      const rightScale =
+        s.activeRight && POWER_UPS[s.activeRight as keyof typeof POWER_UPS]?.effect.scale
+          ? (POWER_UPS[s.activeRight as keyof typeof POWER_UPS].effect.scale as number)
+          : DEFAULT_EFFECTS.scale;
+      leftPaddle.scaling.z = leftScale;
+      rightPaddle.scaling.z = rightScale;
       const scoreChanged =
         s.leftScore !== state.match.playerScore ||
         s.rightScore !== state.match.aiScore;
@@ -5285,34 +5495,27 @@ export function stepPhysics(state: GameState, objs: SceneObjects, dt: number) {
     return;
   }
 
+  const leftSpeedMultiplier = state.powerUpEffects.speed.left;
+  leftPaddle.scaling.z = state.powerUpEffects.scale.left;
   leftPaddle.position.z = clamp(
-    leftPaddle.position.z + state.input.playerDzLeft,
+    leftPaddle.position.z + state.input.playerDzLeft * leftSpeedMultiplier,
     -state.physics.FIELD_HEIGHT + 1.5,
     state.physics.FIELD_HEIGHT - 1.5,
   );
 
+
   if (state.currentMode === GameMode.AI) {
-    state.input.aiTimer += dt;
-    if (state.input.aiTimer >= 1) {
-      state.input.aiTimer = 0;
-      state.input.aiTargetZ = ball.position.z;
-    }
-    const diff = state.input.aiTargetZ - rightPaddle.position.z;
-    if (Math.abs(diff) > 0.4) {
-      rightPaddle.position.z = clamp(
-        rightPaddle.position.z +
-          (diff > 0 ? state.physics.AI_SPEED : -state.physics.AI_SPEED),
-        -state.physics.FIELD_HEIGHT + 1.5,
-        state.physics.FIELD_HEIGHT - 1.5,
-      );
-    }
-  } else {
-    rightPaddle.position.z = clamp(
-      rightPaddle.position.z + state.input.playerDzRight,
-      -state.physics.FIELD_HEIGHT + 1.5,
-      state.physics.FIELD_HEIGHT - 1.5,
-    );
+    updateAI(state, objs, dt);
   }
+
+
+  const rightSpeedMultiplier = state.powerUpEffects.speed.right;
+  rightPaddle.scaling.z = state.powerUpEffects.scale.right;
+  rightPaddle.position.z = clamp(
+    rightPaddle.position.z + state.input.playerDzRight * rightSpeedMultiplier,
+    -state.physics.FIELD_HEIGHT + 1.5,
+    state.physics.FIELD_HEIGHT - 1.5,
+  );
 
   ball.position.x += state.input.ballDX;
   ball.position.z += state.input.ballDZ;
@@ -5336,23 +5539,45 @@ export function stepPhysics(state: GameState, objs: SceneObjects, dt: number) {
     if (state.gameStarted) playGoalAnimation(state, objs);
   }
 
-  if (hitPaddle(ball, leftPaddle, 1)) {
+  if (hitPaddle(ball, leftPaddle, 1, state)) {
     state.input.ballDX = Math.abs(state.input.ballDX);
+    if (state.powerUpEffects.powerShot.left && !state.input.ballPowered) {
+      state.input.ballDX =
+        Math.sign(state.input.ballDX) * state.input.ballBaseSpeed * 2;
+      state.input.ballDZ =
+        Math.sign(state.input.ballDZ) * state.input.ballBaseSpeed * 2;
+      state.input.ballPowered = true;
+    }
     boom(scene, ball.position);
     playPaddleSound();
   }
-  if (hitPaddle(ball, rightPaddle, -1)) {
+  if (hitPaddle(ball, rightPaddle, -1, state)) {
     state.input.ballDX = -Math.abs(state.input.ballDX);
+    if (state.powerUpEffects.powerShot.right && !state.input.ballPowered) {
+      state.input.ballDX =
+        Math.sign(state.input.ballDX) * state.input.ballBaseSpeed * 2;
+      state.input.ballDZ =
+        Math.sign(state.input.ballDZ) * state.input.ballBaseSpeed * 2;
+      state.input.ballPowered = true;
+    }
     boom(scene, ball.position);
     playPaddleSound();
+    state.input.aiTargetZ = 0;
   }
 }
 
-function hitPaddle(ball: BABYLON.Mesh, p: BABYLON.Mesh, dir: number) {
+function hitPaddle(
+  ball: BABYLON.Mesh,
+  p: BABYLON.Mesh,
+  dir: number,
+  state: GameState,
+) {
+  const halfDepth = 1.5 * p.scaling.z;
+  const radius = state.physics.BALL_SIZE / 2;
   return (
-    Math.abs(ball.position.z - p.position.z) < 2.5 &&
+    Math.abs(ball.position.z - p.position.z) < halfDepth + radius &&
     Math.sign(ball.position.x - p.position.x) === dir &&
-    Math.abs(ball.position.x - p.position.x) < 1.0
+    Math.abs(ball.position.x - p.position.x) < 1.0 + radius
   );
 }
 
@@ -5364,7 +5589,7 @@ function checkWin(state: GameState) {
   }
 }
 
-function endGame(state: GameState, winnerSide: "left" | "right") {
+function endGame(state: GameState, winnerSide: Side) {
   state.gameStarted = false;
   state.paused = false;
   state.escMenuOpen = false;
@@ -5399,10 +5624,16 @@ function endGame(state: GameState, winnerSide: "left" | "right") {
 export function resetBall(state: GameState, objs: SceneObjects) {
   const { ball } = objs;
   ball.position.set(0, 0.5, 0);
+  state.input.aiPrevBallX = ball.position.x;
+  state.input.aiPrevBallZ = ball.position.z;
+  state.input.aiTimer = 0;
   const dx = state.physics.BALL_SPEED * (Math.random() > 0.5 ? 1 : -1);
   const dz = state.physics.BALL_SPEED * (Math.random() > 0.5 ? 1 : -1);
   state.input.ballDX = 0;
   state.input.ballDZ = 0;
+  state.input.ballBaseSpeed = state.physics.BALL_SPEED;
+  state.input.ballPowered = false;
+  state.input.aiTargetZ = 0;
   if (state.ballSpawnTimeout) clearTimeout(state.ballSpawnTimeout);
   state.ballSpawnTimeout = setTimeout(() => {
     state.input.ballDX = dx;
@@ -5411,7 +5642,7 @@ export function resetBall(state: GameState, objs: SceneObjects) {
   }, 1000);
 }
 
-export function spawnBall(objs: SceneObjects) {
+export function spawnBall(state: GameState, objs: SceneObjects) {
   const { ball, scene } = objs;
   const FR = 60;
   if (typeof scene.beginAnimation !== "function") return;
@@ -5426,7 +5657,14 @@ export function spawnBall(objs: SceneObjects) {
   );
   anim.setKeys([
     { frame: 0, value: new BABYLON.Vector3(0, 0, 0) },
-    { frame: FR * 0.5, value: new BABYLON.Vector3(1, 1, 1) },
+    {
+      frame: FR * 0.5,
+      value: new BABYLON.Vector3(
+        state.physics.BALL_SIZE,
+        state.physics.BALL_SIZE,
+        state.physics.BALL_SIZE,
+      ),
+    },
   ]);
   ball.animations = [anim];
   scene.beginAnimation(ball, 0, FR * 0.5, false);
@@ -5435,6 +5673,7 @@ export function spawnBall(objs: SceneObjects) {
 export function resetScores(state: GameState) {
   state.match.playerScore = 0;
   state.match.aiScore = 0;
+  resetPowerUps(state);
 }
 
 export function resetPositions(
@@ -5446,7 +5685,7 @@ export function resetPositions(
   leftPaddle.position.set(-state.physics.FIELD_WIDTH + 1.5, 0.5, 0);
   rightPaddle.position.set(state.physics.FIELD_WIDTH - 1.5, 0.5, 0);
   resetBall(state, objs);
-  if (animate) spawnBall(objs);
+  if (animate) spawnBall(state, objs);
 }
 
 export function playGoalAnimation(state: GameState, objs: SceneObjects) {
@@ -5472,7 +5711,7 @@ export function playGoalAnimation(state: GameState, objs: SceneObjects) {
   if (state.goalTimeout) clearTimeout(state.goalTimeout);
   state.goalTimeout = setTimeout(() => {
     resetBall(state, objs);
-    spawnBall(objs);
+    spawnBall(state, objs);
     state.goalTimeout = null;
     state.paused = state.manualPaused;
     state.onPauseChange?.(state.paused);
@@ -5500,7 +5739,7 @@ export function playRemoteGoalAnimation(state: GameState, objs: SceneObjects) {
   scene.beginAnimation(ball, 0, FR * 0.1, false);
 
   // Spawn the ball immediately so it waits one second before moving
-  spawnBall(objs);
+  spawnBall(state, objs);
 
   if (state.goalTimeout) clearTimeout(state.goalTimeout);
   state.goalTimeout = setTimeout(() => {
@@ -5510,6 +5749,41 @@ export function playRemoteGoalAnimation(state: GameState, objs: SceneObjects) {
   }, 1000);
 }
 
+export let predictImpactZ = (
+  x0: number,
+  z0: number,
+  vx: number,
+  vz: number,
+  targetX: number,
+  limit: number,
+) => {
+  if (!isFinite(vx) || vx === 0) return z0;
+  let t = (targetX - x0) / vx;
+  if (t <= 0) return z0;
+  let z = z0;
+  let dz = vz;
+  const top = limit;
+  const bottom = -limit;
+  while (t > 0) {
+    if (!isFinite(dz) || dz === 0) return z;
+    const targetZ = dz >= 0 ? top : bottom;
+    const timeToWall = (targetZ - z) / dz;
+    if (timeToWall >= t) {
+      z += dz * t;
+      break;
+    }
+    z = targetZ;
+    dz *= -1;
+    t -= timeToWall;
+  }
+  return z;
+};
+
+export function __setPredictImpactZ(fn: typeof predictImpactZ) {
+  predictImpactZ = fn;
+}
+
+
 
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/pong.ts
 
@@ -5517,7 +5791,18 @@ export function playRemoteGoalAnimation(state: GameState, objs: SceneObjects) {
 import * as BABYLON from "@babylonjs/core";
 import { createScene, fitFieldToCamera, type SceneObjects } from "./scene";
 import { stepPhysics, resetScores, resetPositions } from "./physics";
-import type { PhysicsParams, MatchInfo, InputState } from "./types";
+import type { PhysicsParams, MatchInfo, InputState, Side } from "./types";
+import type { RemoteSettings } from "../../../shared/messages.js";
+import { MessageTypes } from "../../../shared/messages.js";
+import type { PowerUpState } from "./powerups";
+import {
+  activatePowerUp,
+  deactivatePowerUp,
+  PowerUpType,
+  POWER_UPS,
+  resetPowerUps,
+  createDefaultPowerUpState,
+} from "./powerups";
 import {
   startSinglePlayerAI,
   startLocal2P,
@@ -5525,11 +5810,13 @@ import {
   startRemote2P as startRemote2PMode,
 } from "./modes";
 import { removeAllKeyListeners } from "./utils";
+import { setSoundEnabled } from "./sound";
 import {
   FIELD_WIDTH,
   FIELD_HEIGHT,
   PADDLE_SPEED,
   BALL_SPEED,
+  BALL_SIZE,
   WINNING_SCORE,
 } from "../../../shared/constants.js";
 
@@ -5544,6 +5831,9 @@ export interface GameState {
   physics: PhysicsParams;
   match: MatchInfo;
   input: InputState;
+
+  /** Selected bot configuration for AI mode */
+  bot?: BotInfo | null;
 
   FIXED_DT: number;
   accumulator: number;
@@ -5566,11 +5856,16 @@ export interface GameState {
     message?: string,
   ) => void;
   onPlayersUpdate?: (leftName: string, rightName: string) => void;
+  onPowerUpUpdate?: (
+    left: PowerUpType | null,
+    right: PowerUpType | null,
+  ) => void;
 
   /** Remote play events */
-  onRemoteWaitingChange?: (waiting: boolean) => void;
+  onRemoteWaitingChange?: (status: 'waiting' | 'preparing' | null) => void;
   onRemoteCountdown?: (seconds: number) => void;
   onRemoteError?: () => void;
+  onRemoteSettings?: (settings: RemoteSettings) => void;
 
   onMatchEndCallback?: (
     winner: string,
@@ -5588,7 +5883,7 @@ export interface GameState {
 
   /** Remote play fields */
   ws?: WebSocket;
-  playerSide?: "left" | "right";
+  playerSide?: Side;
   remoteState?: {
     ballX: number;
     ballZ: number;
@@ -5596,16 +5891,33 @@ export interface GameState {
     rightPaddleZ: number;
     leftScore: number;
     rightScore: number;
+    activeLeft?: string | null;
+    activeRight?: string | null;
   } | null;
   remoteBallDX?: number;
   remotePrevBallDX?: number;
   remoteCleanup?: () => void;
+
+  /** Active and available power-ups */
+  powerUps: PowerUpState;
+
+  /** Current modifiers from active power-ups */
+  powerUpEffects: {
+    speed: Record<Side, number>;
+    scale: Record<Side, number>;
+    powerShot: Record<Side, boolean>;
+  };
+
+  /** Whether power-ups can be used */
+  powerUpsEnabled: boolean;
 }
 
+import type { BotInfo } from "../pages/Profile/types/botsData";
+
 export interface GameAPI {
-  startSinglePlayerAI: () => void;
+  startSinglePlayerAI: (bot?: BotInfo) => void;
   startLocal2P: () => void;
-  startRemote2P: (url?: string) => void;
+  startRemote2P: (url?: string, onHost?: () => void) => void;
   startTournamentMatch: (
     p1Name: string,
     p2Name: string,
@@ -5621,6 +5933,16 @@ export interface GameAPI {
 
   restartCurrentMatch?: () => void;
   unpause?: () => void;
+  usePowerUp?: (
+    side: Side,
+    pu: { type: PowerUpType; duration?: number },
+  ) => void;
+  setPowerUpsEnabled?: (v: boolean) => void;
+  setBallSpeed?: (v: number) => void;
+  setBallSize?: (v: number) => void;
+  setWinningScore?: (v: number) => void;
+  setPaddleColor?: (side: Side, color: string) => void;
+  setSoundEnabled?: (v: boolean) => void;
   dispose: () => void;
 }
 
@@ -5636,14 +5958,20 @@ export interface PongCallbacks {
     message?: string,
   ) => void;
   onPlayersUpdate?: (leftName: string, rightName: string) => void;
-  onRemoteWaitingChange?: (waiting: boolean) => void;
+  onPowerUpUpdate?: (
+    left: PowerUpType | null,
+    right: PowerUpType | null,
+  ) => void;
+  onRemoteWaitingChange?: (status: 'waiting' | 'preparing' | null) => void;
   onRemoteCountdown?: (seconds: number) => void;
   onRemoteError?: () => void;
+  onRemoteSettings?: (settings: RemoteSettings) => void;
 }
 
 export function initGame(
   canvas: HTMLCanvasElement,
   callbacks?: PongCallbacks,
+  powerUpsEnabled = true,
 ): GameAPI {
   const engine = new BABYLON.Engine(canvas, true);
 
@@ -5652,8 +5980,11 @@ export function initGame(
       FIELD_WIDTH,
       FIELD_HEIGHT,
       PADDLE_SPEED,
-      AI_SPEED: 0.3,
+      AI_SPEED: PADDLE_SPEED,
+      AI_REACTION: 1,
+      AI_ERROR: 0,
       BALL_SPEED,
+      BALL_SIZE,
       WINNING_SCORE,
     },
     match: {
@@ -5668,8 +5999,13 @@ export function initGame(
       playerDzRight: 0,
       aiTimer: 0,
       aiTargetZ: 0,
+      aiPrevBallX: 0,
+      aiPrevBallZ: 0,
       ballDX: 0,
       ballDZ: 0,
+      ballBaseSpeed: BALL_SPEED,
+      ballPowered: false,
+      dramaPhase: 0,
     },
 
     FIXED_DT: 1 / 60,
@@ -5686,9 +6022,11 @@ export function initGame(
     onEscMenuChange: callbacks?.onEscMenuChange,
     onMatchOver: callbacks?.onMatchOver,
     onPlayersUpdate: callbacks?.onPlayersUpdate,
+    onPowerUpUpdate: callbacks?.onPowerUpUpdate,
     onRemoteWaitingChange: callbacks?.onRemoteWaitingChange,
     onRemoteCountdown: callbacks?.onRemoteCountdown,
     onRemoteError: callbacks?.onRemoteError,
+    onRemoteSettings: callbacks?.onRemoteSettings,
 
     onMatchEndCallback: undefined,
 
@@ -5703,12 +6041,16 @@ export function initGame(
     remoteBallDX: 0,
     remotePrevBallDX: 0,
     remoteCleanup: undefined,
+    bot: null,
+    ...createDefaultPowerUpState(),
+    powerUpsEnabled,
   };
 
   const sceneObjects: SceneObjects = createScene(engine, canvas, state.physics);
 
-  state.input.ballDX = state.physics.BALL_SPEED;
-  state.input.ballDZ = state.physics.BALL_SPEED;
+  state.input.ballBaseSpeed = state.physics.BALL_SPEED;
+  state.input.ballDX = state.input.ballBaseSpeed;
+  state.input.ballDZ = state.input.ballBaseSpeed;
 
   engine.runRenderLoop(() => {
     const dt = engine.getDeltaTime() / 1000;
@@ -5770,16 +6112,16 @@ export function initGame(
   window.addEventListener("keydown", keydownHandler);
 
   const api: GameAPI = {
-    startSinglePlayerAI: () => {
-      startSinglePlayerAI(state, sceneObjects);
+    startSinglePlayerAI: (bot?: BotInfo) => {
+      startSinglePlayerAI(state, sceneObjects, bot);
       state.manualPaused = true;
     },
     startLocal2P: () => {
       startLocal2P(state, sceneObjects);
       state.manualPaused = true;
     },
-    startRemote2P: (url) => {
-      void startRemote2PMode(state, sceneObjects, url);
+    startRemote2P: (url, onHost) => {
+      void startRemote2PMode(state, sceneObjects, url, onHost);
       state.manualPaused = true;
     },
     startTournamentMatch: (p1, p2, isF, cb) => {
@@ -5827,12 +6169,74 @@ export function initGame(
       }
 
       if (state.currentMode === GameMode.AI) {
-        startSinglePlayerAI(state, sceneObjects);
+        startSinglePlayerAI(state, sceneObjects, state.bot ?? undefined);
       } else if (state.currentMode === GameMode.Local2P) {
         startLocal2P(state, sceneObjects);
       } else if (state.currentMode === GameMode.Remote2P) {
         void startRemote2PMode(state, sceneObjects);
       }
+    },
+    usePowerUp: (side, pu) => {
+      if (state.powerUpsEnabled) {
+        const duration = pu.duration ?? POWER_UPS[pu.type].defaultDuration;
+        if (state.currentMode === GameMode.Remote2P && state.ws) {
+          try {
+            if (state.ws.readyState === WebSocket.OPEN) {
+              state.ws.send(
+                JSON.stringify({
+                  type: MessageTypes.POWER,
+                  power: pu.type,
+                  duration,
+                }),
+              );
+            }
+          } catch {}
+        } else {
+          activatePowerUp(state, side, { type: pu.type, duration });
+        }
+      }
+    },
+    setPowerUpsEnabled: (v: boolean) => {
+      state.powerUpsEnabled = v;
+      if (!v) {
+        resetPowerUps(state);
+      }
+    },
+    setBallSpeed: (v: number) => {
+      state.physics.BALL_SPEED = v;
+      state.input.ballBaseSpeed = v;
+      if (state.ballSpawnTimeout) {
+        clearTimeout(state.ballSpawnTimeout);
+        const dx = v * (Math.random() > 0.5 ? 1 : -1);
+        const dz = v * (Math.random() > 0.5 ? 1 : -1);
+        state.ballSpawnTimeout = setTimeout(() => {
+          state.input.ballDX = dx;
+          state.input.ballDZ = dz;
+          state.ballSpawnTimeout = null;
+        }, 1000);
+      } else {
+        if (state.input.ballDX !== 0)
+          state.input.ballDX = Math.sign(state.input.ballDX) * v;
+        if (state.input.ballDZ !== 0)
+          state.input.ballDZ = Math.sign(state.input.ballDZ) * v;
+      }
+    },
+    setBallSize: (v: number) => {
+      sceneObjects.ball.scaling.set(v, v, v);
+      state.physics.BALL_SIZE = v;
+    },
+    setWinningScore: (v: number) => {
+      state.physics.WINNING_SCORE = v;
+    },
+    setPaddleColor: (side: Side, color: string) => {
+      const mat =
+        side === 'left'
+          ? (sceneObjects.leftPaddle.material as BABYLON.StandardMaterial)
+          : (sceneObjects.rightPaddle.material as BABYLON.StandardMaterial);
+      mat.emissiveColor = BABYLON.Color3.FromHexString(color);
+    },
+    setSoundEnabled: (v: boolean) => {
+      setSoundEnabled(v);
     },
     unpause: () => {
       if (state.goalTimeout) return;
@@ -5863,6 +6267,80 @@ export function initGame(
 
 
 
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/powerups.ts
+
+/**
+ * Shared power-up configuration and type definitions used in both the
+ * client and server.
+ */
+
+/**
+ * Default effect values when no power-up is active.
+ * @type {{ readonly speed: number, readonly scale: number, readonly powerShot: boolean }}
+ */
+export const DEFAULT_EFFECTS = {
+  speed: 1,
+  scale: 1,
+  powerShot: false,
+};
+
+/**
+ * Map of available power-ups and their configuration.
+ * @type {{
+ *   readonly speed: { icon: string, label: string, defaultDuration: number, effect: Partial<typeof DEFAULT_EFFECTS> },
+ *   readonly mega: { icon: string, label: string, defaultDuration: number, effect: Partial<typeof DEFAULT_EFFECTS> },
+ *   readonly power: { icon: string, label: string, defaultDuration: number, effect: Partial<typeof DEFAULT_EFFECTS> },
+ * }}
+ */
+export const POWER_UPS = {
+  speed: {
+    icon: '⚡',
+    label: 'Speed boost: doubles paddle speed',
+    defaultDuration: 8,
+    effect: { speed: 2 },
+  },
+  mega: {
+    icon: '🛡',
+    label: 'Mega paddle: increases paddle length',
+    defaultDuration: 12,
+    effect: { scale: 1.5 },
+  },
+  power: {
+    icon: '💥',
+    label: 'Power shot: doubles ball speed on hit',
+    defaultDuration: 10,
+    effect: { powerShot: true },
+  },
+};
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/shared/powerups.d.ts
+
+export interface EffectValues {
+  speed: number;
+  scale: number;
+  powerShot: boolean;
+}
+
+export interface PowerUpInfo {
+  icon: string;
+  label: string;
+  defaultDuration: number;
+  effect: Partial<EffectValues>;
+}
+
+export const DEFAULT_EFFECTS: EffectValues;
+
+export const POWER_UPS: {
+  readonly speed: PowerUpInfo;
+  readonly mega: PowerUpInfo;
+  readonly power: PowerUpInfo;
+};
+
+
+
+
+
 //  /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/Pong3D.tsx
 
 import React, { useEffect, useRef, useState } from "react";
@@ -5882,7 +6360,11 @@ import { RemoteErrorOverlay } from "./components/Overlays/RemoteErrorOverlay";
 import { Scoreboard } from "./components/Scoreboard";
 import { GoalBanner } from "./components/GoalBanner";
 import { EscMenu } from "./components/Overlays/EscMenu";
-import { OnlinePlayOverlay } from "./components/Overlays/OnlinePlayOverlay";
+import { SettingsOverlay } from "./components/Overlays/SettingsOverlay";
+import { RemoteSetupOverlay } from "./components/Overlays/RemoteSetupOverlay";
+import { PowerUpBar } from "./components/PowerUpBar";
+import { PowerUpType } from "./powerups";
+import { BALL_SPEED, BALL_SIZE, WINNING_SCORE } from "../../../shared/constants.js";
 
 import { useTournament } from "./hooks/useTournament";
 import "./pongGame.css";
@@ -5920,14 +6402,25 @@ export default function Pong3D() {
   const [showMenu, setShowMenu] = useState(false);
   const [menuIndex, setMenuIndex] = useState(0);
   const [waitingStart, setWaitingStart] = useState(false);
-  const [remoteWaiting, setRemoteWaiting] = useState(false);
+  const [remoteStatus, setRemoteStatus] = useState<'none' | 'waiting' | 'preparing'>('none');
   const [remoteCountdown, setRemoteCountdown] = useState<number | null>(null);
   const [remoteError, setRemoteError] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showRemoteSetup, setShowRemoteSetup] = useState(false);
+  const [defaultMode, setDefaultMode] = useState(true);
+  const [powerUpsEnabled, setPowerUpsEnabled] = useState(false);
+  const [ballSpeed, setBallSpeed] = useState(BALL_SPEED);
+  const [ballSize, setBallSize] = useState(BALL_SIZE);
+  const [winningScore, setWinningScore] = useState(WINNING_SCORE);
+  const [soundOn, setSoundOn] = useState(true);
+  const [leftColor, setLeftColor] = useState("#cc33cc");
+  const [rightColor, setRightColor] = useState("#33ccaa");
+  const [activeLeft, setActiveLeft] = useState<PowerUpType | null>(null);
+  const [activeRight, setActiveRight] = useState<PowerUpType | null>(null);
 
   // Main menu / tournament
   const [showStartScreen, setShowStartScreen] = useState(!startMode);
   const [showSetup, setShowSetup] = useState(startMode === GameMode.Tournament);
-  const [showOnline, setShowOnline] = useState(false);
   const [players, setPlayers] = useState<string[]>(["Player 1", "Player 2"]);
   const [nameError, setNameError] = useState(false);
   const [duplicateError, setDuplicateError] = useState(false);
@@ -6028,8 +6521,12 @@ export default function Pong3D() {
         setLeftLabel(l);
         setRightLabel(r);
       },
-      onRemoteWaitingChange: (w) => {
-        setRemoteWaiting(w);
+      onPowerUpUpdate: (l, r) => {
+        setActiveLeft(l);
+        setActiveRight(r);
+      },
+      onRemoteWaitingChange: (status) => {
+        setRemoteStatus(status ?? 'none');
       },
       onRemoteCountdown: (sec) => {
         if (sec <= 0) setRemoteCountdown(null);
@@ -6038,13 +6535,58 @@ export default function Pong3D() {
       onRemoteError: () => {
         setRemoteError(true);
       },
+      onRemoteSettings: (s) => {
+        setPowerUpsEnabled(s.powerUps);
+        setBallSpeed(s.ballSpeed);
+        setBallSize(s.ballSize);
+        setWinningScore(s.winningScore);
+        setLeftColor(s.leftColor);
+        setRightColor(s.rightColor);
+        setSoundOn(s.sound);
+      },
     };
-    const game = initGame(canvasRef.current, callbacks);
+    const game = initGame(canvasRef.current, callbacks, powerUpsEnabled);
+    game.setBallSpeed?.(ballSpeed);
+    game.setBallSize?.(ballSize);
+    game.setWinningScore?.(winningScore);
+    game.setPaddleColor?.('left', leftColor);
+    game.setPaddleColor?.('right', rightColor);
+    game.setSoundEnabled?.(soundOn);
     setGameApi(game);
     return () => {
       game.dispose();
     };
   }, []);
+
+  useEffect(() => {
+    if (!gameApi) return;
+    gameApi.setBallSpeed?.(ballSpeed);
+  }, [gameApi, ballSpeed]);
+
+  useEffect(() => {
+    if (!gameApi) return;
+    gameApi.setBallSize?.(ballSize);
+  }, [gameApi, ballSize]);
+
+  useEffect(() => {
+    if (!gameApi) return;
+    gameApi.setWinningScore?.(winningScore);
+  }, [gameApi, winningScore]);
+
+  useEffect(() => {
+    if (!gameApi) return;
+    gameApi.setPaddleColor?.('left', leftColor);
+  }, [gameApi, leftColor]);
+
+  useEffect(() => {
+    if (!gameApi) return;
+    gameApi.setPaddleColor?.('right', rightColor);
+  }, [gameApi, rightColor]);
+
+  useEffect(() => {
+    if (!gameApi) return;
+    gameApi.setSoundEnabled?.(soundOn);
+  }, [gameApi, soundOn]);
 
 
   useEffect(() => {
@@ -6053,8 +6595,11 @@ export default function Pong3D() {
     const mode = query.get("mode");
     if (mode === GameMode.AI) {
       setShowStartScreen(false);
-      gameApi.startSinglePlayerAI();
+      const bot = getStoredBot();
+      gameApi.startSinglePlayerAI(bot || undefined);
       setWaitingStart(true);
+      setLeftLabel('YOU');
+      setRightLabel(bot?.name ?? 'AI');
     } else if (mode === GameMode.Local2P) {
       setShowStartScreen(false);
       gameApi.startLocal2P();
@@ -6065,12 +6610,14 @@ export default function Pong3D() {
     } else if (mode === GameMode.Remote2P) {
       setShowStartScreen(false);
       prevScore.current = { left: 0, right: 0 };
-      gameApi.startRemote2P();
+      gameApi.startRemote2P(undefined, () => {
+        setShowRemoteSetup(true);
+        setDefaultMode(true);
+      });
       setScoreLeft(0);
       setScoreRight(0);
       setLeftLabel("YOU");
       setRightLabel("OPPONENT");
-      setRemoteWaiting(true);
       setRemoteCountdown(null);
     }
   }, [gameApi, location.search]);
@@ -6112,9 +6659,14 @@ export default function Pong3D() {
         arr.push("Switch game mode", "Quit to profile");
         return arr;
       }
-      return ["Resume", "Restart match", "Switch game mode", "Quit to profile"];
+      return [
+        "Resume",
+        "Restart match",
+        "Switch game mode",
+        "Quit to profile",
+      ];
     }
-    return ["Switch game mode", "Quit to profile"];
+    return ["Settings", "Switch game mode", "Quit to profile"];
   }
   function menuAction(idx: number) {
     const arr = getMenuItems();
@@ -6128,6 +6680,11 @@ export default function Pong3D() {
       setWaitingStart(true);
     } else if (chosen === "Show bracket") {
       setShowBracket(true);
+    } else if (chosen === "Settings") {
+      if (!gameApi?.__state?.gameStarted) {
+        setShowSettings(true);
+        setShowMenu(false);
+      }
     } else if (chosen === "Switch game mode") {
       resetAllToMainMenu();
     } else if (chosen === "Quit match") {
@@ -6147,17 +6704,31 @@ export default function Pong3D() {
     resetTourney();
     gameApi?.backToMenu();
     setWaitingStart(false);
-    setRemoteWaiting(false);
+    setRemoteStatus('none');
     setRemoteCountdown(null);
+    setShowRemoteSetup(false);
   }
 
   // --- MAIN SCREEN
+  function getStoredBot() {
+    const raw = localStorage.getItem('selectedBot');
+    if (raw) {
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+
   function startAI() {
     setShowStartScreen(false);
-    gameApi?.startSinglePlayerAI();
+    const bot = getStoredBot();
+    gameApi?.startSinglePlayerAI(bot || undefined);
     prevScore.current = { left: 0, right: 0 };
-    setLeftLabel("YOU");
-    setRightLabel("AI");
+    setLeftLabel('YOU');
+    setRightLabel(bot?.name ?? 'AI');
     setWaitingStart(true);
   }
   function startLocal() {
@@ -6176,18 +6747,7 @@ export default function Pong3D() {
     setShowSetup(true);
   }
 
-  function openOnline() {
-    setShowStartScreen(false);
-    setShowOnline(true);
-  }
-
-  function closeOnline() {
-    setShowOnline(false);
-    resetAllToMainMenu();
-  }
-
   function startRandomMatch() {
-    setShowOnline(false);
     startRemoteDuel();
   }
 
@@ -6195,13 +6755,15 @@ export default function Pong3D() {
     setShowStartScreen(false);
     // Reset score tracking before starting a new remote game
     prevScore.current = { left: 0, right: 0 };
-    gameApi?.startRemote2P();
+    gameApi?.startRemote2P(undefined, () => {
+      setShowRemoteSetup(true);
+      setDefaultMode(true);
+    });
     // Reset UI scores before the server sends the initial state
     setScoreLeft(0);
     setScoreRight(0);
     setLeftLabel("YOU");
     setRightLabel("OPPONENT");
-    setRemoteWaiting(true);
     setRemoteCountdown(null);
   }
 
@@ -6280,17 +6842,43 @@ export default function Pong3D() {
     };
   }, [showBracket, tournamentEnded]);
 
+  // Prevent spacebar from unpausing while settings menu is open
+  useEffect(() => {
+    if (!showSettings) return;
+
+    function blockSpace(e: KeyboardEvent) {
+      if (e.code !== "Space") return;
+      const target = e.target as HTMLElement;
+      // Keep form controls functional but block propagation
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLButtonElement
+      ) {
+        e.stopPropagation();
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    window.addEventListener("keydown", blockSpace, true);
+    return () => {
+      window.removeEventListener("keydown", blockSpace, true);
+    };
+  }, [showSettings]);
+
   // Unpause on any key when waiting to start
-    useEffect(() => {
-      if (!waitingStart) return;
-      if (gameApi?.__state?.currentMode === GameMode.Remote2P) return;
+  useEffect(() => {
+    if (!waitingStart || showSettings) return;
+    if (gameApi?.__state?.currentMode === GameMode.Remote2P) return;
     function handleStart() {
       setWaitingStart(false);
       gameApi?.unpause?.();
     }
     window.addEventListener("keydown", handleStart, { once: true });
     return () => window.removeEventListener("keydown", handleStart);
-  }, [waitingStart, gameApi]);
+  }, [waitingStart, showSettings, gameApi]);
 
   useEffect(() => {
     return () => {
@@ -6324,19 +6912,110 @@ export default function Pong3D() {
         rightLabel={rightLabel}
         scoreLeft={scoreLeft}
         scoreRight={scoreRight}
+        leftPowerUp={activeLeft}
+        rightPowerUp={activeRight}
       />
+      {powerUpsEnabled && (
+        <>
+          <PowerUpBar
+            side="left"
+            onSelect={(t) => gameApi?.usePowerUp?.('left', { type: t })}
+            active={activeLeft}
+            disabled={
+              gameApi?.__state?.currentMode === GameMode.Remote2P &&
+              gameApi?.__state?.playerSide === 'right'
+            }
+          />
+          <PowerUpBar
+            side="right"
+            onSelect={(t) => gameApi?.usePowerUp?.('right', { type: t })}
+            active={activeRight}
+            disabled={
+              gameApi?.__state?.currentMode === GameMode.AI ||
+              (gameApi?.__state?.currentMode === GameMode.Remote2P &&
+                gameApi?.__state?.playerSide === 'left')
+            }
+          />
+        </>
+      )}
       <GoalBanner visible={showGoal} />
       {/* PAUSE overlay */}
-      {isPaused && !showMenu && <PauseOverlay waitingStart={waitingStart} />}
+      {isPaused && !showMenu && !showSettings && (
+        <PauseOverlay
+          waitingStart={waitingStart}
+          onSettings={waitingStart ? () => setShowSettings(true) : undefined}
+        />
+      )}
       {/* Remote status overlay */}
-      {(remoteWaiting || remoteCountdown !== null) && (
-        <RemoteStatusOverlay waiting={remoteWaiting} countdown={remoteCountdown} />
+      {(remoteStatus !== 'none' || remoteCountdown !== null) && !showSettings && (
+        <RemoteStatusOverlay
+          waiting={remoteStatus === 'waiting'}
+          preparing={remoteStatus === 'preparing'}
+          countdown={remoteCountdown}
+        />
       )}
       {remoteError && (
         <RemoteErrorOverlay
           onExit={() => {
             setRemoteError(false);
             navigate('/profile');
+          }}
+        />
+      )}
+      {showRemoteSetup && (
+        <RemoteSetupOverlay
+          defaultMode={defaultMode}
+          powerUps={powerUpsEnabled}
+          ballSpeed={ballSpeed}
+          ballSize={ballSize}
+          winningScore={winningScore}
+          sound={soundOn}
+          leftColor={leftColor}
+          rightColor={rightColor}
+          onDefaultModeChange={(v) => setDefaultMode(v)}
+          onPowerUpsChange={(v) => {
+            setPowerUpsEnabled(v);
+            gameApi?.setPowerUpsEnabled?.(v);
+          }}
+          onBallSpeedChange={(v) => setBallSpeed(v)}
+          onBallSizeChange={(v) => setBallSize(v)}
+          onWinningScoreChange={(v) => setWinningScore(v)}
+          onLeftColorChange={(c) => setLeftColor(c)}
+          onRightColorChange={(c) => setRightColor(c)}
+          onSoundChange={(v) => setSoundOn(v)}
+          onConfirm={() => {
+            if (defaultMode) {
+              setPowerUpsEnabled(false);
+              setBallSpeed(BALL_SPEED);
+              setBallSize(BALL_SIZE);
+              setWinningScore(WINNING_SCORE);
+              setSoundOn(true);
+              setLeftColor('#cc33cc');
+              setRightColor('#33ccaa');
+              gameApi?.setPowerUpsEnabled?.(false);
+              gameApi?.setBallSpeed?.(BALL_SPEED);
+              gameApi?.setBallSize?.(BALL_SIZE);
+              gameApi?.setWinningScore?.(WINNING_SCORE);
+              gameApi?.setPaddleColor?.('left', '#cc33cc');
+              gameApi?.setPaddleColor?.('right', '#33ccaa');
+              gameApi?.setSoundEnabled?.(true);
+            }
+            const settings = {
+              powerUps: powerUpsEnabled,
+              ballSpeed,
+              ballSize,
+              winningScore,
+              sound: soundOn,
+              leftColor,
+              rightColor,
+            };
+            try {
+              gameApi?.__state?.ws?.send(
+                JSON.stringify({ type: 'settings', settings }),
+              );
+            } catch {}
+            gameApi?.__state?.onRemoteWaitingChange?.('waiting');
+            setShowRemoteSetup(false);
           }}
         />
       )}
@@ -6347,6 +7026,33 @@ export default function Pong3D() {
           menuIndex={menuIndex}
           setMenuIndex={setMenuIndex}
           onMenuAction={menuAction}
+        />
+      )}
+      {showSettings && (
+        <SettingsOverlay
+          powerUps={powerUpsEnabled}
+          ballSpeed={ballSpeed}
+          ballSize={ballSize}
+          winningScore={winningScore}
+          sound={soundOn}
+          leftColor={leftColor}
+          rightColor={rightColor}
+          onPowerUpsChange={(v) => {
+            setPowerUpsEnabled(v);
+            gameApi?.setPowerUpsEnabled?.(v);
+          }}
+          onBallSpeedChange={(v) => setBallSpeed(v)}
+          onBallSizeChange={(v) => setBallSize(v)}
+          onWinningScoreChange={(v) => setWinningScore(v)}
+          onLeftColorChange={(c) => setLeftColor(c)}
+          onRightColorChange={
+            gameApi?.__state?.currentMode === GameMode.Local2P ||
+            gameApi?.__state?.currentMode === GameMode.Tournament
+              ? (c) => setRightColor(c)
+              : undefined
+          }
+          onSoundChange={(v) => setSoundOn(v)}
+          onClose={() => setShowSettings(false)}
         />
       )}
       {/* BRACKET Overlay */}
@@ -6407,18 +7113,10 @@ export default function Pong3D() {
           onSingleAI={startAI}
           onLocal2P={startLocal}
           onTournament={openTournament}
-          onOnlinePlay={openOnline}
-          onClose={() => {
-            setShowStartScreen(false);
-            setShowMenu(true);
-          }}
-        />
-      )}
-      {/* ONLINE PLAY */}
-      {showOnline && (
-        <OnlinePlayOverlay
-          onClose={closeOnline}
           onRandomMatch={startRandomMatch}
+          onClose={() => {
+            navigate('/profile');
+          }}
         />
       )}
       {/* TOURNAMENT SETUP */}
@@ -6443,6 +7141,191 @@ export default function Pong3D() {
     </div>
   );
 }
+
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/ai.ts
+
+// client/src/pong/ai.ts
+import type { GameState } from "./pong";
+import type { SceneObjects } from "./scene";
+import { clamp, dispatchKey } from "./utils";
+import { predictImpactZ } from "./physics";
+import {
+  PowerUpType,
+  POWER_UPS,
+  activatePowerUp,
+} from "./powerups";
+
+export const AI_KEYS = {
+  up: 'w',
+  down: 's',
+} as const;
+
+export interface BotBehavior {
+  overshoot?: number;
+  center?: number;
+}
+
+export function calcTargetZ(
+  prevX: number,
+  prevZ: number,
+  dx: number,
+  dz: number,
+  elapsed: number,
+  fieldWidth: number,
+  limit: number,
+) {
+  if (elapsed <= 0) {
+    return prevZ;
+  }
+
+  const leftX = -fieldWidth + 1.5;
+  const rightX = fieldWidth - 1.5;
+  let x = prevX;
+  let z = prevZ;
+  let vx = dx / elapsed;
+  const vz = dz / elapsed;
+
+  while ((rightX - x) / vx < 0) {
+    const target = vx < 0 ? leftX : rightX;
+    z = predictImpactZ(x, z, vx, vz, target, limit);
+    x = target;
+    vx *= -1;
+  }
+
+  return predictImpactZ(x, z, vx, vz, rightX, limit);
+}
+
+
+export function updateAI(state: GameState, objs: SceneObjects, dt: number) {
+  const { rightPaddle, ball } = objs;
+  const dramaMode = state.bot?.name === "Drama Bot";
+  const behavior: BotBehavior = {
+    center: state.bot?.center,
+    overshoot: state.bot?.overshoot,
+  };
+
+  if (
+    !state.powerUps.active.right &&
+    state.match.aiScore <= state.match.playerScore &&
+    state.powerUpsEnabled &&
+    Math.abs(ball.position.x) > state.physics.FIELD_WIDTH / 4
+  ) {
+    const scoreDiff = state.match.playerScore - state.match.aiScore;
+    const chance = scoreDiff >= 2 ? 1 : scoreDiff > 0 ? 0.75 : 0.5;
+    if (Math.random() < chance) {
+      const offensive = state.input.ballDX < 0;
+      const favorite = state.bot?.favorite;
+      const favChance = 0.7;
+      let pu;
+      if (state.powerUps.available.length > 0) {
+        let idx = state.powerUps.available.findIndex((p) =>
+          offensive
+            ? p.type === PowerUpType.PowerShot
+            : p.type !== PowerUpType.PowerShot,
+        );
+        if (
+          favorite &&
+          Math.random() < favChance &&
+          state.powerUps.available.some((p) => p.type === favorite)
+        ) {
+          idx = state.powerUps.available.findIndex((p) => p.type === favorite);
+        }
+        const useIdx = idx === -1 ? 0 : idx;
+        pu = state.powerUps.available.splice(useIdx, 1)[0];
+      } else {
+        const types = offensive
+          ? [PowerUpType.PowerShot]
+          : [PowerUpType.Speed, PowerUpType.MegaPaddle];
+        let type: PowerUpType;
+        if (
+          favorite &&
+          types.includes(favorite) &&
+          Math.random() < favChance
+        ) {
+          type = favorite;
+        } else {
+          type = types[Math.floor(Math.random() * types.length)];
+        }
+        pu = { type, duration: POWER_UPS[type].defaultDuration };
+      }
+      activatePowerUp(state, 'right', pu);
+    }
+  }
+
+  if (dramaMode) state.input.dramaPhase += dt;
+  state.input.aiTimer += dt;
+  if (state.input.aiTimer >= state.physics.AI_REACTION) {
+    const elapsed = state.input.aiTimer;
+    state.input.aiTimer = 0;
+
+    const prevX = state.input.aiPrevBallX;
+    const prevZ = state.input.aiPrevBallZ;
+    const dx = ball.position.x - prevX;
+    const dz = ball.position.z - prevZ;
+
+    state.input.aiPrevBallX = ball.position.x;
+    state.input.aiPrevBallZ = ball.position.z;
+
+    const limit = state.physics.FIELD_HEIGHT - 0.5;
+
+    let predicted: number;
+
+    if (dx > 0) {
+      predicted = calcTargetZ(
+        prevX,
+        prevZ,
+        dx,
+        dz,
+        elapsed,
+        state.physics.FIELD_WIDTH,
+        limit,
+      );
+
+      if (behavior.center) {
+        const targetX = state.physics.FIELD_WIDTH - 1.5;
+        const timeToImpact = (targetX - prevX) / (dx / elapsed);
+        const adjust =
+          behavior.center *
+          Math.max(1 - timeToImpact / state.physics.AI_REACTION, 0);
+        predicted += adjust * Math.sign(predicted - rightPaddle.position.z);
+      }
+
+      if (behavior.overshoot) {
+        predicted +=
+          behavior.overshoot * Math.sign(predicted - rightPaddle.position.z);
+        predicted = clamp(predicted, -limit, limit);
+      }
+    } else {
+      predicted = 0; // return to center when ball moving away
+    }
+
+    let target = predicted + (Math.random() - 0.5) * state.physics.AI_ERROR;
+    state.input.aiTargetZ = target;
+  }
+  let targetZ = state.input.aiTargetZ;
+  if (dramaMode) {
+    const limit = state.physics.FIELD_HEIGHT - 0.5;
+    const osc = Math.sin(state.input.dramaPhase * 8) * 1;
+    targetZ = clamp(targetZ + osc, -limit, limit);
+    state.input.aiTargetZ = targetZ;
+  }
+  const diff = targetZ - rightPaddle.position.z;
+  if (Math.abs(diff) > 0.4) {
+    const up = diff > 0;
+    const key = up ? AI_KEYS.up : AI_KEYS.down;
+    const other = up ? AI_KEYS.down : AI_KEYS.up;
+    dispatchKey(state, other, 'up');
+    dispatchKey(state, key, 'down');
+  } else {
+    dispatchKey(state, AI_KEYS.up, 'up');
+    dispatchKey(state, AI_KEYS.down, 'up');
+  }
+}
+
+
 
 
 
@@ -6540,8 +7423,11 @@ import type {
   StateMessage,
   EndMessage,
   ServerMessage,
+  RemoteSettings,
 } from "../../../shared/messages.js";
 import { MessageTypes } from "../../../shared/messages.js";
+import * as BABYLON from "@babylonjs/core";
+import { setSoundEnabled } from "./sound";
 import type { SceneObjects } from "./scene";
 import { spawnBall } from "./physics";
 import type { GameState } from "./pong";
@@ -6553,12 +7439,14 @@ export function connect(
   state: GameState,
   url: string,
   objs: SceneObjects,
+  onHost?: () => void,
 ): () => void {
   const ws = new WebSocket(url);
   state.ws = ws;
   let receivedInit = false;
   let countdownInterval: ReturnType<typeof setInterval> | null = null;
   let cleaned = false;
+  let hostTimer: ReturnType<typeof setTimeout> | null = null;
 
   const clearCountdown = () => {
     if (countdownInterval) {
@@ -6575,6 +7463,10 @@ export function connect(
 
   const handleInitMessage = (msg: InitMessage) => {
     receivedInit = true;
+    if (hostTimer) {
+      clearTimeout(hostTimer);
+      hostTimer = null;
+    }
     clearCountdown();
     state.playerSide = msg.side;
     if (msg.leftName && msg.rightName) {
@@ -6582,7 +7474,22 @@ export function connect(
       state.match.rightName = msg.rightName;
       state.onPlayersUpdate?.(msg.leftName, msg.rightName);
     }
-    state.onRemoteWaitingChange?.(false);
+    if (msg.settings) {
+      const s = msg.settings as RemoteSettings;
+      state.powerUpsEnabled = s.powerUps;
+      state.physics.BALL_SPEED = s.ballSpeed;
+      state.physics.BALL_SIZE = s.ballSize;
+      state.physics.WINNING_SCORE = s.winningScore;
+      const leftMat =
+        objs.leftPaddle.material as BABYLON.StandardMaterial | undefined;
+      const rightMat =
+        objs.rightPaddle.material as BABYLON.StandardMaterial | undefined;
+      if (leftMat) leftMat.emissiveColor = BABYLON.Color3.FromHexString(s.leftColor);
+      if (rightMat) rightMat.emissiveColor = BABYLON.Color3.FromHexString(s.rightColor);
+      setSoundEnabled(s.sound);
+      state.onRemoteSettings?.(s);
+    }
+    state.onRemoteWaitingChange?.(null);
 
     const serverTime =
       typeof msg.serverTime === 'number' ? msg.serverTime : Date.now();
@@ -6599,7 +7506,7 @@ export function connect(
       } else {
         clearCountdown();
         state.onRemoteCountdown?.(0);
-        spawnBall(objs);
+        spawnBall(state, objs);
         state.paused = false;
         state.manualPaused = false;
         state.onPauseChange?.(false);
@@ -6619,7 +7526,17 @@ export function connect(
       state.remotePrevBallDX = 0;
       state.remoteBallDX = 0;
     }
+    const prev = state.remoteState;
     state.remoteState = newState;
+    if (
+      prev?.activeLeft !== newState.activeLeft ||
+      prev?.activeRight !== newState.activeRight
+    ) {
+      state.onPowerUpUpdate?.(
+        (newState.activeLeft as any) ?? null,
+        (newState.activeRight as any) ?? null,
+      );
+    }
   };
 
   const handleEndMessage = (msg: EndMessage) => {
@@ -6647,9 +7564,13 @@ export function connect(
     cleaned = true;
     state.gameStarted = false;
     state.paused = false;
-    state.onRemoteWaitingChange?.(false);
+    state.onRemoteWaitingChange?.(null);
     state.onRemoteCountdown?.(0);
     clearCountdown();
+    if (hostTimer) {
+      clearTimeout(hostTimer);
+      hostTimer = null;
+    }
     removeAllKeyListeners(state);
     if (
       ws.readyState !== WebSocket.CLOSED &&
@@ -6660,7 +7581,11 @@ export function connect(
   };
 
   ws.onopen = () => {
-    state.onRemoteWaitingChange?.(true);
+    hostTimer = setTimeout(() => {
+      if (!receivedInit) {
+        onHost?.();
+      }
+    }, 500);
   };
 
   ws.onmessage = (ev) => {
@@ -6679,6 +7604,10 @@ export function connect(
         break;
       case MessageTypes.END:
         handleEndMessage(msg as EndMessage);
+        break;
+      case MessageTypes.WAIT:
+        receivedInit = true;
+        state.onRemoteWaitingChange?.('preparing');
         break;
     }
   };
@@ -6722,6 +7651,7 @@ export function connect(
 
   return cleanup;
 }
+
 
 
 
@@ -6824,6 +7754,7 @@ export function createScene(
 
   // ball
   const ball = BABYLON.MeshBuilder.CreateSphere("ball", { diameter: 1 }, scene);
+  ball.scaling.set(config.BALL_SIZE, config.BALL_SIZE, config.BALL_SIZE);
   ball.position.set(0, 0.5, 0);
   ball.material = neonMat(scene, 0.8, 0.8, 0.2);
 
@@ -6933,11 +7864,18 @@ export function bigBoom(scene: BABYLON.Scene, pos: BABYLON.Vector3) {
 
 
 
+
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/sound.ts
 
 let ctx: AudioContext | null = null;
+let soundEnabled = true;
+
+export function setSoundEnabled(v: boolean) {
+  soundEnabled = v;
+}
 
 export function playPaddleSound(): void {
+  if (!soundEnabled) return;
   if (typeof window === 'undefined') return;
   if (!ctx) {
     type WindowWithAudio = Window & { webkitAudioContext?: typeof AudioContext };
@@ -6962,6 +7900,137 @@ export function playPaddleSound(): void {
   osc.start();
   osc.stop(ctx.currentTime + 0.3);
 }
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/types.ts
+
+export type Side = 'left' | 'right';
+
+export const SIDES: readonly Side[] = ['left', 'right'] as const;
+
+export interface PhysicsParams {
+  FIELD_WIDTH: number;
+  FIELD_HEIGHT: number;
+  PADDLE_SPEED: number;
+  AI_SPEED: number;
+  AI_REACTION: number;
+  AI_ERROR: number;
+  BALL_SPEED: number;
+  BALL_SIZE: number;
+  WINNING_SCORE: number;
+}
+
+export interface MatchInfo {
+  playerScore: number;
+  aiScore: number;
+  leftName: string;
+  rightName: string;
+  isFinalMatch: boolean;
+}
+
+export interface InputState {
+  playerDzLeft: number;
+  playerDzRight: number;
+  aiTimer: number;
+  aiTargetZ: number;
+  /** Last observed ball X position for AI refresh */
+  aiPrevBallX: number;
+  /** Last observed ball Z position for AI refresh */
+  aiPrevBallZ: number;
+  ballDX: number;
+  ballDZ: number;
+  /** Base speed magnitude for the ball. Used to restore velocity */
+  ballBaseSpeed: number;
+  /** Whether the ball is currently moving at boosted speed */
+  ballPowered: boolean;
+  /** Phase offset for Drama Bot movement oscillation */
+  dramaPhase: number;
+}
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/utils.ts
+
+
+import type { GameState } from './pong';
+
+export function clamp(v: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, v));
+}
+
+export function resetInput(state: GameState) {
+  state.input.playerDzLeft = 0;
+  state.input.playerDzRight = 0;
+}
+
+export function removeAllKeyListeners(state: GameState) {
+  if (state.keyDownHandler) {
+    window.removeEventListener('keydown', state.keyDownHandler);
+    state.keyDownHandler = null;
+  }
+  if (state.keyUpHandler) {
+    window.removeEventListener('keyup', state.keyUpHandler);
+    state.keyUpHandler = null;
+  }
+  resetInput(state);
+}
+
+export interface PaddleKeys {
+  up: string | string[];
+  down: string | string[];
+}
+
+function keyMatch(target: string, keys: string | string[]) {
+  return Array.isArray(keys) ? keys.includes(target) : target === keys;
+}
+
+export function setupKeyListeners(
+  state: GameState,
+  left: PaddleKeys,
+  right?: PaddleKeys,
+) {
+  state.keyDownHandler = (e: KeyboardEvent) => {
+    if (keyMatch(e.key, left.up))
+      state.input.playerDzLeft = state.physics.PADDLE_SPEED;
+    if (keyMatch(e.key, left.down))
+      state.input.playerDzLeft = -state.physics.PADDLE_SPEED;
+
+    if (right) {
+      if (keyMatch(e.key, right.up))
+        state.input.playerDzRight = state.physics.PADDLE_SPEED;
+      if (keyMatch(e.key, right.down))
+        state.input.playerDzRight = -state.physics.PADDLE_SPEED;
+    }
+  };
+
+  state.keyUpHandler = (e: KeyboardEvent) => {
+    if (keyMatch(e.key, left.up) || keyMatch(e.key, left.down))
+      state.input.playerDzLeft = 0;
+
+    if (
+      right &&
+      (keyMatch(e.key, right.up) || keyMatch(e.key, right.down))
+    )
+      state.input.playerDzRight = 0;
+  };
+
+  window.addEventListener('keydown', state.keyDownHandler!);
+  window.addEventListener('keyup', state.keyUpHandler!);
+}
+
+export function dispatchKey(
+  state: GameState,
+  key: string,
+  type: 'down' | 'up',
+) {
+  const handler = type === 'down' ? state.keyDownHandler : state.keyUpHandler;
+  if (handler) {
+    handler(new KeyboardEvent(type === 'down' ? 'keydown' : 'keyup', { key }));
+  }
+}
+
+
 
 
 
@@ -7555,265 +8624,6 @@ export function MatchResultOverlay({
 
 
 
-// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/components/Overlays/OnlinePlayOverlay.css
-
-
-
-.online-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.online-option {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid #00a1ff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.online-option:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0 15px #00a1ff;
-  background: rgba(0, 162, 255, 0.1);
-}
-
-.online-option h3 {
-  font-size: 1.25rem;
-  margin-bottom: 0.5rem;
-  color: #00a1ff;
-}
-
-.online-option p {
-  color: #aaa;
-  font-size: 0.9rem;
-}
-
-.tournament-list {
-  margin-top: 2rem;
-}
-
-.tournament-item {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid #ff00e6;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: all 0.3s ease;
-}
-
-.tournament-item:hover {
-  background: rgba(255, 0, 230, 0.1);
-  transform: translateX(5px);
-}
-
-.tournament-info h4 {
-  color: #ff00e6;
-  margin-bottom: 0.25rem;
-}
-
-.tournament-info p {
-  color: #aaa;
-  font-size: 0.8rem;
-}
-
-.tournament-status {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: bold;
-}
-
-.status-joining {
-  background-color: rgba(0, 255, 0, 0.2);
-  color: #00ff00;
-}
-
-.status-in-progress {
-  background-color: rgba(255, 165, 0, 0.2);
-  color: #ffa500;
-}
-
-.status-finished {
-  background-color: rgba(255, 0, 0, 0.2);
-  color: #ff0000;
-}
-
-
-.player-list {
-  margin-top: 1rem;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.player-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem;
-  border-bottom: 1px solid rgba(0, 162, 255, 0.2);
-}
-
-.player-item:last-child {
-  border-bottom: none;
-}
-
-.player-name {
-  color: #00a1ff;
-}
-
-.player-rating {
-  color: #00ffaa;
-  font-size: 0.8rem;
-}
-
-
-.search-bar {
-  width: 100%;
-  padding: 0.75rem;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid #00a1ff;
-  border-radius: 4px;
-  color: white;
-  margin-bottom: 1rem;
-}
-
-.search-bar::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-
-@media (max-width: 768px) {
-  .online-options {
-    grid-template-columns: 1fr;
-  }
-
-}
-
-
-
-// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/components/Overlays/OnlinePlayOverlay.tsx
-
-import React, { useEffect, useRef, useState } from "react";
-import { OverlayWrapper } from "./OverlayWrapper";
-import { OverlayCard, OverlayHeading } from "./OverlayComponents";
-import { useEscapeKey } from "../../hooks/useEscapeKey";
-import "./OnlinePlayOverlay.css";
-import TabButton from "../../../components/TabButton";
-import { QuickPlayTab } from "./QuickPlayTab";
-import { TournamentsTab } from "./TournamentsTab";
-import { PlayersTab } from "./PlayersTab";
-
-interface OnlinePlayOverlayProps {
-  onClose: () => void;
-  /** Start a random remote duel */
-  onRandomMatch: () => void;
-}
-
-type Tab = "quick" | "tournaments" | "players";
-
-export function OnlinePlayOverlay({ onClose, onRandomMatch }: OnlinePlayOverlayProps) {
-  const tabValues: Tab[] = ["quick", "tournaments", "players"];
-  const [tab, setTab] = useState<Tab>("quick");
-  const [index, setIndex] = useState(0);
-  const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  useEscapeKey(onClose);
-
-  useEffect(() => {
-    btnRefs.current[index]?.focus();
-  }, [index]);
-
-  useEffect(() => {
-    function handleKey(e: KeyboardEvent) {
-      const total = tabValues.length;
-      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-        e.preventDefault();
-        setIndex((i) => (i - 1 + total) % total);
-      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-        e.preventDefault();
-        setIndex((i) => (i + 1) % total);
-      } else if (e.key === "Tab") {
-        e.preventDefault();
-        if (e.shiftKey) setIndex((i) => (i - 1 + total) % total);
-        else setIndex((i) => (i + 1) % total);
-      } else if (e.key === "Enter") {
-        e.preventDefault();
-        setTab(tabValues[index]);
-      }
-    }
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [index, tabValues]);
-
-  return (
-    <OverlayWrapper>
-      <OverlayCard className="w-[90%] max-w-[800px] max-h-[90vh] overflow-y-auto border-[#00a1ff] bg-gradient-to-br from-[#0a0e2a] to-black shadow-[0_0_20px_#00a1ff,0_0_40px_#00a1ff] md:p-8">
-        <button
-          onClick={onClose}
-          aria-label="Close"
-          className="absolute top-2 right-4 text-[#0A7FC9] hover:text-pink-500 text-lg font-bold"
-        >
-          ✕
-        </button>
-        <OverlayHeading className="text-3xl mb-6 text-center text-[#e9f4fb] drop-shadow-[0_0_10px_#00a1ff]">
-          ONLINE PLAY
-        </OverlayHeading>
-
-        <div
-          className="flex mb-6 border-b border-[rgba(0,162,255,0.3)]"
-          role="tablist"
-        >
-          <TabButton
-            ref={(el) => (btnRefs.current[0] = el)}
-            tabIndex={0}
-            onFocus={() => setIndex(0)}
-            onMouseEnter={() => setIndex(0)}
-            value="quick"
-            active={tab === "quick"}
-            onSelect={setTab}
-          >
-            Quick play
-          </TabButton>
-          <TabButton
-            ref={(el) => (btnRefs.current[1] = el)}
-            tabIndex={0}
-            onFocus={() => setIndex(1)}
-            onMouseEnter={() => setIndex(1)}
-            value="tournaments"
-            active={tab === "tournaments"}
-            onSelect={setTab}
-          >
-            Tournaments
-          </TabButton>
-          <TabButton
-            ref={(el) => (btnRefs.current[2] = el)}
-            tabIndex={0}
-            onFocus={() => setIndex(2)}
-            onMouseEnter={() => setIndex(2)}
-            value="players"
-            active={tab === "players"}
-            onSelect={setTab}
-          >
-            Players
-          </TabButton>
-        </div>
-
-        {tab === "quick" && <QuickPlayTab onRandomMatch={onRandomMatch} />}
-        {tab === "tournaments" && <TournamentsTab />}
-        {tab === "players" && <PlayersTab onClose={onClose} />}
-      </OverlayCard>
-    </OverlayWrapper>
-  );
-}
-
-
 
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/components/Overlays/OverlayComponents.tsx
 
@@ -7881,19 +8691,7 @@ const outlineColorClasses: Record<string, string> = {
   `,
 };
 
-/**
- * OverlayButton
- *
- * A stylized button component for overlays with color variants.
- *
- * Props:
- * - color: "magenta" | "blue" | "green" (optional) — defines button theme. Defaults to "magenta".
- * - className: (optional) — append custom classes if needed.
- *
- * Example usage:
- * <OverlayButton>Play again</OverlayButton>         // magenta (default)
- * <OverlayButton color="blue">Close</OverlayButton> // blue themed
- */
+
 export function OverlayButton({
   children,
   className = "",
@@ -7905,8 +8703,7 @@ export function OverlayButton({
       type="button"
       {...rest}
       className={`
-        mt-2 px-6 py-2 rounded-xl border-2  lg:px-6 lg:py-2 md:px-6 md:py-2  xl:py-3 xl:px-6
-              text-md sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl
+        mt-2 px-6 py-2 rounded-xl border-2
         ${colorClasses[color] || ""}
         ${className}
       `}
@@ -7916,14 +8713,7 @@ export function OverlayButton({
   );
 }
 
-/**
- * overlayOutlineClass
- *
- * Returns Tailwind classes for a neon border around any element.
- *
- * Example usage:
- * <div className={overlayOutlineClass("blue")}>...</div>
- */
+
 export function overlayOutlineClass(
   color: "magenta" | "blue" | "green" = "magenta"
 ) {
@@ -8001,16 +8791,26 @@ import { OverlayWrapper } from "./OverlayWrapper";
 
 interface PauseOverlayProps {
   waitingStart: boolean;
+  onSettings?: () => void;
 }
 
-export function PauseOverlay({ waitingStart }: PauseOverlayProps) {
+export function PauseOverlay({ waitingStart, onSettings }: PauseOverlayProps) {
   return (
     <OverlayWrapper>
+      {onSettings && waitingStart && (
+        <button
+          onClick={onSettings}
+
+          className="absolute top-4 right-4 text-[#0A7FC9] hover:text-cyan-200 text-4xl"
+          aria-label="Settings"
+        >
+          <i className="fa-solid fa-gear text-shadow-[0_0_15px_rgba(0,255,255,0.7)]" />
+
+        </button>
+      )}
       {waitingStart ? (
-        <div className="space-y-4 text-center">
-          <div
-            className="text-4xl font-bold text-cyan-300 text-shadow-[0_0_4px_rgba(0,255,255,0.6)]"
-          >
+        <div className="space-y-4 text-center relative">
+          <div className="text-4xl font-bold text-cyan-300 text-shadow-[0_0_4px_rgba(0,255,255,0.6)]">
             Press any key to start
           </div>
           <div className="text-lg text-white">
@@ -8021,9 +8821,7 @@ export function PauseOverlay({ waitingStart }: PauseOverlayProps) {
           </div>
         </div>
       ) : (
-        <div
-          className="text-4xl font-bold text-cyan-300 text-shadow-[0_0_4px_rgba(0,255,255,0.6)]"
-        >
+        <div className="text-4xl font-bold text-cyan-300 text-shadow-[0_0_4px_rgba(0,255,255,0.6)]">
           PAUSED
         </div>
       )}
@@ -8033,132 +8831,301 @@ export function PauseOverlay({ waitingStart }: PauseOverlayProps) {
 
 
 
-// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/components/Overlays/PlayersTab.tsx
-
-import React, { useState, useMemo } from "react";
-import { OverlayButton } from "./OverlayComponents";
-import { useEscapeKey } from "../../hooks/useEscapeKey";
-import { usePlayers } from "../../hooks/usePlayers";
-
-interface PlayersTabProps {
-  onClose: () => void;
-}
-
-const SEARCH_INVALID_REGEX = /[^a-zA-Z0-9 _-]/g;
-const MAX_SEARCH_LENGTH = 20;
-
-export function PlayersTab({ onClose }: PlayersTabProps) {
-  const { players, loading, error } = usePlayers();
-  const [search, setSearch] = useState("");
-  const [tooLong, setTooLong] = useState(false);
-
-  useEscapeKey(onClose);
-
-  function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
-    let value = e.target.value.replace(SEARCH_INVALID_REGEX, "");
-    if (value.length > MAX_SEARCH_LENGTH) {
-      value = value.slice(0, MAX_SEARCH_LENGTH);
-      setTooLong(true);
-    } else {
-      setTooLong(false);
-    }
-    setSearch(value);
-  }
-
-  const normalized = search.trim().toLowerCase();
-  const filtered = useMemo(() => {
-    if (!normalized) {
-      return players;
-    }
-
-    const priority = (name: string) => {
-      if (name === normalized) return 0;
-      if (name.startsWith(normalized)) return 1;
-      return 2;
-    };
-
-    return players
-      .filter((p) => p.username.toLowerCase().includes(normalized))
-      .sort((a, b) => {
-        const aName = a.username.toLowerCase();
-        const bName = b.username.toLowerCase();
-        const diff = priority(aName) - priority(bName);
-        return diff !== 0 ? diff : aName.localeCompare(bName);
-      });
-  }, [players, normalized]);
-
-  return (
-    <div>
-      <h3 className="text-xl mb-4 text-center text-cyan-400">ONLINE PLAYERS</h3>
-      <input
-        type="text"
-        placeholder="Search for players..."
-        className="search-bar"
-        value={search}
-        onChange={handleSearchChange}
-        maxLength={MAX_SEARCH_LENGTH}
-      />
-      {tooLong && (
-        <p className="text-yellow-300 text-sm mb-1 text-center">
-          Query too long (max {MAX_SEARCH_LENGTH} characters)
-        </p>
-      )}
-      {loading && <p className="text-center text-cyan-300">Loading players...</p>}
-      {error && <p className="text-center text-red-500">{error}</p>}
-      {!loading && !error && (
-        <ul className="player-list">
-          {filtered.length === 0 && search.trim() !== "" ? (
-            <li className="text-center text-red-500">Nobody online with that name</li>
-          ) : (
-            filtered.map((p) => {
-              const games = p.wins + p.losses;
-              const winRate = games ? Math.round((p.wins / games) * 100) : 0;
-              return (
-                <li key={p.username} className="player-item">
-                  <div>
-                    <span className="player-name">{p.username}</span>
-                    <span className="player-rating ml-2">
-                      {games} games • {winRate}% win rate
-                    </span>
-                  </div>
-                  <OverlayButton color="green" className="mt-0 px-3 py-1 text-xs">
-                    CHALLENGE
-                  </OverlayButton>
-                </li>
-              );
-            })
-          )}
-        </ul>
-      )}
-    </div>
-  );
-}
-
-
-// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/components/Overlays/QuickPlayTab.tsx
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/components/Overlays/RemoteSetupOverlay.tsx
 
 import React from "react";
+import { OverlayWrapper } from "./OverlayWrapper";
+import {
+  OverlayCard,
+  OverlayHeading,
+  OverlayButton,
+  OverlayText,
+} from "./OverlayComponents";
+import { useEscapeKey } from "../../hooks/useEscapeKey";
 
-interface QuickPlayTabProps {
-  onRandomMatch: () => void;
+interface RemoteSetupOverlayProps {
+  defaultMode: boolean;
+  powerUps: boolean;
+  ballSpeed: number;
+  ballSize: number;
+  winningScore: number;
+  sound: boolean;
+  leftColor: string;
+  rightColor: string;
+  onDefaultModeChange: (v: boolean) => void;
+  onPowerUpsChange: (v: boolean) => void;
+  onBallSpeedChange: (v: number) => void;
+  onBallSizeChange: (v: number) => void;
+  onWinningScoreChange: (v: number) => void;
+  onLeftColorChange: (v: string) => void;
+  onRightColorChange: (v: string) => void;
+  onSoundChange: (v: boolean) => void;
+  onConfirm: () => void;
 }
 
-export function QuickPlayTab({ onRandomMatch }: QuickPlayTabProps) {
+export function RemoteSetupOverlay({
+  defaultMode,
+  powerUps,
+  ballSpeed,
+  ballSize,
+  winningScore,
+  sound,
+  leftColor,
+  rightColor,
+  onDefaultModeChange,
+  onPowerUpsChange,
+  onBallSpeedChange,
+  onBallSizeChange,
+  onWinningScoreChange,
+  onLeftColorChange,
+  onRightColorChange,
+  onSoundChange,
+  onConfirm,
+}: RemoteSetupOverlayProps) {
+  useEscapeKey(onConfirm);
   return (
-    <div>
-      <div className="online-options">
-        <button
-          type="button"
-          className="online-option"
-          onClick={onRandomMatch}
-        >
-          <h3>Random match</h3>
-          <p>Find a random opponent online</p>
-        </button>
-      </div>
-    </div>
+    <OverlayWrapper>
+      <OverlayCard>
+        <OverlayHeading className="text-2xl">
+          You are creating a match
+        </OverlayHeading>
+        <OverlayText>Choose the desired settings</OverlayText>
+        <OverlayText>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={defaultMode}
+              onChange={(e) => onDefaultModeChange(e.target.checked)}
+            />
+            Default mode
+          </label>
+        </OverlayText>
+        {!defaultMode && (
+          <>
+            <OverlayText>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={powerUps}
+                  onChange={(e) => onPowerUpsChange(e.target.checked)}
+                />
+                Power-ups
+              </label>
+            </OverlayText>
+            <OverlayText>
+              <label className="flex items-center gap-2">
+                Ball speed
+                <input
+                  type="range"
+                  min="0.1"
+                  max="0.5"
+                  step="0.05"
+                  value={ballSpeed}
+                  onChange={(e) => onBallSpeedChange(Number(e.target.value))}
+                />
+              </label>
+            </OverlayText>
+            <OverlayText>
+              <label className="flex items-center gap-2">
+                Ball size
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2"
+                  step="0.1"
+                  value={ballSize}
+                  onChange={(e) => onBallSizeChange(Number(e.target.value))}
+                />
+              </label>
+            </OverlayText>
+            <OverlayText>
+              <label className="flex items-center gap-2">
+                Winning score
+                <input
+                  className="text-blue-800 px-2"
+                  type="number"
+                  min="1"
+                  max="20"
+                  step="1"
+                  value={winningScore}
+                  onChange={(e) => onWinningScoreChange(Number(e.target.value))}
+                  onKeyDown={(e) => {
+                    const allowed = ["ArrowUp", "ArrowDown", "Tab"];
+                    if (!allowed.includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+              </label>
+            </OverlayText>
+            <OverlayText>
+              <label className="flex items-center gap-2">
+                Paddle color
+                <input
+                  type="color"
+                  value={leftColor}
+                  onChange={(e) => onLeftColorChange(e.target.value)}
+                />
+              </label>
+            </OverlayText>
+            <OverlayText>
+              <label className="flex items-center gap-2">
+                Opponent color
+                <input
+                  type="color"
+                  value={rightColor}
+                  onChange={(e) => onRightColorChange(e.target.value)}
+                />
+              </label>
+            </OverlayText>
+            <OverlayText>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={!sound}
+                  onChange={(e) => onSoundChange(!e.target.checked)}
+                />
+                Mute
+              </label>
+            </OverlayText>
+          </>
+        )}
+        <OverlayButton onClick={onConfirm}>Start waiting</OverlayButton>
+      </OverlayCard>
+    </OverlayWrapper>
   );
 }
+
+
+
+
+
+// // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/components/Overlays/PlayersTab.tsx
+
+// import React, { useState, useMemo } from "react";
+// import { OverlayButton } from "./OverlayComponents";
+// import { useEscapeKey } from "../../hooks/useEscapeKey";
+// import { usePlayers } from "../../hooks/usePlayers";
+
+// interface PlayersTabProps {
+//   onClose: () => void;
+// }
+
+// const SEARCH_INVALID_REGEX = /[^a-zA-Z0-9 _-]/g;
+// const MAX_SEARCH_LENGTH = 20;
+
+// export function PlayersTab({ onClose }: PlayersTabProps) {
+//   const { players, loading, error } = usePlayers();
+//   const [search, setSearch] = useState("");
+//   const [tooLong, setTooLong] = useState(false);
+
+//   useEscapeKey(onClose);
+
+//   function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
+//     let value = e.target.value.replace(SEARCH_INVALID_REGEX, "");
+//     if (value.length > MAX_SEARCH_LENGTH) {
+//       value = value.slice(0, MAX_SEARCH_LENGTH);
+//       setTooLong(true);
+//     } else {
+//       setTooLong(false);
+//     }
+//     setSearch(value);
+//   }
+
+//   const normalized = search.trim().toLowerCase();
+//   const filtered = useMemo(() => {
+//     if (!normalized) {
+//       return players;
+//     }
+
+//     const priority = (name: string) => {
+//       if (name === normalized) return 0;
+//       if (name.startsWith(normalized)) return 1;
+//       return 2;
+//     };
+
+//     return players
+//       .filter((p) => p.username.toLowerCase().includes(normalized))
+//       .sort((a, b) => {
+//         const aName = a.username.toLowerCase();
+//         const bName = b.username.toLowerCase();
+//         const diff = priority(aName) - priority(bName);
+//         return diff !== 0 ? diff : aName.localeCompare(bName);
+//       });
+//   }, [players, normalized]);
+
+//   return (
+//     <div>
+//       <h3 className="text-xl mb-4 text-center text-cyan-400">ONLINE PLAYERS</h3>
+//       <input
+//         type="text"
+//         placeholder="Search for players..."
+//         className="search-bar"
+//         value={search}
+//         onChange={handleSearchChange}
+//         maxLength={MAX_SEARCH_LENGTH}
+//       />
+//       {tooLong && (
+//         <p className="text-yellow-300 text-sm mb-1 text-center">
+//           Query too long (max {MAX_SEARCH_LENGTH} characters)
+//         </p>
+//       )}
+//       {loading && <p className="text-center text-cyan-300">Loading players...</p>}
+//       {error && <p className="text-center text-red-500">{error}</p>}
+//       {!loading && !error && (
+//         <ul className="player-list">
+//           {filtered.length === 0 && search.trim() !== "" ? (
+//             <li className="text-center text-red-500">Nobody online with that name</li>
+//           ) : (
+//             filtered.map((p) => {
+//               const games = p.wins + p.losses;
+//               const winRate = games ? Math.round((p.wins / games) * 100) : 0;
+//               return (
+//                 <li key={p.username} className="player-item">
+//                   <div>
+//                     <span className="player-name">{p.username}</span>
+//                     <span className="player-rating ml-2">
+//                       {games} games • {winRate}% win rate
+//                     </span>
+//                   </div>
+//                   <OverlayButton color="green" className="mt-0 px-3 py-1 text-xs">
+//                     CHALLENGE
+//                   </OverlayButton>
+//                 </li>
+//               );
+//             })
+//           )}
+//         </ul>
+//       )}
+//     </div>
+//   );
+// }
+
+
+// // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/components/Overlays/QuickPlayTab.tsx
+
+// import React from "react";
+
+// interface QuickPlayTabProps {
+//   onRandomMatch: () => void;
+// }
+
+// export function QuickPlayTab({ onRandomMatch }: QuickPlayTabProps) {
+//   return (
+//     <div>
+//       <div className="online-options">
+//         <button
+//           type="button"
+//           className="online-option"
+//           onClick={onRandomMatch}
+//         >
+//           <h3>Random match</h3>
+//           <p>Find a random opponent online</p>
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
 
 
 
@@ -8202,11 +9169,18 @@ import { OverlayCard, OverlayHeading, OverlayText } from "./OverlayComponents";
 interface RemoteStatusOverlayProps {
   waiting: boolean;
   countdown: number | null;
+  preparing?: boolean;
 }
 
-export function RemoteStatusOverlay({ waiting, countdown }: RemoteStatusOverlayProps) {
+export function RemoteStatusOverlay({ waiting, countdown, preparing }: RemoteStatusOverlayProps) {
   let heading: React.ReactNode = null;
-  if (waiting) {
+  if (preparing) {
+    heading = (
+      <OverlayHeading className="text-2xl">
+        Please wait while your opponent prepares the match...
+      </OverlayHeading>
+    );
+  } else if (waiting) {
     heading = (
       <OverlayHeading className="text-2xl">Waiting for opponent...</OverlayHeading>
     );
@@ -8229,91 +9203,239 @@ export function RemoteStatusOverlay({ waiting, countdown }: RemoteStatusOverlayP
 }
 
 
-
-// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/components/Overlays/TournamentsTab.tsx
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/components/Overlays/SettingsOverlay.tsx
 
 import React from "react";
-import { OverlayButton } from "./OverlayComponents";
+import { OverlayWrapper } from "./OverlayWrapper";
+import {
+  OverlayCard,
+  OverlayHeading,
+  OverlayButton,
+  OverlayText,
+} from "./OverlayComponents";
+import { useEscapeKey } from "../../hooks/useEscapeKey";
 
-interface TournamentInfo {
-  title: string;
-  info: string;
-  status: "JOINING" | "IN PROGRESS" | "FINISHED";
-  button: string;
-  color: "magenta" | "blue" | "green";
-  disabled?: boolean;
+interface SettingsOverlayProps {
+  powerUps: boolean;
+  ballSpeed: number;
+  ballSize: number;
+  winningScore: number;
+  sound: boolean;
+  leftColor: string;
+  rightColor?: string;
+  onPowerUpsChange: (v: boolean) => void;
+  onBallSpeedChange: (v: number) => void;
+  onBallSizeChange: (v: number) => void;
+  onWinningScoreChange: (v: number) => void;
+  onLeftColorChange: (v: string) => void;
+  onRightColorChange?: (v: string) => void;
+  onSoundChange: (v: boolean) => void;
+  onClose: () => void;
 }
 
-const tournaments: TournamentInfo[] = [
-  {
-    title: "Git push origin pong",
-    info: "2/8 • Single Elimination • Prize: +50 Rating",
-    status: "JOINING",
-    button: "JOIN",
-    color: "green",
-  },
-  {
-    title: "The Void Cup",
-    info: "3/8 • Single Elimination • Prize: +50 Rating",
-    status: "JOINING",
-    button: "JOIN",
-    color: "green",
-  },
-  {
-    title: "Shlöp Cup 3000",
-    info: "8/8 • Single Elimination • Prize: +150 Rating",
-    status: "IN PROGRESS",
-    button: "WATCH",
-    color: "blue",
-    disabled: true,
-  },
-  {
-    title: "No mercy, just pong",
-    info: "6/8 • Single Elimination • Prize: +100 Rating",
-    status: "FINISHED",
-    button: "VIEW RESULTS",
-    color: "magenta",
-    disabled: true,
-  },
-];
-
-export function TournamentsTab() {
+export function SettingsOverlay({
+  powerUps,
+  ballSpeed,
+  ballSize,
+  winningScore,
+  sound,
+  leftColor,
+  rightColor,
+  onPowerUpsChange,
+  onBallSpeedChange,
+  onBallSizeChange,
+  onWinningScoreChange,
+  onLeftColorChange,
+  onRightColorChange,
+  onSoundChange,
+  onClose,
+}: SettingsOverlayProps) {
+  useEscapeKey(onClose);
   return (
-    <div>
-      <div className="online-option mb-4">
-        <h3>Create tournament</h3>
-        <p>Organize your own competition</p>
-      </div>
-      <h3 className="text-xl mb-4 text-center text-purple-400">
-        ACTIVE TOURNAMENTS
-      </h3>
-      <div className="tournament-list">
-        {tournaments.map((t) => (
-          <div className="tournament-item" key={t.title}>
-            <div className="tournament-info">
-              <h4>{t.title}</h4>
-              <p>{t.info}</p>
-              <span
-                className={`tournament-status status-${t.status
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")}`}
-              >
-                {t.status}
-              </span>
-            </div>
-            <OverlayButton
-              color={t.color}
-              className="mt-0 px-4 py-1 text-sm"
-              disabled={t.disabled}
-            >
-              {t.button}
-            </OverlayButton>
-          </div>
-        ))}
-      </div>
-    </div>
+    <OverlayWrapper onBackdropClick={onClose}>
+      <OverlayCard>
+        <OverlayHeading className="text-2xl">Settings</OverlayHeading>
+        <OverlayText>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={powerUps}
+              onChange={(e) => onPowerUpsChange(e.target.checked)}
+            />
+            Power-ups
+          </label>
+        </OverlayText>
+        <OverlayText>
+          <label className="flex items-center gap-2">
+            Ball speed
+            <input
+              type="range"
+              min="0.1"
+              max="0.5"
+              step="0.05"
+              value={ballSpeed}
+              onChange={(e) => onBallSpeedChange(Number(e.target.value))}
+            />
+          </label>
+        </OverlayText>
+        <OverlayText>
+          <label className="flex items-center gap-2">
+            Ball size
+            <input
+              type="range"
+              min="0.5"
+              max="2"
+              step="0.1"
+              value={ballSize}
+              onChange={(e) => onBallSizeChange(Number(e.target.value))}
+            />
+          </label>
+        </OverlayText>
+        <OverlayText>
+          <label className="flex items-center gap-2">
+            Winning score
+            <input
+              className="text-blue-800 px-2"
+              type="number"
+              min="1"
+              max="20"
+              step="1"
+              value={winningScore}
+              onChange={(e) => onWinningScoreChange(Number(e.target.value))}
+              onKeyDown={(e) => {
+                const allowed = ["ArrowUp", "ArrowDown", "Tab"];
+                if (!allowed.includes(e.key)) {
+                  e.preventDefault();
+                }
+              }}
+            />
+          </label>
+        </OverlayText>
+        <OverlayText>
+          <label className="flex items-center gap-2">
+            Paddle color
+            <input
+              type="color"
+              value={leftColor}
+              onChange={(e) => onLeftColorChange(e.target.value)}
+            />
+          </label>
+        </OverlayText>
+        {onRightColorChange && (
+          <OverlayText>
+            <label className="flex items-center gap-2">
+              Opponent color
+              <input
+                type="color"
+                value={rightColor}
+                onChange={(e) => onRightColorChange(e.target.value)}
+              />
+            </label>
+          </OverlayText>
+        )}
+        <OverlayText>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={!sound}
+              onChange={(e) => onSoundChange(!e.target.checked)}
+            />
+            Mute
+          </label>
+        </OverlayText>
+        <OverlayButton onClick={onClose}>Close</OverlayButton>
+      </OverlayCard>
+    </OverlayWrapper>
   );
 }
+
+
+
+
+// // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/components/Overlays/TournamentsTab.tsx
+
+// import React from "react";
+// import { OverlayButton } from "./OverlayComponents";
+
+// interface TournamentInfo {
+//   title: string;
+//   info: string;
+//   status: "JOINING" | "IN PROGRESS" | "FINISHED";
+//   button: string;
+//   color: "magenta" | "blue" | "green";
+//   disabled?: boolean;
+// }
+
+// const tournaments: TournamentInfo[] = [
+//   {
+//     title: "Git push origin pong",
+//     info: "2/8 • Single Elimination • Prize: +50 Rating",
+//     status: "JOINING",
+//     button: "JOIN",
+//     color: "green",
+//   },
+//   {
+//     title: "The Void Cup",
+//     info: "3/8 • Single Elimination • Prize: +50 Rating",
+//     status: "JOINING",
+//     button: "JOIN",
+//     color: "green",
+//   },
+//   {
+//     title: "Shlöp Cup 3000",
+//     info: "8/8 • Single Elimination • Prize: +150 Rating",
+//     status: "IN PROGRESS",
+//     button: "WATCH",
+//     color: "blue",
+//     disabled: true,
+//   },
+//   {
+//     title: "No mercy, just pong",
+//     info: "6/8 • Single Elimination • Prize: +100 Rating",
+//     status: "FINISHED",
+//     button: "VIEW RESULTS",
+//     color: "magenta",
+//     disabled: true,
+//   },
+// ];
+
+// export function TournamentsTab() {
+//   return (
+//     <div>
+//       <div className="online-option mb-4">
+//         <h3>Create tournament</h3>
+//         <p>Organize your own competition</p>
+//       </div>
+//       <h3 className="text-xl mb-4 text-center text-purple-400">
+//         ACTIVE TOURNAMENTS
+//       </h3>
+//       <div className="tournament-list">
+//         {tournaments.map((t) => (
+//           <div className="tournament-item" key={t.title}>
+//             <div className="tournament-info">
+//               <h4>{t.title}</h4>
+//               <p>{t.info}</p>
+//               <span
+//                 className={`tournament-status status-${t.status
+//                   .toLowerCase()
+//                   .replace(/\s+/g, "-")}`}
+//               >
+//                 {t.status}
+//               </span>
+//             </div>
+//             <OverlayButton
+//               color={t.color}
+//               className="mt-0 px-4 py-1 text-sm"
+//               disabled={t.disabled}
+//             >
+//               {t.button}
+//             </OverlayButton>
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// }
 
 
 
@@ -8492,31 +9614,100 @@ export function GoalBanner({ visible }: GoalBannerProps) {
 
 
 
+// /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/components/PowerUpBar.tsx
+
+import React from 'react';
+import {
+  PowerUpType,
+  POWER_UPS,
+} from '../powerups';
+
+interface PowerUpBarProps {
+  /** Which player's bar this is */
+  side: "left" | "right";
+  onSelect: (type: PowerUpType) => void;
+  active?: PowerUpType | null;
+  disabled?: boolean;
+}
+
+const POWER_UP_LIST: { type: PowerUpType; icon: string }[] = Object.entries(
+  POWER_UPS,
+).map(([type, info]) => ({ type: type as PowerUpType, icon: info.icon }));
+
+export function PowerUpBar({ side, onSelect, active, disabled }: PowerUpBarProps) {
+  const posClass =
+    side === "left"
+      ? "left-1/4 -translate-x-1/2"
+      : "right-1/4 translate-x-1/2";
+  return (
+    <div className={`absolute bottom-16 ${posClass} flex gap-4`}>
+      {POWER_UP_LIST.map((pu) => (
+        <button
+          key={pu.type}
+          onClick={() => onSelect(pu.type)}
+          disabled={disabled}
+          className={`text-3xl ${active === pu.type ? 'text-yellow-300' : 'text-white'} ${disabled ? 'opacity-50 cursor-default' : ''}`}
+          aria-label={POWER_UPS[pu.type].label}
+          title={POWER_UPS[pu.type].label}
+        >
+          {pu.icon}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+
+
+
+
 // /home/ogoman/HIVE/Projects/ft_transcendence/client/src/pong/components/Scoreboard.tsx
 
 import React from "react";
+
+import { PowerUpType, POWER_UPS } from "../powerups";
 
 interface ScoreboardProps {
   leftLabel: string;
   rightLabel: string;
   scoreLeft: number;
   scoreRight: number;
+  leftPowerUp?: PowerUpType | null;
+  rightPowerUp?: PowerUpType | null;
 }
 
-export function Scoreboard({ leftLabel, rightLabel, scoreLeft, scoreRight }: ScoreboardProps) {
+export function Scoreboard({
+  leftLabel,
+  rightLabel,
+  scoreLeft,
+  scoreRight,
+  leftPowerUp,
+  rightPowerUp,
+}: ScoreboardProps) {
+  const icon = (p?: PowerUpType | null) =>
+    p ? (
+      <span role="img" aria-label={POWER_UPS[p].label}>
+        {POWER_UPS[p].icon}
+      </span>
+    ) : null;
   return (
     <div className="absolute left-0 right-0 top-4 flex justify-between px-8">
       <div className="score-container rounded-lg px-6 py-3">
         <h2 className="text-xl text-blue-300">{leftLabel}</h2>
-        <div className="score-glow text-4xl font-bold text-blue-400">{scoreLeft}</div>
+        <div className="score-glow text-4xl font-bold text-blue-400">
+          {scoreLeft} {icon(leftPowerUp)}
+        </div>
       </div>
       <div className="score-container rounded-lg px-6 py-3">
         <h2 className="text-xl text-purple-300">{rightLabel}</h2>
-        <div className="score-glow text-4xl font-bold text-purple-400">{scoreRight}</div>
+        <div className="score-glow text-4xl font-bold text-purple-400">
+          {scoreRight} {icon(rightPowerUp)}
+        </div>
       </div>
     </div>
   );
 }
+
 
 
 
@@ -8777,8 +9968,8 @@ interface StartScreenProps {
   onSingleAI: () => void;
   onLocal2P: () => void;
   onTournament: () => void;
-  /** Open the online play modal */
-  onOnlinePlay: () => void;
+  /** Start a random online match */
+  onRandomMatch: () => void;
   onClose: () => void;
 }
 
@@ -8786,7 +9977,7 @@ export function StartScreen({
   onSingleAI,
   onLocal2P,
   onTournament,
-  onOnlinePlay,
+  onRandomMatch,
   onClose,
 }: StartScreenProps) {
   const [index, setIndex] = useState(0);
@@ -8811,7 +10002,7 @@ export function StartScreen({
         else setIndex((i) => (i + 1) % total);
       } else if (e.key === "Enter") {
         e.preventDefault();
-        [onSingleAI, onLocal2P, onTournament, onOnlinePlay][index]();
+        [onSingleAI, onLocal2P, onTournament, onRandomMatch][index]();
       } else if (e.key === "Escape") {
         e.preventDefault();
         onClose();
@@ -8819,7 +10010,7 @@ export function StartScreen({
     }
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [index, onClose, onSingleAI, onLocal2P, onTournament, onOnlinePlay]);
+  }, [index, onClose, onSingleAI, onLocal2P, onTournament, onRandomMatch]);
   return (
     <SpaceBackground>
       {/* Close button */}
@@ -8994,13 +10185,13 @@ export function StartScreen({
             LOCAL TOURNAMENT
           </button>
 
-          {/* Online play */}
+          {/* Random match */}
           <button
             ref={(el) => (btnRefs.current[3] = el)}
             tabIndex={0}
             onFocus={() => setIndex(3)}
             onMouseEnter={() => setIndex(3)}
-            onClick={onOnlinePlay}
+            onClick={onRandomMatch}
             className={`
               w-full flex items-center justify-center gap-4 whitespace-nowrap
               rounded-xl border-2 border-[#0AC9B7]
@@ -9013,7 +10204,7 @@ export function StartScreen({
             `}
           >
             <i className="fa-solid fa-globe text-xl sm:text-2xl" />
-            PLAY ONLINE
+            RANDOM MATCH
           </button>
         </div>
       </div>
@@ -9023,6 +10214,7 @@ export function StartScreen({
     </SpaceBackground>
   );
 }
+
 
 
 
@@ -10093,7 +11285,8 @@ import Database from "better-sqlite3";
 const db = new Database("./database/database.db");
 
 db.exec(
-  `DELETE FROM challenge WHERE  id < 60
+  `
+   DELETE FROM game WHERE  id = 4;
   ` 
 );
 
@@ -10374,7 +11567,7 @@ export function getBlocked(req, reply) {
 
 // /home/ogoman/HIVE/Projects/ft_transcendence/server/controllers/challenge.js
 
-import db from "../database/database.js";
+import db from '../database/database.js';
 
 export async function challenge(req, reply) {
   const { user_id, username } = req.body;
@@ -10385,7 +11578,7 @@ export async function challenge(req, reply) {
       .get(username);
 
     if (!friends_id) {
-      return reply.code(404).send({ message: "User not found online" });
+      return reply.code(404).send({ message: 'User not found online' });
     }
     const alreadyChallengedBefore = db
       .prepare(`SELECT * FROM challenge WHERE (user_id = ? AND friends_id = ?) OR (friends_id = ? AND user_id = ?)`)
@@ -10396,18 +11589,15 @@ export async function challenge(req, reply) {
         .run(user_id, friends_id.id);
       return reply
         .code(201)
-        .send({ message: "Request sent", request: sendRequest });
+        .send({ message: 'Request sent', request: sendRequest });
     } else {
-      return reply
-        .code(400)
-        .send({
-          message:
-            "Challenge has been called once",
-        });
+      return reply.code(400).send({
+        message: 'Challenge has been called once',
+      });
     }
   } catch (err) {
-    console.error("Database error:", err.message);
-    return reply.code(500).send({ message: "Something went wrong" });
+    console.error('Database error:', err.message);
+    return reply.code(500).send({ message: 'Something went wrong' });
   }
 }
 
@@ -10425,7 +11615,7 @@ export async function notification(req, reply) {
       )
       .all(user_id);
 
-    console.log("notifications =>", notification);
+    console.log('notifications =>', notification);
     const accptedFromPartner = db
       .prepare(
         `SELECT challenge.*, users.username
@@ -10435,7 +11625,9 @@ export async function notification(req, reply) {
       )
       .all(user_id);
 
-      const notAcceptedFromPartner = db.prepare(
+    console.log('RRRR=>', accptedFromPartner);
+    const notAcceptedFromPartner = db
+      .prepare(
         `SELECT challenge.*, users.username
       FROM challenge
       JOIN users ON challenge.user_id = users.id 
@@ -10455,7 +11647,7 @@ export async function notification(req, reply) {
       username: user.partner.username,
     }));
 
-        const notAcceptedUsers = notAcceptedFromPartner.map((ch) => {
+    const notAcceptedUsers = notAcceptedFromPartner.map((ch) => {
       return {
         ...ch,
         partner: db
@@ -10466,8 +11658,7 @@ export async function notification(req, reply) {
     const usernamesNotAccepted = notAcceptedUsers.map((user) => ({
       username: user.partner.username,
     }));
-    console.log("Usernames not accepted", usernamesNotAccepted);
-
+    console.log('Usernames not accepted', usernamesNotAccepted);
 
     //not really neeeded, delete later
     const acceptedSeen = db
@@ -10476,24 +11667,32 @@ export async function notification(req, reply) {
       FROM challenge
       JOIN users ON challenge.friends_id = users.id
       WHERE challenge.user_id = ? AND challenge.confirmReq = 1 AND challenge.ok = 1
-    `)
+    `
+      )
       .all(user_id);
 
-    console.log("SSSSSSSSSSSSS=>", acceptedSeen);
-
     if (notification.length === 0) {
-      console.log("FFFFFFFFFFFFF");
       return reply.code(200).send({
-          message: "No challenge found",notification: [],acceptedUsers,notAcceptedUsers, acceptedSeen, usernames,usernamesNotAccepted});
+        message: 'No challenge found',
+        notification: [],
+        acceptedUsers,
+        notAcceptedUsers,
+        acceptedSeen,
+        usernames,
+        usernamesNotAccepted,
+      });
     } else {
-      return reply.code(200).send({message: "There is request", friends_id: notification.user_id, notification});
+      return reply.code(200).send({
+        message: 'There is request',
+        friends_id: notification.user_id,
+        notification,
+      });
     }
   } catch (err) {
-    console.error("Database error:", err.message);
-    return reply.code(500).send({ message: "Something went wrong" });
+    console.error('Database error:', err.message);
+    return reply.code(500).send({ message: 'Something went wrong' });
   }
 }
-
 
 export async function sawAccept(req, reply) {
   const { user_id, friends_id } = req.body;
@@ -10505,12 +11704,10 @@ export async function sawAccept(req, reply) {
       )
       .run(user_id, friends_id);
 
-    console.log("SSSS=>", sawOk);
-
-    return reply.code(200).send({ message: "Saw ok", sawOk });
+    return reply.code(200).send({ message: 'Saw ok', sawOk });
   } catch (err) {
-    console.error("Database error:", err.message);
-    return reply.code(500).send({ message: "Something went wrong" });
+    console.error('Database error:', err.message);
+    return reply.code(500).send({ message: 'Something went wrong' });
   }
 }
 
@@ -10518,42 +11715,50 @@ export async function sawAccept(req, reply) {
 export async function accept(req, reply) {
   const { user_id, friends_id } = req.body;
 
-  console.log("IIIII=>", user_id)
-
-  console.log("BBBB=>", friends_id)
   try {
     const acceptReq = db
       .prepare(
-        `UPDATE challenge SET confirmReq = 1 WHERE user_id =? AND friends_id =?`
+        `UPDATE challenge SET confirmReq = 1 WHERE user_id = ? AND friends_id = ? RETURNING id`
       )
-      .run(friends_id, user_id);
+      .get(friends_id, user_id);
 
-    return reply.code(201).send({ message: "Accepted", acceptReq });
+    console.log('kkkkkkkkkkkkk =>', acceptReq.id);
+
+    const gameStarts = db
+      .prepare(`INSERT INTO game (challenge_id, date ) VALUES (?,?)`)
+      .run(acceptReq.id, new Date().toISOString());
+
+    return reply
+      .code(201)
+      .send({
+        message: 'Accepted',
+        id:acceptReq,
+        challenge_id: acceptReq.lastInsertRowid,
+      });
   } catch (err) {
-    console.error("Database error:", err.message);
-    return reply.code(500).send({ message: "Something went wrong" });
+    console.error('Database error:', err.message);
+    return reply.code(500).send({ message: 'Something went wrong' });
   }
 }
 
 export async function decline(req, reply) {
   const { user_id, friends_id } = req.body;
 
-    console.log("IIIII=>", user_id)
-
-  console.log("BBBB=>", friends_id)
-  console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
-
   try {
     const declineReq = db
-      .prepare(`UPDATE challenge SET confirmReq = 0 WHERE friends_id = ? AND user_id = ?`)
+      .prepare(
+        `UPDATE challenge SET confirmReq = 0 WHERE friends_id = ? AND user_id = ?`
+      )
       .run(user_id, friends_id);
 
-    return reply.code(200).send({ message: "Deleted", declineReq });
+    return reply.code(200).send({ message: 'Deleted', declineReq });
   } catch (err) {
-    console.error("Database error:", err.message);
-    return reply.code(500).send({ message: "Something went wrong" });
+    console.error('Database error:', err.message);
+    return reply.code(500).send({ message: 'Something went wrong' });
   }
 }
+
+
 
 
 // /home/ogoman/HIVE/Projects/ft_transcendence/server/controllers/favorites.js
@@ -10955,10 +12160,24 @@ export async function uploadPicture(data, reply) {
 
 // /home/ogoman/HIVE/Projects/ft_transcendence/server/controllers/statistics.js
 
-import db from "../database/database.js";
+import db from '../database/database.js';
 
 export async function statisticsAll(request, reply) {
-  const stat = db.prepare(`SELECT id,nickname, wins, losses FROM users`).all();
+  const stat = db
+    .prepare(
+      `SELECT 
+    game.id AS game_id,
+    game.challenge_id,
+    game.win_user_id,
+    winner.name AS winner_name,
+    game.losses_user_id,
+    loser.name AS loser_name,
+    game.date
+  FROM game
+  INNER JOIN users AS winner ON game.win_user_id = winner.id
+  INNER JOIN users AS loser ON game.losses_user_id = loser.id`
+    )
+    .all();
 
   return reply.code(200).send({ stat });
 }
@@ -10968,55 +12187,95 @@ export async function statisticsUser(req, reply) {
 
   try {
     const statUser = db
-      .prepare(`SELECT * FROM users WHERE id = ?`)
-      .get(user_id);
-    console.log("USER STAT =>", statUser.wins);
+      .prepare(
+        `SELECT 
+        users.id,
+        users.wins,
+        users.losses,
+        game.id AS game_id,
+        game.date
+        FROM users
+        LEFT JOIN game
+        ON users.id = game.win_user_id OR users.id = game.losses_user_id
+        WHERE users.id = ?`
+      )
+      .all(user_id);
+    console.log('USER STAT =>', statUser);
 
-    const wins = statUser.wins
-    const losses = statUser.losses
+    // const wins = statUser.wins;
+    // const losses = statUser.losses;
 
-    return reply.code(200).send({ "wins":wins, "losses": losses});
+    return reply.code(200).send({ statUser });
   } catch (err) {
-    console.error("Database error:", err.message);
-    return reply.code(500).send({ message: "Something went wrong" });
+    console.error('Database error:', err.message);
+    return reply.code(500).send({ message: 'Something went wrong' });
   }
 }
 
 export async function win(req, reply) {
-  console.log("WE IN WIN");
+  console.log('WE IN WIN');
 
-  const { user_id } = req.body;
+  const { user_id, challenge_id } = req.body;
 
+  console.log("UUUUUUUUUUUUU=>", challenge_id)
+  console.log("ttttttttt=>", user_id)
   try {
-    const winUser = db.prepare(`SELECT * FROM users WHERE id = ?`).get(user_id);
+    // const challenge_id = challenge_id;
+    const gameEND = db
+      .prepare(
+        `UPDATE game SET win_user_id = ?, date = ? WHERE challenge_id = ? `
+      )
+      .run(user_id, new Date().toISOString(), challenge_id);
+    console.log('JJJJJJ=>', gameEND);
+    if (gameEND.changes !== 0) {
+      const winUser = db
+        .prepare(`SELECT * FROM users WHERE id = ?`)
+        .get(user_id);
 
-    const winValue = winUser.wins + 1;
-    const updateWins = db.prepare(`UPDATE users SET wins = ? WHERE id = ?`).run(winValue, user_id);
-
-    return reply.code(200).send({ updateWins });
+      const winValue = winUser.wins + 1;
+      const updateWins = db
+        .prepare(`UPDATE users SET wins = ? WHERE id = ?`)
+        .run(winValue, user_id);
+      return reply.code(200).send({ updateWins, gameEND });
+    } else {
+      return reply.code(400).send({ message: 'We are not in game' });
+    }
   } catch (err) {
-    console.error("Database error:", err.message);
-    return reply.code(500).send({ message: "Something went wrong" });
+    console.error('Database error:', err.message);
+    return reply.code(500).send({ message: 'Something went wrong' });
   }
 }
 
 export async function loseUser(req, reply) {
-    const { user_id } = req.body;
-  
-    try {
-      const loseUser = db.prepare(`SELECT * FROM users WHERE id = ?`).get(user_id);
+  const { user_id, challenge_id } = req.body;
 
-      const haha = loseUser.losses + 1;
+  try {
+    // const challenge_id = 1;
+    const gameEND = db
+      .prepare(
+        `UPDATE game SET losses_user_id = ?, date = ? WHERE challenge_id = ? `
+      )
+      .run(user_id, new Date().toISOString(), challenge_id);
+    if (gameEND.changes !== 0) {
+      const loseUser = db
+        .prepare(`SELECT * FROM users WHERE id = ?`)
+        .get(user_id);
+
+      const count = loseUser.losses + 1;
       const updateLoses = db
         .prepare(`UPDATE users SET losses = ? WHERE id = ?`)
-        .run(haha, user_id);
-  
-      return reply.code(200).send({ updateLoses });
-    } catch (err) {
-      console.error("Database error:", err.message);
-      return reply.code(500).send({ message: "Something went wrong" });
+        .run(count, user_id);
+
+      return reply.code(200).send({ updateLoses, gameEND });
+    } else {
+      return reply.code(400).send({ message: 'We are not in game' });
     }
+  } catch (err) {
+    console.error('Database error:', err.message);
+    return reply.code(500).send({ message: 'Something went wrong' });
   }
+}
+
   
 
 
@@ -11044,6 +12303,8 @@ const db = new Database("./database/database.db");
 // Ensure SQLite enforces foreign key constraints
 db.pragma('foreign_keys = ON');
 //nickname uniqy and email
+
+//time for game
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -11059,17 +12320,7 @@ db.exec(`
 `);
 console.log("Database initialized and users table is ready.");
 
-// const db = new Database("./database/friends.db");
-// db.exec(`
-//   CREATE TABLE IF NOT EXISTS friends (
-//     id INTEGER PRIMARY KEY AUTOINCREMENT,
-//     user_id INTEGER NOT NULL,
-//     friends_id INTEGER NOT NULL,
-//     confirmReq BOOL default 0,
-//     FOREIGN KEY (user_id) REFERENCES users(id),
-//     FOREIGN KEY (friends_id) REFERENCES users(id)
-//   );
-// `);
+
 db.exec(`
   CREATE TABLE IF NOT EXISTS favorites (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -11092,6 +12343,7 @@ db.exec(`
   );
 `);
 
+
 db.exec(`
   CREATE TABLE IF NOT EXISTS messages (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -11102,41 +12354,52 @@ db.exec(`
     created_at TEXT DEFAULT (datetime('now')),
     FOREIGN KEY (sender_id) REFERENCES users(id),
     FOREIGN KEY (receiver_id) REFERENCES users(id)
-  );
-`);
-
-// If the messages table existed before the blocked column was introduced,
-// add it so newer queries don't fail.
-const messageColumns = db.prepare('PRAGMA table_info(messages);').all();
-const hasBlockedColumn = messageColumns.some((c) => c.name === 'blocked');
-if (!hasBlockedColumn) {
-  db.exec('ALTER TABLE messages ADD COLUMN blocked BOOLEAN NOT NULL DEFAULT 0;');
-}
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS blocks (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    blocker_id INTEGER NOT NULL,
-    blocked_id INTEGER NOT NULL,
-    UNIQUE(blocker_id, blocked_id),
+    );
+    `);
+    
+    // If the messages table existed before the blocked column was introduced,
+    // add it so newer queries don't fail.
+    const messageColumns = db.prepare('PRAGMA table_info(messages);').all();
+    const hasBlockedColumn = messageColumns.some((c) => c.name === 'blocked');
+    if (!hasBlockedColumn) {
+      db.exec('ALTER TABLE messages ADD COLUMN blocked BOOLEAN NOT NULL DEFAULT 0;');
+    }
+    
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS blocks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        blocker_id INTEGER NOT NULL,
+        blocked_id INTEGER NOT NULL,
+        UNIQUE(blocker_id, blocked_id),
     FOREIGN KEY (blocker_id) REFERENCES users(id),
     FOREIGN KEY (blocked_id) REFERENCES users(id)
-  );
-`);
+    );
+    `);
+    
+    // Add indexes to optimize lookups by sender and receiver
+    db.exec("CREATE INDEX IF NOT EXISTS idx_messages_sender_id ON messages(sender_id);");
+    db.exec("CREATE INDEX IF NOT EXISTS idx_messages_receiver_id ON messages(receiver_id);");
+    db.exec("CREATE INDEX IF NOT EXISTS idx_blocks_blocker_id ON blocks(blocker_id);");
+    db.exec("CREATE INDEX IF NOT EXISTS idx_blocks_blocked_id ON blocks(blocked_id);");
+    
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS game (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        challenge_id INTEGER NOT NULL,
+        win_user_id INTEGER default 0,
+        losses_user_id INTEGER default 0,
+        date DATE,
+        FOREIGN KEY (challenge_id) REFERENCES challenge(id)
+      );
+    `);
+    
+    
+    console.log("Database initialized and favorites table is ready.");
+    
+    
+    
+    export default db;
 
-// Add indexes to optimize lookups by sender and receiver
-db.exec("CREATE INDEX IF NOT EXISTS idx_messages_sender_id ON messages(sender_id);");
-db.exec("CREATE INDEX IF NOT EXISTS idx_messages_receiver_id ON messages(receiver_id);");
-db.exec("CREATE INDEX IF NOT EXISTS idx_blocks_blocker_id ON blocks(blocker_id);");
-db.exec("CREATE INDEX IF NOT EXISTS idx_blocks_blocked_id ON blocks(blocked_id);");
-
-
-
-console.log("Database initialized and favorites table is ready.");
-
-
-
-export default db;
 
 
 
@@ -11148,9 +12411,12 @@ import {
   FIELD_HEIGHT,
   PADDLE_SPEED,
   BALL_SPEED,
+  BALL_SIZE,
   WINNING_SCORE,
 } from '../../shared/constants.js';
 import { createStateMessage, createEndMessage } from '../../shared/messages.js';
+import { DEFAULT_EFFECTS } from '../../shared/powerups.js';
+import { updatePowerUps, activatePowerUp as sharedActivatePowerUp } from '../../shared/powerupHelpers.js';
 import {
   setInterval,
   clearInterval,
@@ -11158,12 +12424,16 @@ import {
   clearTimeout,
 } from 'node:timers';
 
+
 function clamp(v, min, max) {
   return Math.min(max, Math.max(min, v));
 }
 
-function hitPaddle(ballX, ballZ, paddleX, paddleZ) {
-  return Math.abs(ballZ - paddleZ) < 2.5 && Math.abs(ballX - paddleX) < 1.0;
+function hitPaddle(ballX, ballZ, paddleX, paddleZ, scale = 1) {
+  return (
+    Math.abs(ballZ - paddleZ) < 1.5 * scale + 0.0 &&
+    Math.abs(ballX - paddleX) < 1.0
+  );
 }
 
 export function updateStats(winnerId, loserId) {
@@ -11183,7 +12453,7 @@ export function updateStats(winnerId, loserId) {
 }
 
 export class Game {
-  constructor(ws1, ws2) {
+  constructor(ws1, ws2, options = {}) {
     this.players = [ws1, ws2];
     this.leftInput = 0;
     this.rightInput = 0;
@@ -11191,15 +12461,37 @@ export class Game {
     this.rightZ = 0;
     this.ballX = 0;
     this.ballZ = 0;
-    this.ballDX = BALL_SPEED;
-    this.ballDZ = BALL_SPEED;
+    this.ballSpeed = options.ballSpeed ?? BALL_SPEED;
+    this.ballSize = options.ballSize ?? BALL_SIZE;
+    this.ballDX = this.ballSpeed;
+    this.ballDZ = this.ballSpeed;
     this.leftScore = 0;
     this.rightScore = 0;
+    this.winningScore = options.winningScore ?? WINNING_SCORE;
+    this.powerUpsEnabled = options.powerUps ?? false;
+    this.powerUps = { active: { left: null, right: null }, available: [] };
+    this.powerUpEffects = {
+      speed: { left: DEFAULT_EFFECTS.speed, right: DEFAULT_EFFECTS.speed },
+      scale: { left: DEFAULT_EFFECTS.scale, right: DEFAULT_EFFECTS.scale },
+      powerShot: {
+        left: DEFAULT_EFFECTS.powerShot,
+        right: DEFAULT_EFFECTS.powerShot,
+      },
+    };
+    this.ballPowered = false;
     this.interval = null;
     this.startTimeout = null;
     this.ballSpawnTimeout = null;
     this.ended = false;
   }
+
+
+
+  activatePowerUp(side, type, duration) {
+    if (!this.powerUpsEnabled) return;
+    sharedActivatePowerUp(this, side, type, duration);
+  }
+
 
   /**
    * Stop all running timers associated with the game instance.
@@ -11225,13 +12517,28 @@ export class Game {
   tick() {
     if (this.ended) return;
 
+    updatePowerUps(this, 1 / 60);
+
+    if (
+      !this.powerUpEffects.powerShot.left &&
+      !this.powerUpEffects.powerShot.right &&
+      this.ballPowered
+    ) {
+      this.ballDX = Math.sign(this.ballDX) * this.ballSpeed;
+      this.ballDZ = Math.sign(this.ballDZ) * this.ballSpeed;
+      this.ballPowered = false;
+    }
+
+    const leftSpeed = this.powerUpEffects.speed.left;
+    const rightSpeed = this.powerUpEffects.speed.right;
+
     this.leftZ = clamp(
-      this.leftZ + this.leftInput * PADDLE_SPEED,
+      this.leftZ + this.leftInput * PADDLE_SPEED * leftSpeed,
       -FIELD_HEIGHT + 1.5,
       FIELD_HEIGHT - 1.5,
     );
     this.rightZ = clamp(
-      this.rightZ + this.rightInput * PADDLE_SPEED,
+      this.rightZ + this.rightInput * PADDLE_SPEED * rightSpeed,
       -FIELD_HEIGHT + 1.5,
       FIELD_HEIGHT - 1.5,
     );
@@ -11252,11 +12559,39 @@ export class Game {
       this.resetBall();
     }
 
-    if (hitPaddle(this.ballX, this.ballZ, -FIELD_WIDTH + 1.5, this.leftZ) && this.ballDX < 0) {
+    if (
+      hitPaddle(
+        this.ballX,
+        this.ballZ,
+        -FIELD_WIDTH + 1.5,
+        this.leftZ,
+        this.powerUpEffects.scale.left,
+      ) &&
+      this.ballDX < 0
+    ) {
       this.ballDX = Math.abs(this.ballDX);
+      if (this.powerUpEffects.powerShot.left && !this.ballPowered) {
+        this.ballDX = Math.sign(this.ballDX) * this.ballSpeed * 2;
+        this.ballDZ = Math.sign(this.ballDZ) * this.ballSpeed * 2;
+        this.ballPowered = true;
+      }
     }
-    if (hitPaddle(this.ballX, this.ballZ, FIELD_WIDTH - 1.5, this.rightZ) && this.ballDX > 0) {
+    if (
+      hitPaddle(
+        this.ballX,
+        this.ballZ,
+        FIELD_WIDTH - 1.5,
+        this.rightZ,
+        this.powerUpEffects.scale.right,
+      ) &&
+      this.ballDX > 0
+    ) {
       this.ballDX = -Math.abs(this.ballDX);
+      if (this.powerUpEffects.powerShot.right && !this.ballPowered) {
+        this.ballDX = Math.sign(this.ballDX) * this.ballSpeed * 2;
+        this.ballDZ = Math.sign(this.ballDZ) * this.ballSpeed * 2;
+        this.ballPowered = true;
+      }
     }
 
     const state = {
@@ -11266,13 +12601,18 @@ export class Game {
       ballZ: this.ballZ,
       leftScore: this.leftScore,
       rightScore: this.rightScore,
+      activeLeft: this.powerUps.active.left ? this.powerUps.active.left.type : null,
+      activeRight: this.powerUps.active.right ? this.powerUps.active.right.type : null,
     };
 
     for (const p of this.players) {
       p.send(JSON.stringify(createStateMessage(state)));
     }
 
-    if (this.leftScore >= WINNING_SCORE || this.rightScore >= WINNING_SCORE) {
+    if (
+      this.leftScore >= this.winningScore ||
+      this.rightScore >= this.winningScore
+    ) {
       const winnerSide = this.leftScore > this.rightScore ? 'left' : 'right';
       const winnerIndex = winnerSide === 'left' ? 0 : 1;
       const loserIndex = winnerSide === 'left' ? 1 : 0;
@@ -11299,13 +12639,15 @@ export class Game {
     this.ballZ = 0;
     this.ballDX = 0;
     this.ballDZ = 0;
+    this.ballPowered = false;
     if (this.ballSpawnTimeout) clearTimeout(this.ballSpawnTimeout);
     this.ballSpawnTimeout = setTimeout(() => {
-      this.ballDX = BALL_SPEED * (Math.random() > 0.5 ? 1 : -1);
-      this.ballDZ = BALL_SPEED * (Math.random() > 0.5 ? 1 : -1);
+      this.ballDX = this.ballSpeed * (Math.random() > 0.5 ? 1 : -1);
+      this.ballDZ = this.ballSpeed * (Math.random() > 0.5 ? 1 : -1);
     }, 1000);
   }
 }
+
 
 
 
@@ -11321,8 +12663,8 @@ import { createInitMessage } from '../../shared/messages.js';
  * @param {import('ws').WebSocket} ws2 Right player socket
  * @returns {Game}
  */
-export function startGame(ws1, ws2) {
-  const game = new Game(ws1, ws2);
+export function startGame(ws1, ws2, settings) {
+  const game = new Game(ws1, ws2, settings);
   ws1.side = 'left';
   ws2.side = 'right';
   ws1.game = game;
@@ -11334,10 +12676,24 @@ export function startGame(ws1, ws2) {
   const startTime = serverTime + 5000;
 
   const initLeft = JSON.stringify(
-    createInitMessage('left', leftName, rightName, startTime, serverTime),
+    createInitMessage(
+      'left',
+      leftName,
+      rightName,
+      startTime,
+      serverTime,
+      settings,
+    ),
   );
   const initRight = JSON.stringify(
-    createInitMessage('right', leftName, rightName, startTime, serverTime),
+    createInitMessage(
+      'right',
+      leftName,
+      rightName,
+      startTime,
+      serverTime,
+      settings,
+    ),
   );
 
   ws1.send(initLeft);
@@ -11346,6 +12702,8 @@ export function startGame(ws1, ws2) {
 
   return game;
 }
+
+
 
 
 
@@ -11398,8 +12756,9 @@ export default class PlayerQueue {
 
 import { WebSocketServer } from 'ws';
 import { updateStats } from './gameLogic.js';
+import { POWER_UPS } from '../../shared/powerups.js';
 import PlayerQueue from './playerQueue.js';
-import { createEndMessage } from '../../shared/messages.js';
+import { createEndMessage, MessageTypes } from '../../shared/messages.js';
 import { startGame } from './gameStarter.js';
 import { broadcastSystemMessage } from '../chatWsServer.js';
 import { randomUUID } from 'crypto';
@@ -11416,6 +12775,32 @@ export function initWsServer() {
   const wss = new WebSocketServer({ noServer: true });
   const waiting = new PlayerQueue();
   const refreshInterval = SYSTEM_MESSAGE_TTL_MS - 1000;
+
+  function tryPairing(hostWs) {
+    if (!hostWs.ready) return false;
+    for (let i = 0; i < waiting.queue.length; i++) {
+      const cand = waiting.queue[i].ws;
+      if (cand === hostWs) continue;
+      if (cand.user_id === hostWs.user_id) continue;
+      waiting.queue.splice(i, 1);
+      waiting.remove(hostWs);
+      if (hostWs.waitingMessage) {
+        broadcastSystemMessage(hostWs.waitingMessage, { remove: true });
+        hostWs.waitingMessage = null;
+        if (hostWs.waitingRefresh) clearInterval(hostWs.waitingRefresh);
+        hostWs.waitingRefresh = null;
+      }
+      if (cand.waitingMessage) {
+        broadcastSystemMessage(cand.waitingMessage, { remove: true });
+        cand.waitingMessage = null;
+        if (cand.waitingRefresh) clearInterval(cand.waitingRefresh);
+        cand.waitingRefresh = null;
+      }
+      startGame(hostWs, cand, hostWs.settings);
+      return true;
+    }
+    return false;
+  }
 
   wss.on('connection', (ws, req) => {
     ws.id = randomUUID();
@@ -11458,10 +12843,25 @@ export function initWsServer() {
       } catch {
         return;
       }
+      if (msg.type === 'settings' && typeof msg.settings === 'object') {
+        ws.settings = msg.settings;
+        ws.ready = true;
+        tryPairing(ws);
+        return;
+      }
       const game = ws.game;
-      if (!game || msg.type !== 'input') return;
-      if (typeof msg.dir !== 'number' || ![-1, 0, 1].includes(msg.dir)) return;
-      game.handleInput(ws.side, msg.dir);
+      if (!game) return;
+      if (msg.type === 'input') {
+        if (typeof msg.dir !== 'number' || ![-1, 0, 1].includes(msg.dir)) return;
+        game.handleInput(ws.side, msg.dir);
+      } else if (msg.type === MessageTypes.POWER) {
+        if (typeof msg.power !== 'string') return;
+        const dur =
+          typeof msg.duration === 'number'
+            ? msg.duration
+            : undefined;
+        game.activatePowerUp(ws.side, msg.power, dur ?? POWER_UPS[msg.power]?.defaultDuration);
+      }
     });
 
     ws.on('close', () => {
@@ -11512,35 +12912,20 @@ export function initWsServer() {
       game.stop();
     });
 
-    if (waiting.size > 0) {
-      const other = waiting.dequeueDifferent(ws.user_id);
-      if (other) {
-        if (other.waitingMessage) {
-          broadcastSystemMessage(other.waitingMessage, { remove: true });
-          other.waitingMessage = null;
-          if (other.waitingRefresh) clearInterval(other.waitingRefresh);
-          other.waitingRefresh = null;
-        }
-        startGame(other, ws);
-      } else {
-        waiting.enqueue(ws);
-        const name = ws.username || `Player-${ws.user_id ?? ws.id}`;
-        ws.waitingMessage = {
-          id: randomUUID(),
-          type: 'waiting',
-          text: `${name} is waiting for an opponent`,
-          userId: ws.user_id,
-        };
-        broadcastSystemMessage(ws.waitingMessage, { excludeUsers: ws.user_id !== undefined ? [ws.user_id] : [] });
-        ws.waitingRefresh = setInterval(() => {
-          if (ws.waitingMessage) {
-            broadcastSystemMessage(ws.waitingMessage, { excludeUsers: ws.user_id !== undefined ? [ws.user_id] : [] });
-          } else if (ws.waitingRefresh) {
-            clearInterval(ws.waitingRefresh);
-          }
-        }, refreshInterval);
+    const readyHostIndex = waiting.queue.findIndex(
+      (p) => p.ws.ready && p.ws.user_id !== ws.user_id,
+    );
+    if (readyHostIndex !== -1) {
+      const host = waiting.queue.splice(readyHostIndex, 1)[0].ws;
+      if (host.waitingMessage) {
+        broadcastSystemMessage(host.waitingMessage, { remove: true });
+        host.waitingMessage = null;
+        if (host.waitingRefresh) clearInterval(host.waitingRefresh);
+        host.waitingRefresh = null;
       }
+      startGame(host, ws, host.settings);
     } else {
+      ws.ready = waiting.size > 0; // non-host players are ready
       waiting.enqueue(ws);
       const name = ws.username || `Player-${ws.user_id ?? ws.id}`;
       ws.waitingMessage = {
@@ -11557,11 +12942,20 @@ export function initWsServer() {
           clearInterval(ws.waitingRefresh);
         }
       }, refreshInterval);
+      const hostWaiting = waiting.queue.find(
+        (p) => p.ws !== ws && !p.ws.ready,
+      );
+      if (hostWaiting) {
+        try {
+          ws.send(JSON.stringify({ type: MessageTypes.WAIT }));
+        } catch {}
+      }
     }
   });
 
   return wss;
 }
+
 
 
 
@@ -11996,6 +13390,7 @@ export const ProfileSchema = z.object({
 // /home/ogoman/HIVE/Projects/ft_transcendence/server/schema/statisticSchema.js
 
 import { z } from "zod";
+// import { challenge } from "../controllers/challenge";
 
 export const statisticsSchema = z.object({
   user_id: z.number(),
@@ -12003,6 +13398,7 @@ export const statisticsSchema = z.object({
 
 export const winSchema = z.object({
   user_id: z.number(),
+  challenge_id:z.number()
 });
 
 
@@ -12354,7 +13750,9 @@ export const FIELD_WIDTH = 20;
 export const FIELD_HEIGHT = 10;
 export const PADDLE_SPEED = 0.3;
 export const BALL_SPEED = 0.25;
-export const WINNING_SCORE = 3;
+export const BALL_SIZE = 1;
+export const WINNING_SCORE = 7;
+
 
 
 
@@ -12369,6 +13767,18 @@ export interface RemoteState {
   rightPaddleZ: number;
   leftScore: number;
   rightScore: number;
+  activeLeft?: string | null;
+  activeRight?: string | null;
+}
+
+export interface RemoteSettings {
+  powerUps: boolean;
+  ballSpeed: number;
+  ballSize: number;
+  winningScore: number;
+  sound: boolean;
+  leftColor: string;
+  rightColor: string;
 }
 
 export interface InitMessage {
@@ -12378,6 +13788,7 @@ export interface InitMessage {
   rightName?: string;
   startTime?: number;
   serverTime?: number;
+  settings?: RemoteSettings;
 }
 
 export interface StateMessage {
@@ -12392,7 +13803,22 @@ export interface EndMessage {
   reason?: 'opponent_left';
 }
 
-export type ServerMessage = InitMessage | StateMessage | EndMessage;
+export interface PowerMessage {
+  type: 'power';
+  power: string;
+  duration?: number;
+}
+
+export interface WaitMessage {
+  type: 'wait';
+}
+
+export type ServerMessage =
+  | InitMessage
+  | StateMessage
+  | EndMessage
+  | PowerMessage
+  | WaitMessage;
 
 /**
  * Enum-like object with string constants for message types.
@@ -12401,6 +13827,8 @@ export const MessageTypes: {
   readonly INIT: 'init';
   readonly STATE: 'state';
   readonly END: 'end';
+  readonly POWER: 'power';
+  readonly WAIT: 'wait';
 };
 
 export function createInitMessage(
@@ -12409,6 +13837,7 @@ export function createInitMessage(
   rightName?: string,
   startTime?: number,
   serverTime?: number,
+  settings?: RemoteSettings,
 ): InitMessage;
 
 export function createStateMessage(state: RemoteState): StateMessage;
@@ -12418,6 +13847,147 @@ export function createEndMessage(
   state: RemoteState,
   reason?: 'opponent_left',
 ): EndMessage;
+
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/shared/powerupHelpers.js
+
+import { POWER_UPS, DEFAULT_EFFECTS } from './powerups.js';
+
+const SIDES = ['left', 'right'];
+
+function getActive(state, side) {
+  return state.powerUps.active[side];
+}
+
+function setActive(state, side, value) {
+  state.powerUps.active[side] = value;
+}
+
+export function applyEffects(state, side, effect) {
+  if (effect.speed !== undefined) state.powerUpEffects.speed[side] = effect.speed;
+  if (effect.scale !== undefined) state.powerUpEffects.scale[side] = effect.scale;
+  if (effect.powerShot !== undefined)
+    state.powerUpEffects.powerShot[side] = effect.powerShot;
+}
+
+export function removeEffects(state, side, effect) {
+  if (effect.speed !== undefined)
+    state.powerUpEffects.speed[side] = DEFAULT_EFFECTS.speed;
+  if (effect.scale !== undefined)
+    state.powerUpEffects.scale[side] = DEFAULT_EFFECTS.scale;
+  if (effect.powerShot !== undefined)
+    state.powerUpEffects.powerShot[side] = DEFAULT_EFFECTS.powerShot;
+}
+
+export function activatePowerUp(state, side, type, duration) {
+  if (!(duration > 0 && Number.isFinite(duration))) return false;
+  const info = POWER_UPS[type];
+  if (!info) return false;
+
+  const active = getActive(state, side);
+  if (active) removeEffects(state, side, POWER_UPS[active.type].effect);
+
+  setActive(state, side, { type, timer: duration });
+  applyEffects(state, side, info.effect);
+
+  return true;
+}
+
+export function updatePowerUps(state, dt) {
+  if (state.powerUpsEnabled === false) return;
+  let changed = false;
+  for (const side of SIDES) {
+    const active = getActive(state, side);
+    if (!active) continue;
+    active.timer = Math.max(active.timer - dt, 0);
+    if (active.timer === 0) {
+      removeEffects(state, side, POWER_UPS[active.type].effect);
+      setActive(state, side, null);
+      changed = true;
+    }
+  }
+  if (changed && typeof state.onPowerUpUpdate === 'function') {
+    state.onPowerUpUpdate(
+      getActive(state, 'left')?.type ?? null,
+      getActive(state, 'right')?.type ?? null,
+    );
+  }
+}
+
+export function resetPowerUps(state) {
+  let changed = false;
+  for (const side of SIDES) {
+    const active = getActive(state, side);
+    if (active) {
+      removeEffects(state, side, POWER_UPS[active.type].effect);
+      setActive(state, side, null);
+      changed = true;
+    }
+  }
+  if (state.powerUps && 'available' in state.powerUps) {
+    state.powerUps.available = [];
+  }
+  if (changed && typeof state.onPowerUpUpdate === 'function') {
+    state.onPowerUpUpdate(
+      getActive(state, 'left')?.type ?? null,
+      getActive(state, 'right')?.type ?? null,
+    );
+  }
+}
+
+
+
+
+// /home/ogoman/HIVE/Projects/ft_transcendence/shared/powerupHelpers.d.ts
+
+import type { EffectValues } from './powerups.js';
+
+export interface ActivePowerUp {
+  type: string;
+  timer: number;
+}
+
+export interface PowerUpContext {
+  powerUps: {
+    active: {
+      left: ActivePowerUp | null;
+      right: ActivePowerUp | null;
+    };
+    available: any[];
+  };
+  powerUpEffects: {
+    speed: { left: number; right: number };
+    scale: { left: number; right: number };
+    powerShot: { left: boolean; right: boolean };
+  };
+  powerUpsEnabled: boolean;
+  onPowerUpUpdate?: (left: string | null, right: string | null) => void;
+}
+
+export function applyEffects(
+  state: PowerUpContext,
+  side: 'left' | 'right',
+  effect: Partial<EffectValues>,
+): void;
+
+export function removeEffects(
+  state: PowerUpContext,
+  side: 'left' | 'right',
+  effect: Partial<EffectValues>,
+): void;
+
+export function activatePowerUp(
+  state: PowerUpContext,
+  side: 'left' | 'right',
+  type: string,
+  duration: number,
+): boolean;
+
+export function updatePowerUps(state: PowerUpContext, dt: number): void;
+
+export function resetPowerUps(state: PowerUpContext): void;
 
 
 
@@ -12442,6 +14012,8 @@ export function createEndMessage(
  * @property {number} rightPaddleZ
  * @property {number} leftScore
  * @property {number} rightScore
+ * @property {string | null} [activeLeft]
+ * @property {string | null} [activeRight]
  */
 
 /**
@@ -12462,14 +14034,21 @@ export function createEndMessage(
 
 /**
  * @typedef {object} EndMessage
- * @property {'end'} type
- * @property {Side} winner
- * @property {RemoteState} state
- * @property {'opponent_left'} [reason]
+  * @property {'end'} type
+  * @property {Side} winner
+  * @property {RemoteState} state
+  * @property {'opponent_left'} [reason]
  */
 
 /**
- * @typedef {InitMessage | StateMessage | EndMessage} ServerMessage
+ * @typedef {object} PowerMessage
+ * @property {'power'} type
+ * @property {string} power
+ * @property {number} [duration]
+ */
+
+/**
+ * @typedef {InitMessage | StateMessage | EndMessage | PowerMessage} ServerMessage
  */
 
 /**
@@ -12481,6 +14060,8 @@ export const MessageTypes = {
   INIT: 'init',
   STATE: 'state',
   END: 'end',
+  POWER: 'power',
+  WAIT: 'wait',
 };
 
 /**
@@ -12492,12 +14073,20 @@ export const MessageTypes = {
  * @param {number} [serverTime]
  * @returns {InitMessage}
  */
-export function createInitMessage(side, leftName, rightName, startTime, serverTime) {
+export function createInitMessage(
+  side,
+  leftName,
+  rightName,
+  startTime,
+  serverTime,
+  settings,
+) {
   const msg = { type: 'init', side };
   if (leftName) msg.leftName = leftName;
   if (rightName) msg.rightName = rightName;
   if (typeof startTime === 'number') msg.startTime = startTime;
   if (typeof serverTime === 'number') msg.serverTime = serverTime;
+  if (settings) msg.settings = settings;
   return msg;
 }
 
@@ -12522,3 +14111,4 @@ export function createEndMessage(winner, state, reason) {
     ? { type: 'end', winner, state, reason }
     : { type: 'end', winner, state };
 }
+
